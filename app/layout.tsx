@@ -33,14 +33,14 @@ const DIRECTION_CONTRACT = `<!--
 THESIS: A product page for an engineer: the estate Mihir runs drawn as a console
 service map, every number traceable to the infrastructure that produced it.
 Refuses the centred hero, skill-icon grid and screenshot cards.
-OWN-WORLD: Blue-tinted near-black, three lifted surfaces split by hairlines, one
-console blue for action, focus and lit paths; tech colours only as marks. Mona
-Sans speaks, Fragment Mono labels data.
+OWN-WORLD: Blue-tinted near-black, lifted surfaces split by hairlines, one console
+blue for action, focus and lit paths; tech colours only as marks. Mona Sans
+speaks, figures included; Fragment Mono only for the literal email.
 STORY: A recruiter reads name, role and six measured figures in ten seconds; a
 DevOps lead traces any figure to its path; both email or take the resume.
-FIRST VIEWPORT: Sticky nav. Left 5/12: name, role, positioning, View work and
-Download resume, copy email. Right 7/12: service map, control plane over Azure,
-AWS and AI zones. Below: the proof ledger, figure first, provenance beside it.
+FIRST VIEWPORT: Sticky nav. From xl, left 5/12: name, role, positioning, both
+actions, copy email; right 7/12: service map, build band over Azure, AWS and AI
+zones, observe band beneath. Below: the proof ledger, figure first.
 FORM: Service Map Console; candidate 1 of 7, IMPECCABLE'S PICK over roll
 assignment 6; seed key 957454d0.
 FINISH: unreviewed and undocumented is unfinished; this build ends with the

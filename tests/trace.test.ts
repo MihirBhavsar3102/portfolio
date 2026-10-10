@@ -73,6 +73,11 @@ describe("nextTraceState", () => {
     expect(nextTraceState(pinned, { type: "toggle", id: "a" })).toEqual(idle);
   });
 
+  it("keeps a keyboard preview when the pointer leaves a different figure", () => {
+    const focused = { active: "a", pinned: false };
+    expect(nextTraceState(focused, { type: "leave", id: "b" })).toEqual(focused);
+  });
+
   it("keeps a pinned figure through hover elsewhere ending", () => {
     const pinned = { active: "a", pinned: true };
     expect(nextTraceState(pinned, { type: "leave", id: "b" })).toEqual(pinned);

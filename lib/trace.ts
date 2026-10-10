@@ -58,7 +58,9 @@ export function nextTraceState(state: TraceState, event: TraceEvent): TraceState
     case "enter":
       return state.pinned ? state : { active: event.id, pinned: false };
     case "leave":
-      return state.pinned ? state : IDLE;
+      // Only the figure being previewed can end its own preview, so a pointer
+      // crossing another figure never clears what keyboard focus lit.
+      return state.pinned || state.active !== event.id ? state : IDLE;
     case "toggle":
       return state.pinned && state.active === event.id ? IDLE : { active: event.id, pinned: true };
     case "clear":

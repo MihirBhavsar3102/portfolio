@@ -51,6 +51,17 @@ export function TraceProvider({
     });
   }, [state.active]);
 
+  // Escape clears from anywhere on the page while something is lit — a pin
+  // outlives focus (click elsewhere, or Safari never focusing the button).
+  useEffect(() => {
+    if (state.active === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") dispatch({ type: "clear" });
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [state.active]);
+
   useEffect(() => {
     if (!restored.current) return;
     const next = traceHref(window.location.href, state.pinned ? state.active : null);
@@ -59,14 +70,7 @@ export function TraceProvider({
 
   return (
     <TraceContext.Provider value={{ state, send }}>
-      <div
-        ref={root}
-        className={className}
-        data-tracing={state.active ? "" : undefined}
-        onKeyDown={(e) => {
-          if (e.key === "Escape") send({ type: "clear" });
-        }}
-      >
+      <div ref={root} className={className} data-tracing={state.active ? "" : undefined}>
         {children}
       </div>
     </TraceContext.Provider>
