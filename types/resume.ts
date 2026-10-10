@@ -1,49 +1,114 @@
-export interface SocialLink {
+import type { TechId } from "@/lib/tech";
+
+/** A measured outcome. A number without its provenance is resume inflation. */
+export interface Figure {
+  /** As displayed, qualifiers included: "70%+", "~60%", "450+", "<30 min". */
+  value: string;
+  /** What the value measures, read straight after it. */
   label: string;
-  href: string;
+  /** How it was achieved, one sentence. */
+  provenance: string;
+  /** How it was measured — only when Mihir has said so. */
+  measuredHow?: string;
 }
 
-export interface ExperienceEntry {
-  role: string;
-  company: string;
-  location: string;
-  /** Mono timestamp shown in the log column, e.g. "2025-04 → present" */
-  stamp: string;
-  /** Human-readable range for screen readers and tooltips */
-  range: string;
-  current: boolean;
-  bullets: string[];
+export interface EstateNode {
+  id: string;
+  label: string;
+  /** Short second line, e.g. "autoscaling" or a count. */
+  meta?: string;
+  tech?: TechId;
 }
+
+/** A workload zone. Zones are siblings: no edge ever joins two workload zones. */
+export interface EstateZone {
+  id: "clients" | "azure" | "aws" | "ai";
+  label: string;
+  tech?: TechId;
+  nodes: EstateNode[];
+}
+
+export interface ControlLane {
+  id: "build" | "observe";
+  label: string;
+  nodes: EstateNode[];
+}
+
+/** An edge between node or zone ids. `source` cites where the relationship is stated. */
+export interface EstateEdge {
+  from: string;
+  to: string;
+  source: string;
+}
+
+/** A proof-strip figure and the topology ids its Trace lights. */
+export interface ProofItem {
+  id: string;
+  figure: Figure;
+  highlight: string[];
+}
+
+export interface Estate {
+  zones: EstateZone[];
+  controlPlane: ControlLane[];
+  edges: EstateEdge[];
+  proof: ProofItem[];
+}
+
+export interface Workstream {
+  name: string;
+  summary: string;
+  points: string[];
+  /** Slug of the case study that tells this workstream's story. */
+  caseStudy?: string;
+}
+
+export interface Role {
+  title: string;
+  company: string;
+  legalName: string;
+  location: string;
+  /** ISO month, e.g. "2024-12". A current role has no end. */
+  start: string;
+  workstreams: Workstream[];
+}
+
+export type ProjectKind = "work" | "personal";
 
 export interface Project {
+  slug: string;
+  title: string;
+  summary: string;
+  kind: ProjectKind;
+  /** What Mihir owned, one line. */
+  role: string;
+  repo?: { owner: string; name: string };
+  stack: TechId[];
+  /** First figure is the card's lead figure. */
+  figures: Figure[];
+  /** Pipeline stages, shown on a card that has no figure. */
+  stages?: string[];
+}
+
+export interface Skill {
   name: string;
-  description: string;
-  outcome: string;
-  stack: string[];
-  /** The system drawn left to right, one plate per stage of the real pipeline */
-  flow: string[];
-  /** Swap href for a real repo/demo URL when available */
-  link: { label: string; href: string };
-  inProduction?: boolean;
-  /** Case-study detail shown in the project dialog */
-  caseStudy: {
-    problem: string;
-    approach: string;
-    impact: string[];
-    metrics: { value: string; label: string }[];
-  };
+  detail?: string;
+  /** Links the skill to evidence in project and workstream stacks (Phase 3). */
+  tech?: TechId;
 }
 
 export interface SkillGroup {
-  /** Display label for the group, e.g. "IaC & Automation" */
-  key: string;
-  skills: string[];
-  /**
-   * The subset of `skills` that appears in the work documented on this site —
-   * the experience bullets, the projects, or the drawn estate. Derived from
-   * evidence already on the page, never a self-assessed proficiency rating.
-   */
-  shipped?: string[];
+  name: string;
+  skills: Skill[];
+}
+
+export interface Certification {
+  name: string;
+  code?: string;
+  issuerId: "aws" | "microsoft" | "google";
+  /** ISO month, e.g. "2025-06". */
+  earned?: string;
+  verifyUrl?: string;
 }
 
 export interface EducationEntry {
@@ -53,100 +118,44 @@ export interface EducationEntry {
   score: string;
 }
 
-export interface Certification {
-  name: string;
-  issuer: string;
-}
-
 export interface Achievement {
   title: string;
   detail: string;
 }
 
-/** One service plate sitting on a zone plane in the estate drawing. */
-export interface EstateNode {
-  id: string;
+export interface FeaturedRepo {
+  owner: string;
+  name: string;
+  /** Fallback description when the API is unavailable or the repo has none. */
+  blurb: string;
+  demonstrates: string;
+  /** Required for a fork to be shown: what Mihir added. */
+  contribution?: string;
+  /** Case-study slug this repo belongs to. */
+  project?: string;
+}
+
+export interface SocialLink {
   label: string;
-  /** Optional second line under the label, e.g. a count */
-  meta?: string;
-  icon: IconName;
+  href: string;
 }
-
-/** A zone of the estate, drawn as one isometric plane. */
-export interface EstatePlane {
-  id: string;
-  label: string;
-  note: string;
-  nodes: EstateNode[];
-}
-
-/**
- * A numbered operation on the drawing. `whole` is the original quantity the
- * work acted on and `remaining` is what is left of it — so every bar shows the
- * honest denominator, never only the flattering figure. Both are proportions
- * of the same original, which is what makes the four comparable.
- */
-export interface EstateFlow {
-  n: number;
-  /** Zone plane this operation acts on */
-  plane: string;
-  label: string;
-  detail: string;
-  /** The figured result, e.g. "40% faster" — a rate, not always a quantity */
-  headline: string;
-  /**
-   * What the solid span actually is: the share of `wholeLabel` taken away,
-   * stated in the same category as `remainingLabel` so the legend's three
-   * cells compare like with like. "40% faster" is a rate and cannot sit in a
-   * slot the key defines as a removed quantity.
-   */
-  removedLabel: string;
-  wholeLabel: string;
-  remainingLabel: string;
-  /** 0–1: the share of the original quantity still being spent */
-  remaining: number;
-}
-
-export interface Estate {
-  planes: EstatePlane[];
-  rail: { label: string; tools: string[] };
-  flows: EstateFlow[];
-}
-
-export type IconName =
-  | "clients"
-  | "users"
-  | "hostpool"
-  | "profiles"
-  | "vault"
-  | "identity"
-  | "compute"
-  | "balancer"
-  | "database"
-  | "edge"
-  | "service"
-  | "model"
-  | "chain"
-  | "vector";
 
 export interface Resume {
   name: string;
   role: string;
-  headline: string;
   location: string;
-  tagline: string;
-  /** The production estate, drawn as the sheet's reference architecture. */
-  estate: Estate;
-  about: string[];
-  quickFacts: { label: string; value: string }[];
+  /** Hero line, at most 30 words. */
+  positioning: string;
+  summary: string;
   email: string;
-  phone: string;
   resumeFile: string;
   socials: SocialLink[];
-  experience: ExperienceEntry[];
+  estate: Estate;
+  experience: Role[];
   projects: Project[];
   skillGroups: SkillGroup[];
-  education: EducationEntry[];
   certifications: Certification[];
+  education: EducationEntry[];
   achievements: Achievement[];
+  featuredRepos: FeaturedRepo[];
 }
