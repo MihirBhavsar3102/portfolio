@@ -6,9 +6,10 @@ import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 
 /*
- * Mona Sans speaks: headings, prose, interface, and the figures (set slightly
- * condensed through its width axis). Fragment Mono only labels data — units,
- * node names on the service map, exam codes — never prose, never chrome.
+ * Mona Sans speaks: headings, prose, interface, map labels, and the figures
+ * (set slightly condensed through its width axis). Fragment Mono is kept for
+ * literal, copyable strings — today only the email address — never prose,
+ * never chrome, never names dressed up to look technical.
  */
 const mona = Mona_Sans({
   subsets: ["latin"],
