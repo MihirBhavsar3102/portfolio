@@ -9,7 +9,8 @@ type Vars = CSSProperties & Record<`--${string}`, string | number>;
 /** Splits a two-or-more-word label into two balanced lines. */
 function twoLines(label: string): [string, string] {
   const words = label.split(" ");
-  const cut = Math.ceil(words.length / 2);
+  // Lighter first line: a short lead word, the rest beneath ("Concurrent" / "VDI users").
+  const cut = Math.max(1, Math.floor(words.length / 2));
   return [words.slice(0, cut).join(" "), words.slice(cut).join(" ")];
 }
 

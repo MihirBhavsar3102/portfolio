@@ -9,7 +9,8 @@ import type { Figure, Resume } from "@/types/resume";
 const fig = {
   deploy: {
     value: "40%",
-    label: "faster AVD deployments across clients, ~8 h → ~5 h",
+    // Non-breaking spaces keep each duration on one line.
+    label: "faster AVD deployments across clients, ~8\u00a0h\u00a0→ ~5\u00a0h",
     provenance: "PowerShell provisioning and Azure VM Image Builder golden images replaced the manual build.",
     measuredHow: "Timed the deployment task before and after automation.",
   },
