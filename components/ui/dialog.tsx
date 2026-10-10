@@ -19,9 +19,9 @@ type DialogVariant = "modal" | "sheet";
  */
 const variantClasses: Record<DialogVariant, string> = {
   modal:
-    "fixed left-1/2 top-1/2 z-50 max-h-[86vh] w-[calc(100%-1.5rem)] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto border border-rule bg-plate p-6 shadow-[0_28px_70px_-24px_rgb(11_31_51_/_0.5)] md:p-9",
+    "fixed left-1/2 top-1/2 z-50 max-h-[86vh] w-[calc(100%-1.5rem)] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg border border-line-strong bg-surface-1 p-6 shadow-[0_28px_70px_-24px_rgb(0_0_0/0.75)] md:p-9",
   sheet:
-    "fixed right-0 top-0 z-50 flex h-full w-80 max-w-[85vw] flex-col overflow-y-auto border-l border-rule bg-plate p-6",
+    "fixed right-0 top-0 z-50 flex h-full w-80 max-w-[85vw] flex-col overflow-y-auto border-l border-line bg-surface-1 p-6",
 };
 
 interface DialogContentProps extends ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
@@ -42,7 +42,7 @@ export function DialogContent({
 
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-field/70" />
+      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-canvas/80" />
       <DialogPrimitive.Content
         ref={contentRef}
         onOpenAutoFocus={(event) => {
@@ -62,7 +62,7 @@ export function DialogContent({
         {children}
         <DialogPrimitive.Close
           aria-label={closeLabel}
-          className="absolute right-4 top-4 flex size-8 items-center justify-center border border-rule text-ink-3 transition-colors hover:border-ink hover:text-ink"
+          className="absolute right-4 top-4 flex size-9 items-center justify-center rounded-md text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
         >
           <svg
             aria-hidden="true"
@@ -87,7 +87,7 @@ export function DialogTitle({
 }: ComponentPropsWithoutRef<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
-      className={`font-display text-2xl font-extrabold leading-[1.08] tracking-[-0.03em] md:text-3xl ${className ?? ""}`}
+      className={`text-xl font-semibold leading-tight tracking-[-0.02em] text-ink md:text-2xl ${className ?? ""}`}
       {...props}
     />
   );
@@ -99,7 +99,7 @@ export function DialogDescription({
 }: ComponentPropsWithoutRef<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
-      className={`text-[15px] leading-relaxed text-ink-2 ${className ?? ""}`}
+      className={`text-base leading-relaxed text-ink-2 ${className ?? ""}`}
       {...props}
     />
   );

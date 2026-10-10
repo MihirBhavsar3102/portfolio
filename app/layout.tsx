@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fragment_Mono, Mona_Sans } from "next/font/google";
-import { SiteNav } from "@/components/site-nav";
-import { SiteFooter } from "@/components/site-footer";
+import { SiteNav } from "@/components/site/site-nav";
+import { SiteFooter } from "@/components/site/site-footer";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 
