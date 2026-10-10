@@ -82,10 +82,10 @@ export function Topology() {
   const dataEdges = layout.edges.filter((e) => e.kind === "data");
   const delayOf = (key: string) => {
     const b = buildEdges.findIndex((e) => e.key === key);
-    if (b >= 0) return 640 + b * 50;
+    if (b >= 0) return 360 + b * 40;
     const o = observeEdges.findIndex((e) => e.key === key);
-    if (o >= 0) return 880 + o * 60;
-    return 720 + dataEdges.findIndex((e) => e.key === key) * 30;
+    if (o >= 0) return 520 + o * 50;
+    return 440 + dataEdges.findIndex((e) => e.key === key) * 25;
   };
 
   return (
@@ -96,7 +96,7 @@ export function Topology() {
       style={{ fontVariantNumeric: "tabular-nums" }}
     >
       {layout.lanes.map((lane, i) => (
-        <g key={lane.id} className="topo-in" style={{ "--d": `${i * 260}ms` } as Vars}>
+        <g key={lane.id} className="topo-in" style={{ "--d": `${i * 160}ms` } as Vars}>
           <rect x={lane.x + 0.5} y={lane.y + 0.5} width={lane.w - 1} height={lane.h - 1} rx={8} className="fill-surface-2 stroke-line" />
           <text x={lane.x + 14} y={lane.y + 20} className="fill-ink-3 font-sans" fontSize={11.5} fontWeight={500}>
             {lane.label}
@@ -108,7 +108,7 @@ export function Topology() {
       ))}
 
       {layout.zones.map((zone, i) => (
-        <g key={zone.id} className="topo-in" style={{ "--d": `${120 + i * 90}ms` } as Vars}>
+        <g key={zone.id} className="topo-in" style={{ "--d": `${60 + i * 60}ms` } as Vars}>
           <g data-lit-by={by(zone.id)} className="group">
             <rect
               x={zone.x + 0.5}

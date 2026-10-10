@@ -133,28 +133,29 @@
 }
 
 /*
- * The service map's one authored moment: the bands and zones settle, then the
- * edges draw out from the control plane like a rollout. Runs once on load,
- * from an already-correct resting state (`backwards` fill), in at most 1.6s.
- * Each element sets --d (delay) and edges set --len (path length).
+ * The service map's one authored moment: the bands and zones settle into
+ * place, then the edges draw out from the control plane like a rollout. Every
+ * node and label is visible from the first frame (the settle starts at 45%
+ * opacity, never 0); only the edges are drawn in. About 1.1s, once. Each
+ * element sets --d (delay) and edges set --len (path length).
  */
 @media (prefers-reduced-motion: no-preference) {
   .topo-in {
-    animation: topo-settle 640ms var(--ease-out-expo) backwards;
+    animation: topo-settle 520ms var(--ease-out-expo) backwards;
     animation-delay: var(--d, 0ms);
   }
 
   .topo-draw {
     stroke-dasharray: var(--len);
-    animation: topo-draw 560ms var(--ease-out-expo) backwards;
+    animation: topo-draw 480ms var(--ease-out-expo) backwards;
     animation-delay: var(--d, 0ms);
   }
 }
 
 @keyframes topo-settle {
   from {
-    opacity: 0;
-    transform: translateY(6px);
+    opacity: 0.45;
+    transform: translateY(4px);
   }
 }
 
