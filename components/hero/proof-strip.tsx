@@ -63,7 +63,7 @@ export function ProofStrip({ entries }: { entries: ProofEntry[] }) {
                 >
                   {entry.value}
                 </span>
-                <span className="mt-1.5 block text-[15px] leading-snug text-ink">{entry.label}</span>
+                <span className="mt-1.5 block text-base leading-snug text-ink">{entry.label}</span>
               </button>
 
               <p id={`proof-${entry.id}-how`} className="mt-2.5 text-sm leading-relaxed text-ink-2 xl:leading-[1.55]">

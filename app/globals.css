@@ -71,10 +71,10 @@
     color: var(--color-ink);
   }
 
+  /* The outline follows each element's own radius; never reshape it here. */
   :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 3px;
-    border-radius: 2px;
   }
 
   a {

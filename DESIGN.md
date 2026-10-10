@@ -179,7 +179,7 @@ A cool, blue-tinted near-black ramp with one saturated console blue; colour is s
 - **Figure** (600, 2.25rem, 1.0, -0.02em, width 88%; 32px at xl): measured values in the proof ledger. Turns Console Blue when its figure is active.
 - **Title** (600, 1rem): section headings such as "Measured outcomes" and "Service map". Dialog titles step up to 1.25–1.5rem, 600, -0.02em.
 - **Body Large** (400, 1.125rem, 1.625, max 42ch, Ink Two): the positioning paragraph.
-- **Body** (400, 0.875–0.9375rem, 1.55–1.625): claim lines (15px, Ink), provenance (14px, Ink Two), nav links, buttons (14px, 600).
+- **Body** (400, 0.875rem, 1.55–1.625): provenance (14px, Ink Two), nav links, buttons (14px, 600). Claim lines in the proof ledger take the Title size (16px, 400, Ink).
 - **Label** (400–500, 0.75–0.8125rem): zone notes, path lines, legends, footer note. Ink Three.
 - **Mono** (Fragment Mono 400, 13px): the email address inside the copy-email control, and nowhere else.
 
@@ -238,7 +238,7 @@ A joined pair inside one Surface One, 6px-radius container with a Hairline borde
 - **Internal Padding:** 10–20px; ledger cells 20px.
 
 ### Navigation
-Sticky, 56px, canvas at 85% with backdrop blur and a bottom hairline. The name sits left in 15px semibold Ink. Section links are 14px Ink Three, Ink on hover and when current (aria-current="location"); a 2px Console Blue underline glides between the current links on a 300ms expo-out transition. An outlined compact Resume button closes the row (12px × 6px, 14px medium). Below md the links collapse into a ghost menu button that opens a right-hand sheet: Surface One, left hairline, hairline-ruled 16px links that turn Console Blue on hover, then a full-width primary Download resume, the copy-email control and social links.
+Sticky, 56px, canvas at 85% with backdrop blur and a bottom hairline. The name sits left in 16px semibold Ink. Section links are 14px Ink Three, Ink on hover and when current (aria-current="location"); a 2px Console Blue underline glides between the current links on a 300ms expo-out transition. An outlined compact Resume button closes the row (12px × 6px, 14px medium). Below md the links collapse into a ghost menu button that opens a right-hand sheet: Surface One, left hairline, hairline-ruled 16px links that turn Console Blue on hover, then a full-width primary Download resume, the copy-email control and social links.
 
 ### Dialogs and Sheets
 Radix dialogs open and close without animation (a measured performance decision: Presence's animation detection made opens lag). Modal: centred, max 672px, Surface One, Strong Hairline border, 10px radius, Dialog lift shadow, over an 80% canvas overlay. Sheet: right edge, 320px (max 85vw). Close is a ghost icon button top right.
@@ -253,7 +253,7 @@ An SVG console drawing of the estate, framed in a Surface One panel with a capti
 - **Small screens:** below md, a ruled three-zone list (zone with tech dot, note, services, "Built with" and "Watched by") carrying the same Trace marks.
 
 ### Proof Ledger (signature)
-Six measured outcomes in a ruled 3×2 grid. Each cell is a sentence, not a tile: the Figure, a 15px Ink claim, then Ink Two provenance with an Ink Three "how measured" aside when known. Below md each cell also writes out its traced path in a 12px line that lights Console Blue with the figure.
+Six measured outcomes in a ruled 3×2 grid. Each cell is a sentence, not a tile: the Figure, a 16px Ink claim, then Ink Two provenance with an Ink Three "how measured" aside when known. Below md each cell also writes out its traced path in a 12px line that lights Console Blue with the figure.
 
 ### Trace (signature interaction)
 Hover or focus on a figure previews its path; click or tap pins it (aria-pressed), a second tap or Escape clears it; the pinned id is mirrored to `?trace=` so a link can carry it. While tracing, lit elements take Console Blue and every unlit traceable element dims to 30% opacity over 220ms expo-out. Every traceable element carries a `data-lit-by` attribute (empty when nothing lights it) so the whole drawing dims around the path. The active cell steps to Surface Two; a pinned cell adds a 1px inset Console Blue ring.
