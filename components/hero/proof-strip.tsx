@@ -23,8 +23,8 @@ export function ProofStrip({ entries }: { entries: ProofEntry[] }) {
   const { state, send } = useTrace();
 
   return (
-    <section aria-labelledby="proof-heading" className="mt-10 xl:mt-6">
-      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+    <section aria-labelledby="proof-heading" className="mt-10 xl:mt-5">
+      <div className="mb-2.5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
         <h2 id="proof-heading" className="text-base font-semibold text-ink">
           Measured outcomes
         </h2>
@@ -63,7 +63,7 @@ export function ProofStrip({ entries }: { entries: ProofEntry[] }) {
                 >
                   {entry.value}
                 </span>
-                <span className="mt-2 block text-[15px] leading-snug text-ink">{entry.label}</span>
+                <span className="mt-1.5 block text-[15px] leading-snug text-ink">{entry.label}</span>
               </button>
 
               <p id={`proof-${entry.id}-how`} className="mt-2.5 text-sm leading-relaxed text-ink-2 xl:leading-[1.55]">

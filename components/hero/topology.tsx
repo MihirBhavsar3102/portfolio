@@ -32,12 +32,12 @@ function NodeMark({ node, litIds }: { node: PlacedNode; litIds: string }) {
         className="fill-canvas stroke-line-strong transition-[fill,stroke] duration-200 group-data-lit:fill-accent-soft group-data-lit:stroke-accent"
         strokeWidth={1}
       />
-      <Dot x={x + 12} y={chip ? y + h / 2 : y + 13} techId={node.tech} />
-      <text x={x + 22} y={chip ? y + h / 2 + 4.75 : y + 17} className="fill-ink font-sans" fontSize={chip ? SIZE.chip : SIZE.label}>
+      <Dot x={x + 12} y={chip ? y + h / 2 : y + 14} techId={node.tech} />
+      <text x={x + 22} y={chip ? y + h / 2 + 4.75 : y + 18} className="fill-ink font-sans" fontSize={chip ? SIZE.chip : SIZE.label}>
         {node.label}
       </text>
       {!chip && node.meta && (
-        <text x={x + 22} y={y + 29.5} className="fill-ink-3 font-sans" fontSize={SIZE.meta}>
+        <text x={x + 22} y={y + 32.5} className="fill-ink-3 font-sans" fontSize={SIZE.meta}>
           {node.meta}
         </text>
       )}

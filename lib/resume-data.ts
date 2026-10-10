@@ -17,8 +17,7 @@ const fig = {
   manual: {
     value: "70%+",
     label: "less manual effort across 5 clients, with configuration errors near zero",
-    provenance:
-      "Azure DevOps pipelines run Terraform and PowerShell, joining the domain and pulling Key Vault secrets without a human step.",
+    provenance: "Azure DevOps pipelines run Terraform and PowerShell, with domain join and Key Vault secrets automated.",
     measuredHow: "Timed the task before and after automation.",
   },
   spend: {

@@ -66,9 +66,9 @@ const CHIP_H = 28;
 const BUS = 28; // gap between a band and the zones, where control edges run
 const ZONE_GAP = 12;
 const ZONE_INSET = 12; // node inset from a zone's sides
-const FIRST_NODE = 48; // first node's offset below a zone's top (clears label + note)
-const NODE_H = 35;
-const NODE_GAP = 8;
+const FIRST_NODE = 46; // first node's offset below a zone's top (clears label + note)
+const NODE_H = 39;
+const NODE_GAP = 6;
 const ZONE_BOTTOM = 12;
 
 /** Column widths in estate zone order. They sum, with the gaps, to WIDTH. */

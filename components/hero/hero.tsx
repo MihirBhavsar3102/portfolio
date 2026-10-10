@@ -41,7 +41,7 @@ export function Hero() {
 
   return (
     <div className="overflow-x-clip">
-      <TraceProvider ids={entries.map((e) => e.id)} className="mx-auto max-w-7xl px-5 pt-10 pb-16 sm:px-8 xl:pt-8">
+      <TraceProvider ids={entries.map((e) => e.id)} className="mx-auto max-w-7xl px-5 pt-10 pb-16 sm:px-8 xl:pt-6">
         <section aria-labelledby="hero-name" className="grid items-center gap-x-12 gap-y-10 xl:grid-cols-12">
           <div className="xl:col-span-5">
             <h1 id="hero-name" className="type-display text-display text-ink">
@@ -83,7 +83,7 @@ export function Hero() {
               className="pointer-events-none absolute -inset-x-16 -inset-y-20 -z-10 bg-[radial-gradient(50%_45%_at_55%_45%,rgb(76_141_255/0.09),transparent_75%)]"
             />
             <figure className="rounded-lg border border-line bg-surface-1">
-              <figcaption className="flex items-center justify-between gap-4 border-b border-line px-4 py-2.5">
+              <figcaption className="flex items-center justify-between gap-4 border-b border-line px-4 py-2">
                 <span className="text-sm font-medium text-ink-2">Service map</span>
                 <span aria-hidden="true" className="flex items-center gap-4 text-xs text-ink-3">
                   <span className="flex items-center gap-1.5">
@@ -96,7 +96,7 @@ export function Hero() {
                   </span>
                 </span>
               </figcaption>
-              <div className="p-3">
+              <div className="p-2.5">
                 <Topology />
               </div>
               <p className="sr-only">{mapSummary()}</p>
