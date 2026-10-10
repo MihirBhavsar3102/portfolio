@@ -32,14 +32,17 @@ describe("estate", () => {
     for (const e of estate.edges) {
       const a = workload(e.from);
       const b = workload(e.to);
-      if (a && b && a !== "clients" && b !== "clients") expect(a, `${e.from}->${e.to}`).toBe(b);
+      if (a && b) expect(a, `${e.from}->${e.to}`).toBe(b);
     }
   });
 
-  it("only connects clients to the Azure zone", () => {
-    for (const e of estate.edges) {
-      if (nodeZone.get(e.from) === "clients") expect(nodeZone.get(e.to) ?? e.to).toBe("azure");
-    }
+  it("draws exactly the three workloads, each with a plain-text note", () => {
+    expect(estate.zones.map((z) => z.id)).toEqual(["azure", "aws", "ai"]);
+    for (const z of estate.zones) expect(z.note?.trim(), z.id).toBeTruthy();
+  });
+
+  it("carries the client scale on the Azure zone, matching the resume", () => {
+    expect(estate.zones.find((z) => z.id === "azure")?.note).toBe("5 clients · 450+ concurrent users");
   });
 
   it("resolves every proof highlight", () => {

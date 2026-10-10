@@ -71,16 +71,9 @@ export const resume: Resume = {
   estate: {
     zones: [
       {
-        id: "clients",
-        label: "Clients",
-        nodes: [
-          { id: "clients-orgs", label: "Enterprise clients", meta: "5" },
-          { id: "clients-users", label: "Concurrent VDI users", meta: "450+" },
-        ],
-      },
-      {
         id: "azure",
         label: "Azure · Virtual Desktop",
+        note: "5 clients · 450+ concurrent users",
         tech: "azure",
         nodes: [
           { id: "host-pools", label: "Host pools", meta: "autoscaling", tech: "azure-virtual-desktop" },
@@ -93,6 +86,7 @@ export const resume: Resume = {
       {
         id: "aws",
         label: "AWS · Web platform",
+        note: "Multi-AZ WordPress in Terraform",
         tech: "aws",
         nodes: [
           { id: "cdn", label: "CloudFront + S3", tech: "cloudfront" },
@@ -105,6 +99,7 @@ export const resume: Resume = {
       {
         id: "ai",
         label: "AI · HR policy assistant",
+        note: "RAG over HR policy documents",
         nodes: [
           { id: "api", label: "FastAPI", tech: "fastapi" },
           { id: "orchestration", label: "LangChain", tech: "langchain" },
@@ -138,7 +133,6 @@ export const resume: Resume = {
       },
     ],
     edges: [
-      { from: "clients-users", to: "host-pools", source: "resume: AVD — 450+ concurrent VDI users on client host pools" },
       { from: "host-pools", to: "session-hosts", source: "resume: AVD — FSLogix profiles and host-pool autoscaling" },
       { from: "golden-images", to: "session-hosts", source: "resume: AVD — Image Builder golden-image pipelines" },
       { from: "cdn", to: "alb", source: "resume: AWS — multi-AZ WordPress architecture" },
@@ -161,7 +155,7 @@ export const resume: Resume = {
       { id: "deploy", figure: fig.deploy, highlight: ["golden-images", "session-hosts", "host-pools", "powershell"] },
       { id: "manual", figure: fig.manual, highlight: ["key-vault", "domain-join", "session-hosts", "azure-devops", "terraform", "powershell"] },
       { id: "spend", figure: fig.spend, highlight: ["host-pools", "asg"] },
-      { id: "users", figure: fig.users, highlight: ["clients-orgs", "clients-users", "host-pools", "session-hosts"] },
+      { id: "users", figure: fig.users, highlight: ["host-pools", "session-hosts"] },
       { id: "uptime", figure: fig.uptime, highlight: ["cdn", "alb", "asg", "rds"] },
       { id: "answers", figure: fig.answers, highlight: ["api", "orchestration", "retrieval", "inference"] },
     ],

@@ -18,13 +18,13 @@ function monthYear(iso: string) {
 /** One sentence a screen reader gets in place of the drawing. */
 function mapSummary() {
   const { estate } = resume;
-  const workloads = estate.zones.filter((z) => z.id !== "clients").map((z) => z.label.replace(" · ", ": "));
+  const workloads = estate.zones.map((z) => `${z.label.replace(" · ", ": ")} (${z.note})`);
   const lane = (id: string) =>
     estate.controlPlane
       .find((l) => l.id === id)
       ?.nodes.map((n) => n.label)
       .join(", ");
-  return `Service map. Three workloads — ${workloads.join("; ")} — serving 5 enterprise clients and 450+ concurrent VDI users. Built with ${lane("build")}. Watched by ${lane("observe")}.`;
+  return `Service map. Three workloads — ${workloads.join("; ")}. Built with ${lane("build")}. Watched by ${lane("observe")}.`;
 }
 
 export function Hero() {
@@ -41,9 +41,9 @@ export function Hero() {
 
   return (
     <div className="overflow-x-clip">
-      <TraceProvider ids={entries.map((e) => e.id)} className="mx-auto max-w-7xl px-5 pt-10 pb-16 sm:px-8 lg:pt-14">
-        <section aria-labelledby="hero-name" className="grid items-center gap-x-12 gap-y-10 lg:grid-cols-12">
-          <div className="lg:col-span-5">
+      <TraceProvider ids={entries.map((e) => e.id)} className="mx-auto max-w-7xl px-5 pt-10 pb-16 sm:px-8 xl:pt-8">
+        <section aria-labelledby="hero-name" className="grid items-center gap-x-12 gap-y-10 xl:grid-cols-12">
+          <div className="xl:col-span-5">
             <h1 id="hero-name" className="type-display text-display text-ink">
               {resume.name}
             </h1>
@@ -77,7 +77,7 @@ export function Hero() {
             <CopyEmailButton email={resume.email} className="mt-4" />
           </div>
 
-          <div className="relative hidden md:block lg:col-span-7">
+          <div className="relative hidden max-w-3xl md:block xl:col-span-7 xl:max-w-none">
             <div
               aria-hidden="true"
               className="pointer-events-none absolute -inset-x-16 -inset-y-20 -z-10 bg-[radial-gradient(50%_45%_at_55%_45%,rgb(76_141_255/0.09),transparent_75%)]"
@@ -96,7 +96,7 @@ export function Hero() {
                   </span>
                 </span>
               </figcaption>
-              <div className="p-3 lg:p-4">
+              <div className="p-3">
                 <Topology />
               </div>
               <p className="sr-only">{mapSummary()}</p>
@@ -104,8 +104,8 @@ export function Hero() {
           </div>
         </section>
 
-        <ProofStrip entries={entries} />
         <TopologyStack />
+        <ProofStrip entries={entries} />
       </TraceProvider>
     </div>
   );

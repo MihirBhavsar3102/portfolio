@@ -5,8 +5,8 @@ import { edgeKey, litBy, nextTraceState, readTraceParam, traceHref, tracedLabels
 const figure = { value: "1", label: "x", provenance: "y" };
 const estate: Estate = {
   zones: [
-    { id: "azure", label: "Azure", nodes: [{ id: "pool", label: "Pool" }, { id: "kv", label: "KV" }] },
-    { id: "aws", label: "AWS", nodes: [{ id: "alb", label: "ALB" }, { id: "rds", label: "RDS" }] },
+    { id: "azure", label: "Azure", note: "n", nodes: [{ id: "pool", label: "Pool" }, { id: "kv", label: "KV" }] },
+    { id: "aws", label: "AWS", note: "n", nodes: [{ id: "alb", label: "ALB" }, { id: "rds", label: "RDS" }] },
   ],
   controlPlane: [{ id: "build", label: "Build", nodes: [{ id: "ps", label: "PowerShell" }] }],
   edges: [

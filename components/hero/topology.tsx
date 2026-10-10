@@ -6,13 +6,12 @@ import { layoutTopology, type PlacedNode } from "@/components/hero/topology-layo
 
 type Vars = CSSProperties & Record<`--${string}`, string | number>;
 
-/** Splits a two-or-more-word label into two balanced lines. */
-function twoLines(label: string): [string, string] {
-  const words = label.split(" ");
-  // Lighter first line: a short lead word, the rest beneath ("Concurrent" / "VDI users").
-  const cut = Math.max(1, Math.floor(words.length / 2));
-  return [words.slice(0, cut).join(" "), words.slice(cut).join(" ")];
-}
+/*
+ * Type sizes are in viewBox units. The map renders at ~0.91× in the xl split
+ * column (its narrowest), so every size here is chosen to land at 11px or
+ * more on screen: 12.5 → ~11.4px, 14 → ~12.7px.
+ */
+const SIZE = { lane: 12.5, chip: 13.5, zone: 13.5, note: 12.5, label: 14, meta: 12.5 };
 
 function Dot({ x, y, techId }: { x: number; y: number; techId?: PlacedNode["tech"] }) {
   const color = techId ? tech[techId].color : undefined;
@@ -21,6 +20,7 @@ function Dot({ x, y, techId }: { x: number; y: number; techId?: PlacedNode["tech
 
 function NodeMark({ node, litIds }: { node: PlacedNode; litIds: string }) {
   const { x, y, w, h } = node;
+  const chip = node.variant === "chip";
   return (
     <g data-lit-by={litIds} className="group">
       <rect
@@ -32,34 +32,14 @@ function NodeMark({ node, litIds }: { node: PlacedNode; litIds: string }) {
         className="fill-canvas stroke-line-strong transition-[fill,stroke] duration-200 group-data-lit:fill-accent-soft group-data-lit:stroke-accent"
         strokeWidth={1}
       />
-      {node.variant === "count" ? (
-        <>
-          <text x={x + 10} y={y + 25} className="type-figure fill-ink font-sans" fontSize={19}>
-            {node.meta}
-          </text>
-          {twoLines(node.label).map((line, i) => (
-            <text key={line} x={x + 10} y={y + 39 + i * 11.5} className="fill-ink-3 font-sans" fontSize={10.5}>
-              {line}
-            </text>
-          ))}
-        </>
-      ) : (
-        <>
-          <Dot x={x + 12} y={y + (node.variant === "chip" ? h / 2 : 14)} techId={node.tech} />
-          <text
-            x={x + 22}
-            y={node.variant === "chip" ? y + h / 2 + 4.5 : y + 18}
-            className="fill-ink font-sans"
-            fontSize={node.variant === "chip" ? 12.5 : 13}
-          >
-            {node.label}
-          </text>
-          {node.variant === "service" && node.meta && (
-            <text x={x + 22} y={y + 31} className="fill-ink-3 font-mono" fontSize={10.5}>
-              {node.meta}
-            </text>
-          )}
-        </>
+      <Dot x={x + 12} y={chip ? y + h / 2 : y + 13} techId={node.tech} />
+      <text x={x + 22} y={chip ? y + h / 2 + 4.75 : y + 17} className="fill-ink font-sans" fontSize={chip ? SIZE.chip : SIZE.label}>
+        {node.label}
+      </text>
+      {!chip && node.meta && (
+        <text x={x + 22} y={y + 29.5} className="fill-ink-3 font-sans" fontSize={SIZE.meta}>
+          {node.meta}
+        </text>
       )}
     </g>
   );
@@ -77,8 +57,9 @@ export function Topology() {
   const lit = litBy(estate);
   const by = (id: string) => lit.get(id)?.join(" ") ?? "";
 
-  const buildEdges = layout.edges.filter((e) => e.kind === "control" && layout.lanes[0]?.nodes.some((n) => n.id === e.from));
-  const observeEdges = layout.edges.filter((e) => e.kind === "control" && !buildEdges.includes(e));
+  const buildIds = new Set(layout.lanes.find((l) => l.id === "build")?.nodes.map((n) => n.id));
+  const buildEdges = layout.edges.filter((e) => e.kind === "control" && buildIds.has(e.from));
+  const observeEdges = layout.edges.filter((e) => e.kind === "control" && !buildIds.has(e.from));
   const dataEdges = layout.edges.filter((e) => e.kind === "data");
   const delayOf = (key: string) => {
     const b = buildEdges.findIndex((e) => e.key === key);
@@ -89,16 +70,11 @@ export function Topology() {
   };
 
   return (
-    <svg
-      viewBox={`0 0 ${layout.width} ${layout.height}`}
-      aria-hidden="true"
-      className="block h-auto w-full"
-      style={{ fontVariantNumeric: "tabular-nums" }}
-    >
+    <svg viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true" className="block h-auto w-full">
       {layout.lanes.map((lane, i) => (
         <g key={lane.id} className="topo-in" style={{ "--d": `${i * 160}ms` } as Vars}>
           <rect x={lane.x + 0.5} y={lane.y + 0.5} width={lane.w - 1} height={lane.h - 1} rx={8} className="fill-surface-2 stroke-line" />
-          <text x={lane.x + 14} y={lane.y + 20} className="fill-ink-3 font-sans" fontSize={11.5} fontWeight={500}>
+          <text x={lane.x + 14} y={lane.y + 17} className="fill-ink-3 font-sans" fontSize={SIZE.lane} fontWeight={500}>
             {lane.label}
           </text>
           {lane.nodes.map((node) => (
@@ -118,15 +94,18 @@ export function Topology() {
               rx={8}
               className="fill-surface-2 stroke-line transition-[stroke] duration-200 group-data-lit:stroke-accent/45"
             />
-            {zone.tech && <Dot x={zone.x + 15} y={zone.y + 16} techId={zone.tech} />}
+            {zone.tech && <Dot x={zone.x + 15} y={zone.y + 15} techId={zone.tech} />}
             <text
               x={zone.x + (zone.tech ? 25 : 12)}
               y={zone.y + 20}
               className="fill-ink-2 font-sans"
-              fontSize={12}
+              fontSize={SIZE.zone}
               fontWeight={500}
             >
               {zone.label}
+            </text>
+            <text x={zone.x + 12} y={zone.y + 37} className="fill-ink-3 font-sans" fontSize={SIZE.note}>
+              {zone.note}
             </text>
           </g>
           {zone.nodes.map((node) => (

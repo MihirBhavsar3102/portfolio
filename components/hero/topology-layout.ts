@@ -16,7 +16,7 @@ export interface Rect {
   h: number;
 }
 
-export type NodeVariant = "chip" | "service" | "count";
+export type NodeVariant = "chip" | "service";
 
 export interface PlacedNode extends Rect {
   id: string;
@@ -29,6 +29,7 @@ export interface PlacedNode extends Rect {
 export interface PlacedZone extends Rect {
   id: string;
   label: string;
+  note: string;
   tech?: TechId;
   nodes: PlacedNode[];
 }
@@ -59,20 +60,19 @@ export interface TopologyLayout {
 const WIDTH = 720;
 const PAD = 14; // inner padding of a band
 const CHIP_GAP = 8;
-const BAND_H = 72; // label row + one chip row
-const CHIP_Y = 30; // chip top inside a band
+const BAND_H = 60; // label row + one chip row
+const CHIP_Y = 24; // chip top inside a band
 const CHIP_H = 28;
-const BUS = 32; // gap between a band and the zones, where control edges run
+const BUS = 28; // gap between a band and the zones, where control edges run
 const ZONE_GAP = 12;
 const ZONE_INSET = 12; // node inset from a zone's sides
-const FIRST_NODE = 30; // first node's offset below a zone's top (clears the label)
-const NODE_H = 38;
-const COUNT_H = 56;
-const NODE_GAP = 10;
-const ZONE_BOTTOM = 10;
+const FIRST_NODE = 48; // first node's offset below a zone's top (clears label + note)
+const NODE_H = 35;
+const NODE_GAP = 8;
+const ZONE_BOTTOM = 12;
 
 /** Column widths in estate zone order. They sum, with the gaps, to WIDTH. */
-const ZONE_W: Record<string, number> = { clients: 104, azure: 236, aws: 188, ai: 156 };
+const ZONE_W: Record<string, number> = { azure: 256, aws: 228, ai: 212 };
 
 interface Point {
   x: number;
@@ -93,8 +93,6 @@ function orth(points: Point[]): { d: string; length: number } {
   return { d, length };
 }
 
-const nodeHeight = (variant: NodeVariant) => (variant === "count" ? COUNT_H : NODE_H);
-
 function placeChips(nodes: EstateNode[], laneY: number): PlacedNode[] {
   const w = (WIDTH - 2 * PAD - (nodes.length - 1) * CHIP_GAP) / nodes.length;
   return nodes.map((n, i) => ({
@@ -114,23 +112,19 @@ export function layoutTopology(estate: Estate): TopologyLayout {
   // Zones: one row of columns below the build band.
   const zonesTop = BAND_H + BUS;
   const zoneHeight = Math.max(
-    ...estate.zones.map((z) => {
-      const variant: NodeVariant = z.id === "clients" ? "count" : "service";
-      return FIRST_NODE + z.nodes.length * nodeHeight(variant) + (z.nodes.length - 1) * NODE_GAP + ZONE_BOTTOM;
-    }),
+    ...estate.zones.map((z) => FIRST_NODE + z.nodes.length * NODE_H + (z.nodes.length - 1) * NODE_GAP + ZONE_BOTTOM),
   );
 
   let x = 0;
   const zones: PlacedZone[] = estate.zones.map((z) => {
     const w = ZONE_W[z.id];
-    const variant: NodeVariant = z.id === "clients" ? "count" : "service";
     let y = zonesTop + FIRST_NODE;
     const nodes = z.nodes.map((n) => {
-      const placed: PlacedNode = { ...n, variant, x: x + ZONE_INSET, y, w: w - 2 * ZONE_INSET, h: nodeHeight(variant) };
+      const placed: PlacedNode = { ...n, variant: "service", x: x + ZONE_INSET, y, w: w - 2 * ZONE_INSET, h: NODE_H };
       y += placed.h + NODE_GAP;
       return placed;
     });
-    const zone: PlacedZone = { id: z.id, label: z.label, tech: z.tech, x, y: zonesTop, w, h: zoneHeight, nodes };
+    const zone: PlacedZone = { id: z.id, label: z.label, note: z.note, tech: z.tech, x, y: zonesTop, w, h: zoneHeight, nodes };
     x += w + ZONE_GAP;
     return zone;
   });
@@ -186,18 +180,8 @@ export function layoutTopology(estate: Estate): TopologyLayout {
     const b = nodeById.get(e.to);
     if (!a || !b) throw new Error(`Topology edge ${key} has an endpoint the map cannot place`);
 
-    // Across the gap between two zones (clients → a workload).
-    if (a.zone.id !== b.zone.id) {
-      const [left, right] = a.zone.x < b.zone.x ? [a, b] : [b, a];
-      const mid = left.zone.x + left.zone.w + ZONE_GAP / 2;
-      const points = [
-        { x: left.node.x + left.node.w, y: left.node.y + left.node.h / 2 },
-        { x: mid, y: left.node.y + left.node.h / 2 },
-        { x: mid, y: right.node.y + right.node.h / 2 },
-        { x: right.node.x, y: right.node.y + right.node.h / 2 },
-      ];
-      return { key, from: e.from, to: e.to, kind: "data", ...orth(points) };
-    }
+    // Workloads are siblings; the content tests guarantee this never fires.
+    if (a.zone.id !== b.zone.id) throw new Error(`Topology edge ${key} joins two workloads`);
 
     const [upper, lower] = a.index < b.index ? [a, b] : [b, a];
 

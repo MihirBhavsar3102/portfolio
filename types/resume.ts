@@ -22,8 +22,10 @@ export interface EstateNode {
 
 /** A workload zone. Zones are siblings: no edge ever joins two workload zones. */
 export interface EstateZone {
-  id: "clients" | "azure" | "aws" | "ai";
+  id: "azure" | "aws" | "ai";
   label: string;
+  /** One plain-text line under the label: who it serves or what it is. */
+  note: string;
   tech?: TechId;
   nodes: EstateNode[];
 }
