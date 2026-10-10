@@ -1,21 +1,7 @@
-import { EstateSheet } from "@/components/estate-sheet";
-import { OperationsRecord } from "@/components/operations-record";
-import { Projects } from "@/components/projects";
-import { Experience } from "@/components/experience";
-import { Skills } from "@/components/skills";
-import { Credentials } from "@/components/education";
-import { Contact } from "@/components/contact";
-
+/**
+ * Phase 1 builds the page top-down: the hero lands in Task 9, the remaining
+ * sections in Phases 2–3.
+ */
 export default function Home() {
-  return (
-    <>
-      <EstateSheet />
-      <OperationsRecord />
-      <Projects />
-      <Experience />
-      <Skills />
-      <Credentials />
-      <Contact />
-    </>
-  );
+  return null;
 }

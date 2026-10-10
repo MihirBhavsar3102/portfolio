@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, Azeret_Mono } from "next/font/google";
-import { ThemeProvider } from "@/components/theme-provider";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { siteConfig } from "@/lib/site-config";
@@ -109,7 +108,6 @@ export default function RootLayout({
         {/* React cannot emit a bare comment node, so the contract rides in an
             empty hidden element as the document body's first child. */}
         <div hidden dangerouslySetInnerHTML={{ __html: DIRECTION_CONTRACT }} />
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <a href="#main" className="skip-link">
             Skip to content
           </a>
@@ -118,7 +116,6 @@ export default function RootLayout({
             {children}
           </main>
           <SiteFooter />
-        </ThemeProvider>
       </body>
     </html>
   );

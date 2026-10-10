@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { MobileNav } from "@/components/mobile-nav";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { resume } from "@/lib/resume-data";
 import { sections } from "@/lib/sections";
 
@@ -78,7 +77,6 @@ export function SiteNav() {
             ))}
           </nav>
 
-          <ThemeToggle />
 
           <a
             href={`mailto:${resume.email}?subject=${encodeURIComponent(
