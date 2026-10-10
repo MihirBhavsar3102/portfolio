@@ -2,17 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { MobileNav } from "@/components/mobile-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { resume } from "@/lib/resume-data";
+import { sections } from "@/lib/sections";
 
-const sections = [
-  { label: "About", id: "about" },
-  { label: "Experience", id: "experience" },
-  { label: "Projects", id: "projects" },
-  { label: "Skills", id: "skills" },
-  { label: "Contact", id: "contact" },
-];
-
-/** Tracks which section is currently in view to drive the active nav indicator. */
+/** Tracks which section is currently in view to drive the active nav rule. */
 function useActiveSection() {
   const [active, setActive] = useState<string | null>(null);
 
@@ -38,39 +33,63 @@ function useActiveSection() {
   return active;
 }
 
+/**
+ * The sheet's header strip. It sits on paper above the navy field rather than
+ * floating over it, so it never has to fight two grounds for legibility.
+ */
 export function SiteNav() {
   const active = useActiveSection();
   const reduceMotion = useReducedMotion();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-bg/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-6">
-        <a href="#" className="font-display text-base font-bold tracking-tight">
-          Mihir Bhavsar
+    <header className="sticky top-0 z-50 border-b border-rule bg-paper/92 backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-352 items-center justify-between gap-4 px-5 sm:px-8">
+        <a
+          href="#"
+          className="font-display text-[15px] font-extrabold tracking-[-0.02em] whitespace-nowrap"
+        >
+          {resume.name}
         </a>
-        <div className="flex items-center gap-6">
-          <nav aria-label="Sections" className="hidden items-center gap-1 md:flex">
+
+        <div className="flex items-center gap-1.5 md:gap-4">
+          <nav aria-label="Sections" className="hidden items-center md:flex">
             {sections.map((s) => (
               <a
                 key={s.id}
                 href={`#${s.id}`}
                 aria-current={active === s.id ? "location" : undefined}
-                className={`relative px-3 py-2 text-sm font-medium transition-colors ${
-                  active === s.id ? "text-ink" : "text-muted hover:text-ink"
+                className={`relative px-3 py-4 text-[12px] font-semibold uppercase tracking-widest transition-colors ${
+                  active === s.id ? "text-ink" : "text-ink-3 hover:text-ink"
                 }`}
               >
                 {s.label}
                 {active === s.id && (
                   <motion.span
-                    layoutId="nav-active-indicator"
-                    className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-accent"
-                    transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 30 }}
+                    layoutId="nav-active-rule"
+                    className="absolute inset-x-2 bottom-0 h-0.5 bg-signal"
+                    transition={
+                      reduceMotion
+                        ? { duration: 0 }
+                        : { type: "spring", stiffness: 380, damping: 30 }
+                    }
                   />
                 )}
               </a>
             ))}
           </nav>
+
           <ThemeToggle />
+
+          <a
+            href={`mailto:${resume.email}?subject=${encodeURIComponent(
+              "Cloud/DevOps role — let's talk"
+            )}`}
+            className="hidden bg-signal px-4 py-2.5 text-[12px] font-semibold uppercase tracking-widest text-signal-ink transition-colors hover:bg-ink lg:inline-flex"
+          >
+            Book a call
+          </a>
+
+          <MobileNav />
         </div>
       </div>
     </header>

@@ -1,52 +1,63 @@
-import { Reveal } from "@/components/reveal";
-import { Section } from "@/components/section";
-import { TimelineConnector } from "@/components/timeline-connector";
+import { Sheet } from "@/components/section";
 import { resume } from "@/lib/resume-data";
 
+/**
+ * The revision block: every drawing carries one, listing what changed and
+ * when. Dates hold their own ruled column so the record scans vertically
+ * before any prose is read.
+ */
 export function Experience() {
   return (
-    <Section id="experience" eyebrow="Experience" title="Where I've worked">
-      <ol>
-        {resume.experience.map((entry, i) => {
-          const isLast = i === resume.experience.length - 1;
-          return (
-            <li key={`${entry.role}-${entry.stamp}`} className="relative pl-9 pb-12 last:pb-0">
-              {!isLast && <TimelineConnector />}
-              <span
-                aria-hidden="true"
-                className={`absolute left-0 top-1.5 size-2.75 rounded-full ${
-                  entry.current ? "bg-accent" : "border-2 border-line bg-bg"
-                }`}
-              />
-              <Reveal delay={i * 0.05}>
-                <article aria-label={`${entry.role} at ${entry.company}, ${entry.range}`}>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                    <h3 className="font-display text-xl font-semibold tracking-tight">
-                      {entry.role}
-                    </h3>
-                    {entry.current && (
-                      <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-semibold text-accent">
-                        Current
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-1.5 text-sm text-muted">
-                    <span className="font-medium text-accent">{entry.company}</span> ·{" "}
-                    {entry.location} · <span title={entry.range}>{entry.stamp}</span>
-                  </p>
-                  <ul className="mt-4 max-w-3xl list-disc space-y-2.5 pl-5 marker:text-accent/70">
-                    {entry.bullets.map((bullet) => (
-                      <li key={bullet.slice(0, 32)} className="text-sm leading-relaxed text-muted">
-                        {bullet}
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              </Reveal>
-            </li>
-          );
-        })}
+    <Sheet
+      id="experience"
+      title="Service record"
+      intro="Where the estate above was actually built and run."
+    >
+      <ol className="border-t border-rule">
+        {resume.experience.map((entry) => (
+          <li
+            key={`${entry.role}-${entry.stamp}`}
+            className="grid gap-x-10 gap-y-5 border-b border-rule py-9 md:grid-cols-12"
+          >
+            <div className="md:col-span-3">
+              <p className="font-annot text-[12px] font-semibold tracking-[0.04em] text-ink">
+                <span className="sr-only">{entry.range}</span>
+                <span aria-hidden="true">{entry.stamp}</span>
+              </p>
+              {entry.current && (
+                <p className="mt-2.5 inline-flex items-center gap-2 font-annot text-[10px] font-semibold uppercase tracking-[0.16em] text-signal">
+                  <span aria-hidden="true" className="size-1.5 rounded-full bg-signal" />
+                  Current
+                </p>
+              )}
+              <p className="mt-3 font-annot text-[11px] text-ink-3">{entry.location}</p>
+            </div>
+
+            <div className="md:col-span-9">
+              <h3 className="font-display text-xl font-bold tracking-[-0.02em] md:text-2xl">
+                {entry.role}
+              </h3>
+              <p className="mt-1.5 font-annot text-[12px] uppercase tracking-[0.12em] text-signal">
+                {entry.company}
+              </p>
+              <ul className="mt-5 space-y-3">
+                {entry.bullets.map((bullet) => (
+                  <li
+                    key={bullet}
+                    className="flex max-w-[74ch] gap-4 text-[15px] leading-relaxed text-ink-2"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="mt-2.5 h-px w-4 shrink-0 bg-rule-strong"
+                    />
+                    {bullet}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        ))}
       </ol>
-    </Section>
+    </Sheet>
   );
 }

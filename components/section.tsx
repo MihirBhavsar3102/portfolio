@@ -1,35 +1,37 @@
 import type { ReactNode } from "react";
-import { Reveal } from "@/components/reveal";
 
-interface SectionProps {
+interface SheetProps {
   id: string;
-  eyebrow: string;
   title: string;
   intro?: string;
-  /** "alt" gives the section a tinted background — alternate for rhythm */
-  tone?: "default" | "alt";
+  /** "plate" lifts the sheet off the paper ground for rhythm */
+  tone?: "paper" | "plate";
   children: ReactNode;
 }
 
-export function Section({ id, eyebrow, title, intro, tone = "default", children }: SectionProps) {
+/**
+ * One sheet of the drawing set. The heading carries its own weight — there is
+ * no label above it — and the top rule is what separates one sheet from the
+ * next, in place of a card or a tinted band.
+ */
+export function Sheet({ id, title, intro, tone = "paper", children }: SheetProps) {
   return (
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className={tone === "alt" ? "bg-bg-alt" : undefined}
+      className={tone === "plate" ? "bg-plate" : "bg-paper"}
     >
-      <div className="mx-auto max-w-5xl px-6 py-20 md:py-24">
-        <Reveal>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{eyebrow}</p>
-          <h2
-            id={`${id}-title`}
-            className="mt-3 font-display text-3xl font-bold tracking-tight md:text-4xl"
-          >
-            {title}
-          </h2>
-          {intro && <p className="mt-4 max-w-2xl leading-relaxed text-muted">{intro}</p>}
-        </Reveal>
-        <div className="mt-10 md:mt-12">{children}</div>
+      <div className="mx-auto max-w-352 border-t border-rule-strong px-5 py-16 sm:px-8 md:py-20">
+        <h2
+          id={`${id}-title`}
+          className="max-w-[20ch] font-display text-[clamp(1.75rem,3.4vw,2.75rem)] font-extrabold leading-[1.03] tracking-[-0.03em] text-balance"
+        >
+          {title}
+        </h2>
+        {intro && (
+          <p className="mt-5 max-w-[68ch] text-[17px] leading-relaxed text-ink-2">{intro}</p>
+        )}
+        <div className="mt-10 md:mt-14">{children}</div>
       </div>
     </section>
   );

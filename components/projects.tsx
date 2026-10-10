@@ -1,63 +1,116 @@
-import { Reveal } from "@/components/reveal";
-import { Section } from "@/components/section";
+import { Pipeline } from "@/components/pipeline";
+import { CaseStudyDialog } from "@/components/project-dialog";
+import { Sheet } from "@/components/section";
 import { resume } from "@/lib/resume-data";
 
+/**
+ * One system earns the face-out slot at full width — the service that is
+ * actually running in production — and the rest sit behind it. An even grid of
+ * three would have said they weigh the same, and they do not.
+ */
 export function Projects() {
+  const [lead, ...rest] = resume.projects;
+
   return (
-    <Section id="projects" eyebrow="Projects" title="What I've built" tone="alt">
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {resume.projects.map((project, i) => (
-          <Reveal key={project.name} delay={i * 0.08} className="h-full">
-            <article className="group flex h-full flex-col rounded-2xl border border-line bg-panel p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="font-display text-lg font-semibold leading-snug tracking-tight">
-                  {project.name}
-                </h3>
-                {project.inProduction && (
-                  <span className="shrink-0 whitespace-nowrap rounded-full bg-accent/10 px-2.5 py-1 text-xs font-semibold text-accent">
-                    In production
-                  </span>
-                )}
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-muted">{project.description}</p>
-              <p className="mt-3 text-sm font-medium leading-relaxed">{project.outcome}</p>
-              <div className="mt-auto pt-5">
-                <ul aria-label="Tech stack" className="flex flex-wrap gap-1.5">
-                  {project.stack.map((tech) => (
-                    <li
-                      key={tech}
-                      className="rounded-full border border-line bg-bg px-2.5 py-1 text-xs text-muted"
-                    >
-                      {tech}
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href={project.link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${project.name} on ${project.link.label} (opens in new tab)`}
-                  className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-accent transition-colors hover:text-accent-strong"
+    <Sheet
+      id="projects"
+      title="Systems I've built"
+      intro="Three systems, each with the problem it solved, how it was assembled, and what changed once it ran. Open any one to read the full case study."
+      tone="plate"
+    >
+      <article className="on-field border border-rule-field bg-field text-on-field">
+        <div className="grid gap-8 p-6 sm:p-9 lg:grid-cols-12 lg:gap-10">
+          {/* No label above the heading — the production status is a field in
+              the metrics block below, where it is evidence rather than an eyebrow. */}
+          <div className="lg:col-span-5">
+            <h3 className="font-display text-[clamp(1.75rem,3.6vw,2.75rem)] font-extrabold leading-[1.02] tracking-[-0.035em] text-balance">
+              {lead.name}
+            </h3>
+            <p className="mt-5 max-w-[46ch] text-[15px] leading-relaxed text-on-field-2">
+              {lead.description}
+            </p>
+            <p className="mt-5 max-w-[46ch] text-[15px] font-medium leading-relaxed">
+              {lead.outcome}
+            </p>
+            <div className="mt-8">
+              <CaseStudyDialog project={lead} tone="field" />
+            </div>
+          </div>
+
+          <div className="lg:col-span-7">
+            <h4 className="font-annot text-[10px] uppercase tracking-[0.16em] text-on-field-2">
+              The system
+            </h4>
+            <div className="mt-4">
+              <Pipeline stages={lead.flow} tone="field" label={`${lead.name} pipeline`} />
+            </div>
+
+            <dl className="mt-9 grid gap-px border border-rule-field bg-rule-field sm:grid-cols-2">
+              {lead.caseStudy.metrics.map((metric) => (
+                <div key={metric.label} className="bg-field px-5 py-4">
+                  <dd className="font-display text-3xl font-extrabold tracking-[-0.03em] text-signal-field">
+                    {metric.value}
+                  </dd>
+                  <dt className="mt-1 font-annot text-[10px] uppercase tracking-[0.14em] text-on-field-2">
+                    {metric.label}
+                  </dt>
+                </div>
+              ))}
+            </dl>
+
+            <ul aria-label="Stack" className="mt-6 flex flex-wrap gap-1.5">
+              {lead.stack.map((tech) => (
+                <li
+                  key={tech}
+                  className="border border-rule-field px-2.5 py-1 font-annot text-[10px] text-on-field-2"
                 >
-                  View on {project.link.label}
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
-                  >
-                    <path d="M7 17 17 7M8 7h9v9" />
-                  </svg>
-                </a>
+                  {tech}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <div className="mt-px grid gap-px bg-rule md:grid-cols-2">
+        {rest.map((project) => (
+          <article key={project.name} className="flex flex-col bg-plate p-6 sm:p-8">
+            <h3 className="max-w-[22ch] font-display text-2xl font-bold leading-[1.1] tracking-[-0.03em]">
+              {project.name}
+            </h3>
+            <p className="mt-4 max-w-[52ch] text-[15px] leading-relaxed text-ink-2">
+              {project.description}
+            </p>
+            <p className="mt-4 max-w-[52ch] text-[15px] font-medium leading-relaxed">
+              {project.outcome}
+            </p>
+
+            <div className="mt-7">
+              <h4 className="font-annot text-[10px] uppercase tracking-[0.16em] text-ink-3">
+                The system
+              </h4>
+              <div className="mt-3">
+                <Pipeline stages={project.flow} label={`${project.name} pipeline`} />
               </div>
-            </article>
-          </Reveal>
+            </div>
+
+            <ul aria-label="Stack" className="mt-6 flex flex-wrap gap-1.5">
+              {project.stack.map((tech) => (
+                <li
+                  key={tech}
+                  className="border border-rule px-2.5 py-1 font-annot text-[10px] text-ink-3"
+                >
+                  {tech}
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-auto pt-8">
+              <CaseStudyDialog project={project} />
+            </div>
+          </article>
         ))}
       </div>
-    </Section>
+    </Sheet>
   );
 }

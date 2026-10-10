@@ -3,50 +3,108 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * Palette — sober navy + slate on white.
- * bg-alt tints alternate sections; the navy accent carries all emphasis.
+ * ── The plotted architecture sheet ──────────────────────────────────────────
+ * A reference-architecture poster: navy ink on cool plotter paper, zone fields
+ * that own whole regions, hairline rules instead of shadows, white plates that
+ * sit on the field like physical chips. Dark mode is the same poster plotted on
+ * a navy ground — chosen, not flipped.
  */
 :root {
-  --bg: #ffffff;
-  --bg-alt: #f7f9fb;
-  --panel: #ffffff;
-  --ink: #1c2733;
-  --muted: #526071;
-  --line: #e4e8ed;
-  --accent: #0f4c81; /* deep classic navy */
-  --accent-strong: #0a3a63; /* hover */
-  --accent-ink: #ffffff; /* text on accent */
+  --paper: #edf0f4; /* page ground — cool plotter stock */
+  --plate: #ffffff; /* raised plates sitting on the ground */
+  --field: #0b1f33; /* navy zone fields; carries whole regions */
+  --field-2: #123049; /* second step inside a field */
+  --ink: #0b1f33;
+  --ink-2: #46586b; /* secondary prose */
+  --ink-3: #55697d; /* drafting annotation — AA at body size */
+  --on-field: #e9eff6;
+  --on-field-2: #9cb3c8;
+  --rule: #cbd4de; /* hairline */
+  --rule-strong: #93a3b4;
+  --rule-field: #24405a; /* hairline drawn on a navy field */
+  --signal: #1b5e9e; /* live / current / energized — on paper */
+  --signal-ink: #ffffff;
+  /* The same role painted on a navy field: #1b5e9e reads ~2.5:1 there. */
+  --signal-field: #63a6e8;
+  --signal-field-ink: #0b1f33;
+  --ghost: #bcc8d6; /* the unlit remainder of a measured field */
+  --ghost-line: #93a3b4;
+
+  /* Isometric drawing: zone planes and the service plates standing on them */
+  --plane-face: #123049;
+  --plane-edge: #2c4d6d;
+  --plane-east: #0d2840;
+  --plane-south: #0a2034;
+  --plate-top: #e9eff6;
+  --plate-east: #a9bdd2;
+  --plate-south: #85a0bb;
+  --plate-edge: #ffffff;
 }
 
 .dark {
-  --bg: #0d141c;
-  --bg-alt: #111a24;
-  --panel: #16202c;
-  --ink: #e7ecf1;
-  --muted: #97a4b2;
-  --line: #26313e;
-  --accent: #7fb0e0; /* muted steel blue */
-  --accent-strong: #a3c8ec;
-  --accent-ink: #0d141c;
+  --paper: #071320;
+  --plate: #0e2032;
+  --field: #04101b;
+  --field-2: #0e2032;
+  --ink: #e6edf5;
+  --ink-2: #9fb2c6;
+  --ink-3: #8296ab;
+  --on-field: #e6edf5;
+  --on-field-2: #9fb2c6;
+  --rule: #1c3145;
+  --rule-strong: #33506b;
+  --rule-field: #1c3145;
+  /*
+   * In dark these two are deliberately the same value: the field and the paper
+   * are already close enough in luminance that one blue clears AA on both.
+   * They stay separate declarations so that darkening --signal here can never
+   * silently drag the on-field register down with it.
+   */
+  --signal: #63a6e8;
+  --signal-ink: #04101b;
+  --signal-field: #63a6e8;
+  --signal-field-ink: #04101b;
+  --ghost: #24405a;
+  --ghost-line: #33506b;
+
+  --plane-face: #0e2032;
+  --plane-edge: #24405a;
+  --plane-east: #0a1927;
+  --plane-south: #06121d;
+  --plate-top: #dbe6f2;
+  --plate-east: #93aac4;
+  --plate-south: #6b87a4;
+  --plate-edge: #f2f7fc;
 }
 
 @theme inline {
-  --color-bg: var(--bg);
-  --color-bg-alt: var(--bg-alt);
-  --color-panel: var(--panel);
+  --color-paper: var(--paper);
+  --color-plate: var(--plate);
+  --color-field: var(--field);
+  --color-field-2: var(--field-2);
   --color-ink: var(--ink);
-  --color-muted: var(--muted);
-  --color-line: var(--line);
-  --color-accent: var(--accent);
-  --color-accent-strong: var(--accent-strong);
-  --color-accent-ink: var(--accent-ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-on-field: var(--on-field);
+  --color-on-field-2: var(--on-field-2);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-rule-field: var(--rule-field);
+  --color-signal: var(--signal);
+  --color-signal-ink: var(--signal-ink);
+  --color-signal-field: var(--signal-field);
+  --color-signal-field-ink: var(--signal-field-ink);
+  --color-ghost: var(--ghost);
 
-  --font-display: var(--font-schibsted);
-  --font-sans: var(--font-inter);
+  --font-display: var(--font-archivo);
+  --font-sans: var(--font-archivo);
+  --font-annot: var(--font-azeret);
 }
 
 html {
-  scroll-padding-top: 5rem;
+  scroll-padding-top: 5.5rem;
+  /* Deliberately NOT scrollbar-gutter: stable — Radix's scroll lock already
+     pads the body, and combining the two shifts centred content by ~7px. */
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -56,18 +114,60 @@ html {
 }
 
 body {
-  background: var(--bg);
+  background: var(--paper);
   color: var(--ink);
+  /* Drafting figures line up in columns everywhere; browsers default to
+     proportional numerals, which is the tell that nobody set them. */
+  font-variant-numeric: tabular-nums;
 }
 
+/* ── Browser surfaces ─────────────────────────────────────────────────────
+   The parts we did not draw still carry the design. */
 ::selection {
-  background: color-mix(in srgb, var(--accent) 25%, transparent);
+  background: var(--signal);
+  color: var(--signal-ink);
+}
+
+:root {
+  caret-color: var(--signal);
+  scrollbar-color: var(--rule-strong) transparent;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--rule-strong);
+  border: 3.5px solid var(--paper);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-3);
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 2px;
+  outline: 2px solid var(--signal);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+/* On a navy field the navy focus ring disappears — invert it there. */
+.on-field :focus-visible,
+.on-field:focus-visible {
+  outline-color: var(--on-field);
+}
+
+a {
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: from-font;
 }
 
 /* Skip link — visible only on keyboard focus */
@@ -77,29 +177,142 @@ body {
   left: 1rem;
   z-index: 100;
   padding: 0.5rem 1rem;
-  background: var(--accent);
-  color: var(--accent-ink);
-  border-radius: 9999px;
-  font-size: 0.875rem;
+  background: var(--signal);
+  color: var(--signal-ink);
+  font-family: var(--font-annot);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .skip-link:focus {
   top: 1rem;
 }
 
-/* Blinking caret for the hero typewriter */
-@keyframes cursor-blink {
-  50% {
+/* ── Drafting materials ───────────────────────────────────────────────────── */
+
+/* The unlit remainder of a measured field: present, hatched, never invented. */
+.ghost-hatch {
+  background-color: var(--ghost);
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--ghost-line) 0 1px,
+    transparent 1px 5px
+  );
+}
+
+/* A sheet's ruled grid, drawn faintly on the navy field like plotter guides. */
+.sheet-grid {
+  background-image:
+    linear-gradient(to right, var(--rule-field) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--rule-field) 1px, transparent 1px);
+  background-size: 56px 56px;
+  background-position: center;
+  opacity: 0.5;
+}
+
+/* ── Motion ───────────────────────────────────────────────────────────────
+   One authored moment: the estate energizes as the sheet lands. Every
+   animated element's resting state IS its default, so content is present
+   with JS off, with motion reduced, and before the animation runs. */
+@keyframes plane-settle {
+  from {
     opacity: 0;
+    transform: translateY(18px);
   }
 }
 
-.cursor-blink {
-  animation: cursor-blink 1s step-end infinite;
+@keyframes rail-draw {
+  from {
+    stroke-dashoffset: var(--rail-length, 600);
+  }
+}
+
+@keyframes disc-land {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+.energize-plane {
+  animation: plane-settle 760ms cubic-bezier(0.16, 0.84, 0.3, 1) backwards;
+  animation-delay: var(--stagger, 0ms);
+}
+
+.energize-rail {
+  stroke-dasharray: var(--rail-length, 600);
+  animation: rail-draw 900ms cubic-bezier(0.16, 0.84, 0.3, 1) backwards;
+}
+
+.energize-disc {
+  animation: disc-land 420ms cubic-bezier(0.16, 0.84, 0.3, 1) backwards;
+  animation-delay: var(--stagger, 0ms);
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cursor-blink {
+  .energize-plane,
+  .energize-rail,
+  .energize-disc {
     animation: none;
+  }
+}
+
+/*
+ * Radix popup motion, used only on the small popups (menu, tooltip, toast).
+ * The dialog and sheet are deliberately un-animated: Radix's Presence calls
+ * getComputedStyle() on animated nodes to know when it may unmount, and on a
+ * large subtree those forced style recalcs cost more than the animation is
+ * worth. Radix keeps an element mounted until its CSS animation finishes, so
+ * exit states animate from [data-state="closed"] with no forceMount plumbing.
+ */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes pop-out {
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.anim-pop[data-state="open"] {
+  animation: pop-in 140ms cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+.anim-pop[data-state="closed"] {
+  animation: pop-out 110ms ease-in;
+}
+
+.anim-toast[data-state="open"] {
+  animation: toast-in 220ms cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+.anim-toast[data-state="closed"] {
+  animation: toast-out 160ms ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-pop,
+  .anim-toast {
+    animation: none !important;
   }
 }
