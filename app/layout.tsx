@@ -1,26 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Azeret_Mono } from "next/font/google";
+import { Fragment_Mono, Mona_Sans } from "next/font/google";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 
 /*
- * Archivo carries the plates and the prose — a grotesque with a width axis, so
- * the display sizes can be set slightly expanded like poster lettering without
- * a second family. Azeret Mono is the drafting hand: annotation, ratings,
- * callout numbers and tabular figures only, never prose and never code.
+ * Mona Sans speaks: headings, prose, interface, and the figures (set slightly
+ * condensed through its width axis). Fragment Mono only labels data — units,
+ * node names on the service map, exam codes — never prose, never chrome.
  */
-const archivo = Archivo({
+const mona = Mona_Sans({
   subsets: ["latin"],
-  variable: "--font-archivo",
+  variable: "--font-mona",
   display: "swap",
   axes: ["wdth"],
 });
 
-const azeret = Azeret_Mono({
+const fragment = Fragment_Mono({
   subsets: ["latin"],
-  variable: "--font-azeret",
+  weight: "400",
+  variable: "--font-fragment",
   display: "swap",
 });
 
@@ -58,10 +58,10 @@ export const metadata: Metadata = {
     "DevOps Engineer",
     "Azure Virtual Desktop",
     "Terraform",
-    "PowerShell",
     "AWS",
+    "CI/CD",
+    "Kubernetes",
     "RAG",
-    "Infrastructure as Code",
     "Ahmedabad",
   ],
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
@@ -86,10 +86,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#edf0f4" },
-    { media: "(prefers-color-scheme: dark)", color: "#071320" },
-  ],
+  themeColor: "#0a0d12",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
@@ -98,23 +96,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={`${archivo.variable} ${azeret.variable} h-full antialiased`}
-    >
-      <body className="flex min-h-full flex-col font-sans">
+    <html lang="en" className={`${mona.variable} ${fragment.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col">
         {/* React cannot emit a bare comment node, so the contract rides in an
             empty hidden element as the document body's first child. */}
         <div hidden dangerouslySetInnerHTML={{ __html: DIRECTION_CONTRACT }} />
-          <a href="#main" className="skip-link">
-            Skip to content
-          </a>
-          <SiteNav />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <SiteFooter />
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
+        <SiteNav />
+        <main id="main" className="flex-1">
+          {children}
+        </main>
+        <SiteFooter />
       </body>
     </html>
   );
