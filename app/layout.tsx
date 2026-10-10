@@ -29,20 +29,19 @@ const azeret = Azeret_Mono({
  * can be audited against the decision it was built from.
  */
 const DIRECTION_CONTRACT = `<!--
-THESIS: One career drawn as a published reference architecture — zones, numbered
-flows, legend, title block — refusing the centred hero and card grid this
-category always ships.
-OWN-WORLD: A plotted architecture sheet. Cool paper ground, deep navy ink, navy
-zone fields owning whole regions, hairline rules instead of shadows, white
-service plates with extruded edges, Archivo plates, Azeret Mono annotation.
-STORY: A recruiter reads the drawing and the title block in under a minute and
-acts; an engineer opens any system into its own detail sheet.
-FIRST VIEWPORT: Full-bleed navy field. Isometric estate of four stacked zone
-planes right, automation rail and numbered callouts down its left edge; white
-title block plate lower left carrying name, role, both actions and the record
-strip; numbered operations legend ruled across the foot.
-FORM: Reference architecture poster; candidate 1 of 7 on the grounded list,
-taken as IMPECCABLE'S PICK over roll assignment 7; seed key 7543e52e.
+THESIS: A product page for an engineer: the estate Mihir runs drawn as a console
+service map, every number traceable to the infrastructure that produced it.
+Refuses the centred hero, skill-icon grid and screenshot cards.
+OWN-WORLD: Blue-tinted near-black, three lifted surfaces split by hairlines, one
+console blue for action, focus and lit paths; tech colours only as marks. Mona
+Sans speaks, Fragment Mono labels data.
+STORY: A recruiter reads name, role and six measured figures in ten seconds; a
+DevOps lead traces any figure to its path; both email or take the resume.
+FIRST VIEWPORT: Sticky nav. Left 5/12: name, role, positioning, View work and
+Download resume, copy email. Right 7/12: service map, control plane over Azure,
+AWS and AI zones. Below: the proof ledger, figure first, provenance beside it.
+FORM: Service Map Console; candidate 1 of 7, IMPECCABLE'S PICK over roll
+assignment 6; seed key 957454d0.
 FINISH: unreviewed and undocumented is unfinished; this build ends with the
 finish review, the verdict, and DESIGN.md
 -->`;
