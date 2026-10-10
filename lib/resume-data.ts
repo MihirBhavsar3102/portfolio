@@ -117,9 +117,11 @@ export const resume: Resume = {
         id: "build",
         label: "Build and ship",
         nodes: [
-          { id: "terraform", label: "Terraform", tech: "terraform" },
+          // Ordered so Terraform, which feeds both clouds, sits between the
+          // Azure-only and AWS-only tools and no control edge crosses another.
           { id: "powershell", label: "PowerShell", tech: "powershell" },
           { id: "azure-devops", label: "Azure DevOps", tech: "azure-devops" },
+          { id: "terraform", label: "Terraform", tech: "terraform" },
           { id: "github-actions", label: "GitHub Actions", tech: "github-actions" },
           { id: "ansible", label: "Ansible", tech: "ansible" },
         ],

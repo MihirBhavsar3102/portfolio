@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Estate } from "@/types/resume";
-import { edgeKey, litBy, nextTraceState, traceSelection } from "@/lib/trace";
+import { edgeKey, litBy, nextTraceState, readTraceParam, traceHref, tracedLabels, traceSelection } from "@/lib/trace";
 
 const figure = { value: "1", label: "x", provenance: "y" };
 const estate: Estate = {
@@ -85,5 +85,36 @@ describe("nextTraceState", () => {
 
   it("clears everything on escape", () => {
     expect(nextTraceState({ active: "a", pinned: true }, { type: "clear" })).toEqual(idle);
+  });
+});
+
+describe("readTraceParam", () => {
+  it("returns a known proof id from the query string", () => {
+    expect(readTraceParam("?trace=b", ["a", "b"])).toBe("b");
+  });
+
+  it("ignores an unknown or missing id", () => {
+    expect(readTraceParam("?trace=zzz", ["a", "b"])).toBeNull();
+    expect(readTraceParam("", ["a", "b"])).toBeNull();
+  });
+});
+
+describe("traceHref", () => {
+  it("writes the pinned id into the query and keeps the hash", () => {
+    expect(traceHref("https://x.dev/?a=1#work", "b")).toBe("https://x.dev/?a=1&trace=b#work");
+  });
+
+  it("removes the param when nothing is pinned", () => {
+    expect(traceHref("https://x.dev/?trace=b", null)).toBe("https://x.dev/");
+  });
+});
+
+describe("tracedLabels", () => {
+  it("names the nodes and tools a figure lights, in map order, without zones", () => {
+    expect(tracedLabels(estate, "a")).toEqual(["Pool", "PowerShell"]);
+  });
+
+  it("is empty for an unknown figure", () => {
+    expect(tracedLabels(estate, "nope")).toEqual([]);
   });
 });

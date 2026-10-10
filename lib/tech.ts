@@ -8,7 +8,7 @@ export interface TechInfo {
   color?: string;
 }
 
-export const tech = {
+const registry = {
   aws: { name: "AWS", color: "#FF9900" },
   azure: { name: "Azure", color: "#0078D4" },
   gcp: { name: "Google Cloud", color: "#4285F4" },
@@ -48,4 +48,7 @@ export const tech = {
   llama: { name: "Llama", color: "#0467DF" },
 } satisfies Record<string, TechInfo>;
 
-export type TechId = keyof typeof tech;
+export type TechId = keyof typeof registry;
+
+/** Widened so every entry reads as a TechInfo, colour optional. */
+export const tech: Record<TechId, TechInfo> = registry;

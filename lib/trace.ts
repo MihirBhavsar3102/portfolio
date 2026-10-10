@@ -65,3 +65,24 @@ export function nextTraceState(state: TraceState, event: TraceEvent): TraceState
       return IDLE;
   }
 }
+
+/** The pinned figure named in a URL's query string, if it is a real proof id. */
+export function readTraceParam(search: string, ids: string[]): string | null {
+  const id = new URLSearchParams(search).get("trace");
+  return id && ids.includes(id) ? id : null;
+}
+
+/** `href` with `?trace=` set to the pinned figure, or removed when none is pinned. */
+export function traceHref(href: string, id: string | null): string {
+  const url = new URL(href);
+  if (id) url.searchParams.set("trace", id);
+  else url.searchParams.delete("trace");
+  return url.toString();
+}
+
+/** Labels of the nodes and tools a figure lights, in map order — zones left out. */
+export function tracedLabels(estate: Estate, proofId: string): string[] {
+  const { ids } = traceSelection(estate, proofId);
+  const nodes = [...estate.zones.flatMap((z) => z.nodes), ...estate.controlPlane.flatMap((l) => l.nodes)];
+  return nodes.filter((n) => ids.has(n.id)).map((n) => n.label);
+}
