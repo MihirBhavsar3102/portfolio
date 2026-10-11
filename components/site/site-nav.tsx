@@ -89,7 +89,7 @@ export function SiteNav() {
   return (
     <header className="sticky top-0 z-50 bg-canvas/85 backdrop-blur-md">
       <div className={`${frame} flex h-14 items-center justify-between gap-4`}>
-        <Link href="/" className="text-[15px] font-semibold tracking-tight whitespace-nowrap text-ink">
+        <Link href="/" className="py-1 text-[15px] font-semibold tracking-tight whitespace-nowrap text-ink">
           {resume.name}
         </Link>
 

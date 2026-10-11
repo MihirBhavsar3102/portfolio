@@ -278,7 +278,7 @@ Achromatic grounds and ink in two themes, one warm persimmon accent, and three c
 - **Prose** (400, 17px, 1.7, max 68ch, Ink Two): case-study MDX paragraphs and lists.
 - **Body** (400, 15px, 1.625): provenance, summaries, points, buttons (600).
 - **Small / Nav / Label** (14px, 13px, 12px): chips, nav links, metadata.
-- **Mono** (Fragment Mono 400): the contact address at clamp(1.125rem, 2.6vw, 2rem), and 13px inside the menu's copy control.
+- **Mono** (Fragment Mono 400): the contact address at clamp(1.125rem, 2.6vw, 2rem) from sm and clamp(1rem, 4.3vw, 1.125rem) below it (so the copy button stays on its line), and 13px inside the menu's copy control.
 
 ### Named Rules
 **The Statement Scale Rule.** Hierarchy comes from scale and weight, never from colour or an eyebrow. A heading speaks for itself at Headline size; nothing sits above it.
@@ -323,7 +323,7 @@ Confident and quiet; colour shifts, nothing glows.
 
 ### Chips
 - **Figure chips** (the map section): pill, Strong Hairline border, 14px Ink Two with the value in semibold. Active (hover, focus or pinned): persimmon border, Persimmon Wash fill, persimmon text.
-- **Skill chips** (Stack): 6px radius, 14px; filled Surface Three with Ink text and a brand dot when used at work, outlined Strong Hairline with Ink Two text and a dot when used in a personal project, Hairline with Ink Three and no dot otherwise.
+- **Skill chips** (Stack): 6px radius, 14px (13px with tighter padding below sm, so the nine rows stay short on a phone); filled Surface Three with Ink text and a brand dot when used at work, outlined Strong Hairline with Ink Two text and a dot when used in a personal project, Hairline with Ink Three and no dot otherwise.
 - **Stage chips** (a pipeline case study): pill, Canvas fill, Strong Hairline border, 14px Ink.
 
 ### Cards / Containers

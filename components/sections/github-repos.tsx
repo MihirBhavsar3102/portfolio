@@ -33,7 +33,7 @@ function Repo({ repo }: { repo: RepoCard }) {
       <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-5 text-sm">
         <span className="text-ink-3">{repo.demonstrates}</span>
         {project && (
-          <Link href={`/work/${project.slug}`} className="group inline-flex items-center gap-1.5 font-medium text-ink">
+          <Link href={`/work/${project.slug}`} className="group inline-flex items-center gap-1.5 py-1 font-medium text-ink">
             Case study
             <span className="sr-only">: {project.title}</span>
             <ArrowRight

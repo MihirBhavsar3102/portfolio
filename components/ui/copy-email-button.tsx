@@ -11,7 +11,7 @@ import { Check, Copy, X } from "lucide-react";
  * refused, the control selects the address and says how to copy it, so it
  * never dead-ends.
  */
-/** `display` sets the address large, as the close of the page, with a round copy button beside it. */
+/** `display` sets the address large, as the close of the page, with a round copy button beside it; on phones the type steps down so the button stays on the address's line. */
 const looks = {
   default: {
     box: "inline-flex items-center rounded-md border border-line bg-surface-1",
@@ -19,8 +19,8 @@ const looks = {
     button: "flex size-9 shrink-0 items-center justify-center border-l border-line text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink",
   },
   display: {
-    box: "inline-flex flex-wrap items-center gap-x-4 gap-y-3",
-    link: "min-w-0 font-mono text-[clamp(1.125rem,2.6vw,2rem)] break-all text-accent underline decoration-accent/40 underline-offset-[0.25em] transition-colors hover:decoration-accent",
+    box: "inline-flex flex-wrap items-center gap-x-3 gap-y-3 sm:gap-x-4",
+    link: "min-w-0 font-mono text-[clamp(1rem,4.3vw,1.125rem)] break-all sm:text-[clamp(1.125rem,2.6vw,2rem)] text-accent underline decoration-accent/40 underline-offset-[0.25em] transition-colors hover:decoration-accent",
     button: "flex size-11 shrink-0 items-center justify-center rounded-full border border-line-strong text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink",
   },
 };
@@ -114,7 +114,7 @@ export function CopyEmailButton({
         className="anim-toast flex items-center justify-between gap-3 rounded-xl border border-line-strong bg-surface-2 px-4 py-3 shadow-[0_18px_44px_-18px_rgb(0_0_0/0.45)]"
       >
         <Toast.Title className="text-sm text-ink">{message}</Toast.Title>
-        <Toast.Close aria-label="Dismiss" className="shrink-0 text-ink-3 transition-colors hover:text-ink">
+        <Toast.Close aria-label="Dismiss" className="flex size-6 shrink-0 items-center justify-center rounded-full text-ink-3 transition-colors hover:bg-surface-3 hover:text-ink">
           <X aria-hidden="true" className="size-3.5" strokeWidth={2} />
         </Toast.Close>
       </Toast.Root>

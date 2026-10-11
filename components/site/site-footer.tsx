@@ -2,7 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import { resume } from "@/lib/resume-data";
 import { frame } from "@/components/site/frame";
 
-const link = "inline-flex items-center gap-1 text-ink-2 transition-colors hover:text-ink";
+const link = "inline-flex items-center gap-1 py-0.5 text-ink-2 transition-colors hover:text-ink";
 
 export function SiteFooter() {
   return (

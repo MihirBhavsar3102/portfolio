@@ -28,7 +28,7 @@ function SkillChip({ skill }: { skill: Skill }) {
   return (
     <li
       data-evidence={evidence}
-      className={`inline-flex max-w-full flex-wrap items-center gap-x-1.5 rounded-md border px-2.5 py-1 text-sm ${look[evidence ?? "none"]}`}
+      className={`inline-flex max-w-full flex-wrap items-center gap-x-1.5 rounded-md border px-2 py-0.5 text-[13px] sm:px-2.5 sm:py-1 sm:text-sm ${look[evidence ?? "none"]}`}
     >
       {evidence && <Dot color={skill.tech && tech[skill.tech].color} />}
       <span>{skill.name}</span>
@@ -39,7 +39,7 @@ function SkillChip({ skill }: { skill: Skill }) {
   );
 }
 
-/** The resume's nine skill groups as hairline rows of chips; which chips stand out is derived from the work. */
+/** The resume's nine skill groups as hairline rows of chips; which chips stand out is derived from the work. On phones the chips set at 13px so the nine rows stay short; nothing is hidden. */
 export function Stack() {
   return (
     <Section id="stack" title="Stack">
@@ -53,9 +53,9 @@ export function Stack() {
       </ul>
       <div className="mt-4 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface-1">
         {resume.skillGroups.map((group) => (
-          <div key={group.name} className="grid gap-x-8 gap-y-3 px-5 py-4 md:grid-cols-[12rem_1fr]">
+          <div key={group.name} className="grid gap-x-8 gap-y-2.5 px-4 py-3.5 sm:gap-y-3 sm:px-5 sm:py-4 md:grid-cols-[12rem_1fr]">
             <h3 className="pt-1 text-[15px] font-semibold tracking-tight text-ink">{group.name}</h3>
-            <ul className="flex flex-wrap gap-2">
+            <ul className="flex flex-wrap gap-1.5 sm:gap-2">
               {group.skills.map((skill) => (
                 <SkillChip key={skill.name} skill={skill} />
               ))}

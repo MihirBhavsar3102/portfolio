@@ -421,6 +421,39 @@ const chipLit = await evaluate(`(() => { const chip = document.querySelector('#m
 check("the tapped figure chip turns accent", chipLit.got === chipLit.want, JSON.stringify(chipLit));
 await shot(`${LABEL}-mobile-trace`);
 
+// ---------- Responsive sweep and target sizes ----------
+// WCAG 2.5.8 without the spacing exception: every target that isn't inside running text is >= 24x24.
+const smallTargets = () =>
+  evaluate(`(() => {
+    // In running text: its parent lays out inline (not a flex or grid row) and the block holds other words.
+    const inSentence = (el) => {
+      if (/flex|grid/.test(getComputedStyle(el.parentElement).display)) return false;
+      const block = el.parentElement.closest('p, li, dd, td');
+      return !!block && block.textContent.replace(el.textContent, '').trim().length > 1;
+    };
+    return [...document.querySelectorAll('a[href], button, summary')].filter((el) => {
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height || el.closest('.sr-only') || el.classList.contains('skip-link') || getComputedStyle(el).visibility === 'hidden') return false;
+      return (r.width < 24 || r.height < 24) && !inSentence(el);
+    }).map((el) => (el.getAttribute('aria-label') || el.textContent.trim()).slice(0, 32) + ' ' + Math.round(el.getBoundingClientRect().width) + 'x' + Math.round(el.getBoundingClientRect().height));
+  })()`);
+for (const path of ["/", cardHrefs[0]]) {
+  for (const [width, height] of [[375, 812], [768, 1024], [1024, 768], [1440, 900]]) {
+    await load(path, { width, height, mobile: width < 1024 });
+    const o = await evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth");
+    const small = await smallTargets();
+    check(`${path} at ${width}: no horizontal scroll and every target at least 24px`, o === 0 && small.length === 0, `overflow ${o}; ${small.join(" | ")}`);
+  }
+}
+for (const width of [360, 375, 414]) {
+  await load("/", { width, height: 800, mobile: true });
+  const row = await evaluate(`(() => { const a = document.querySelector('#contact a[href^="mailto:"]').getBoundingClientRect(); const b = document.querySelector('#contact button[aria-label="Copy email address"]').getBoundingClientRect(); return Math.round(Math.abs((a.top + a.height / 2) - (b.top + b.height / 2))); })()`);
+  check(`Contact at ${width}: the copy button sits on the email's line`, row < 6, `${row}px apart`);
+}
+await load("/", MOBILE);
+const stackHeight = await evaluate("Math.round(document.getElementById('stack').getBoundingClientRect().height)");
+check("Stack at 375 is shorter than the 2,180px it started at", stackHeight < 1900, `${stackHeight}px`);
+
 // ---------- Case studies ----------
 for (const href of cardHrefs) {
   const slug = href.split("/").pop();

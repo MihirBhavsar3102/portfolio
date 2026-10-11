@@ -45,7 +45,7 @@ export default async function CaseStudyPage({ params }: Props) {
   return (
     <article className={`${frame} pt-10 pb-24`}>
       <JsonLd data={articleJsonLd(project)} />
-      <Link href="/#work" className="group inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink">
+      <Link href="/#work" className="group inline-flex items-center gap-1.5 py-1 text-sm text-ink-3 transition-colors hover:text-ink">
         <ArrowLeft aria-hidden="true" className="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" strokeWidth={2} />
         All work
       </Link>

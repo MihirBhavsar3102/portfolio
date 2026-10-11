@@ -16,7 +16,7 @@ function CaseStudyLink({ slug }: { slug: string }) {
   const last = words.pop();
   return (
     <p className="mt-6 text-[15px]">
-      <Link href={`/work/${slug}`} className={`group ${textLink}`}>
+      <Link href={`/work/${slug}`} className={`group py-1 ${textLink}`}>
         Case study: {words.join(" ")}{" "}
         <span className="whitespace-nowrap">
           {last}
