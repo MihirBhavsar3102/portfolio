@@ -38,7 +38,7 @@ Cloud & DevOps engineer at Parkar Global Technologies (December 2024 – present
 ## Capabilities and Constraints
 
 - **Stack:** Next.js 16.2.10 App Router, React 19.2.4, TypeScript, Tailwind CSS v4 (CSS-first `@theme` config), `framer-motion` (via `LazyMotion`), Radix UI primitives, `lucide-react` for interface icons, MDX for case studies, Vitest for logic and content tests. Deployed via a Dockerfile (`output: "standalone"`); `NEXT_PUBLIC_SITE_URL` configures the canonical URL. Vercel later, not now.
-- **Dark only.** There is no light theme and no theme toggle; colours live in tokens so one could be added later.
+- **Light and dark themes**, both first-class, with a toggle in the nav. The visitor's system setting picks the first theme and a chosen one is remembered; with JavaScript off the system setting still applies (decided 2026-10-11, replacing "dark only").
 - **No blog** in this rebuild.
 - All facts live in `lib/resume-data.ts`, typed by `types/resume.ts`; long-form case-study narrative lives in MDX. Content tests guard both.
 - No backend, no database, no auth, no analytics.
@@ -55,7 +55,7 @@ Cloud & DevOps engineer at Parkar Global Technologies (December 2024 – present
 - Name and identity: Mihir Bhavsar. No logo exists.
 - Employer name: "Parkar Global Technologies"; the legal name "Parkar Global Technologies Pvt Ltd" appears once, in the experience entry.
 - Voice: plain, measured, specific. Numbers carry the persuasion; the prose does not oversell.
-- Visual register: a dark, premium engineering aesthetic — "AWS Console × Linear × Vercel". One professional blue accent; technology brand colours only where they mark that technology. Teal, violet, neon, glow, glassmorphism, Matrix rain, terminal windows, code-editor chrome, and hacker motifs are explicitly rejected. Motion is restrained and orchestrated, never scattered.
+- Visual register: premium, minimal and plainly professional, "Linear × Apple" in feel: big confident type, one idea per screen, generous space. One persimmon accent for action and the lit path; colour beyond it only where it names a cloud (the work cards) or marks a technology (its brand dot). Neon, glow, glassmorphism, gradient text, Matrix rain, terminal windows, code-editor chrome, and hacker motifs are explicitly rejected. Motion is restrained and orchestrated, never scattered (direction chosen 2026-10-11 from live previews: "Statement").
 
 ## Evidence on Hand
 
