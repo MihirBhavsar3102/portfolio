@@ -203,6 +203,7 @@ export const resume: Resume = {
     {
       slug: "avd-automation",
       title: "Azure Virtual Desktop automation",
+      headline: "Automating Azure Virtual Desktop for five enterprise clients",
       summary:
         "Provisioning, imaging and scaling Azure Virtual Desktop for five enterprise clients, automated with PowerShell, Image Builder and Azure DevOps pipelines.",
       kind: "work",
@@ -213,6 +214,7 @@ export const resume: Resume = {
     {
       slug: "aws-web-platform",
       title: "Multi-AZ AWS web platform",
+      headline: "A multi-AZ AWS platform, built and shipped from code",
       summary:
         "A fault-tolerant WordPress platform on AWS, defined in Terraform and shipped through a Terraform, Ansible and GitHub Actions pipeline.",
       kind: "work",
@@ -224,6 +226,7 @@ export const resume: Resume = {
     {
       slug: "hr-policy-assistant",
       title: "HR policy assistant",
+      headline: "An HR policy assistant on retrieval-augmented generation",
       summary: "A retrieval-augmented chatbot that answers HR policy questions from the policy documents themselves.",
       kind: "work",
       role: "Built it: FAISS retrieval, Llama inference and the FastAPI service around them.",
@@ -234,6 +237,7 @@ export const resume: Resume = {
     {
       slug: "devsecops-pipeline",
       title: "DevSecOps CI/CD pipeline",
+      headline: "Security gates in a Jenkins-to-Kubernetes pipeline",
       summary:
         "A Jenkins pipeline with security gates at build and deploy, shipping a three-tier Java app to self-managed Kubernetes on every push.",
       kind: "personal",

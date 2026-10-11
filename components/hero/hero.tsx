@@ -1,4 +1,5 @@
 import { ArrowRight, Download } from "lucide-react";
+import { monthYear } from "@/lib/format";
 import { resume } from "@/lib/resume-data";
 import { tracedLabels } from "@/lib/trace";
 import { CopyEmailButton } from "@/components/ui/copy-email-button";
@@ -6,14 +7,6 @@ import { ProofStrip, type ProofEntry } from "@/components/hero/proof-strip";
 import { Topology } from "@/components/hero/topology";
 import { TopologyStack } from "@/components/hero/topology-stack";
 import { TraceProvider } from "@/components/hero/trace-provider";
-
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-/** "2024-12" → "Dec 2024" */
-function monthYear(iso: string) {
-  const [year, month] = iso.split("-").map(Number);
-  return `${MONTHS[month - 1]} ${year}`;
-}
 
 /** One sentence a screen reader gets in place of the drawing. */
 function mapSummary() {

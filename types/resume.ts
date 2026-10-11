@@ -80,6 +80,8 @@ export type ProjectKind = "work" | "personal";
 export interface Project {
   slug: string;
   title: string;
+  /** The case-study page's h1; longer than the card `title`. */
+  headline: string;
   summary: string;
   kind: ProjectKind;
   /** What Mihir owned, one line. */
