@@ -1,0 +1,25 @@
+export const meta = { slug: "devsecops-pipeline" };
+
+## Context
+
+A personal project: a CI/CD pipeline with security gates built into its build and deploy stages. It ships a three-tier Java application to a self-managed Kubernetes cluster, and it runs on every push.
+
+## Architecture
+
+<Diagram />
+
+A push to GitHub fires a webhook, and Jenkins runs the pipeline. Maven builds the application, SonarQube runs static analysis on the code, and OWASP Dependency-Check scans its dependencies. The pipeline then builds a Docker image, Trivy scans that image, and the application is deployed to the cluster. SonarQube, Dependency-Check and Trivy are the security gates.
+
+## What I built
+
+<Ownership
+  mine={[
+    "The Jenkins pipeline from end to end, with its three security gates.",
+    "The GitHub webhook that starts it on every push.",
+    "The deployment to the self-managed Kubernetes cluster.",
+  ]}
+/>
+
+## Results
+
+Every push goes through build, analysis, dependency scan, image build, image scan and deployment without a manual step.

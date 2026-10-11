@@ -1,0 +1,30 @@
+export const meta = { slug: "aws-web-platform" };
+
+## Context
+
+At Parkar Global Technologies I designed and deployed a WordPress platform on AWS built to tolerate faults: it runs across availability zones behind a load balancer. Its infrastructure is defined in Terraform, so a new environment comes from code and can be replicated in one step.
+
+## Architecture
+
+<Diagram />
+
+CloudFront, with S3, sits in front of an Application Load Balancer, which spreads traffic across EC2 instances in an Auto Scaling group that spans availability zones. WordPress runs on those instances, with its database in RDS. The platform also uses Lambda; I've left its wiring out of the drawing.
+
+A GitHub Actions pipeline ships changes end to end: Terraform provisions the infrastructure with plan and apply, and Ansible configures the instances. CloudWatch alarms and dashboards watch the platform, and I built Grafana dashboards and alert rules on a Prometheus stack that was already running.
+
+## What I built
+
+<Ownership
+  mine={[
+    "The platform's design and deployment: EC2 Auto Scaling across availability zones, the Application Load Balancer, RDS, Lambda, S3 and CloudFront.",
+    "The Terraform that defines it, run with plan and apply, which lets the environment be replicated in one step.",
+    "The CI/CD pipeline: GitHub Actions running Terraform and Ansible.",
+    "CloudWatch alarms and dashboards, and Grafana dashboards and alert rules.",
+  ]}
+  teamLabel="Already in place"
+  team={["The Prometheus stack that the Grafana dashboards and alert rules are built on."]}
+/>
+
+## Results
+
+The figures at the top of this page measure three things: uptime on the multi-AZ platform, how long a new environment takes to stand up, and how much faster features ship. One result has no number: an environment can be replicated in one step.

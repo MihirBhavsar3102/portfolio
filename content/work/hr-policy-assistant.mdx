@@ -1,0 +1,25 @@
+export const meta = { slug: "hr-policy-assistant" };
+
+## Context
+
+Answering an HR policy question used to mean someone looking it up by hand in the policy documents. At Parkar Global Technologies I built a chatbot that answers those questions from the documents themselves, using retrieval-augmented generation.
+
+## Architecture
+
+<Diagram />
+
+A question comes in through a FastAPI service, and LangChain coordinates the rest. FAISS semantic search finds the parts of the HR policy documents that matter for the question, and Llama inference writes the answer with them as context. It's written in Python.
+
+## What I built
+
+<Ownership
+  mine={[
+    "The assistant itself, on a retrieval-augmented generation design.",
+    "Semantic document retrieval with FAISS, and the Llama inference that answers in context.",
+    "The Python service around them, with FastAPI and LangChain.",
+  ]}
+/>
+
+## Results
+
+The chatbot replaces manual lookups in the policy documents. The figure at the top of this page is how much faster that made answering HR policy questions.
