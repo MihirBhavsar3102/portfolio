@@ -135,6 +135,8 @@ export interface FeaturedRepo {
   demonstrates: string;
   /** Required for a fork to be shown: what Mihir added. */
   contribution?: string;
+  /** Set when the repo is a fork: the upstream's full name ("owner/repo"). Keeps it hidden without a `contribution` even when the API is down. */
+  upstream?: string;
   /** Case-study slug this repo belongs to. */
   project?: string;
 }

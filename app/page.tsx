@@ -4,6 +4,10 @@ import { Experience } from "@/components/sections/experience";
 import { Stack } from "@/components/sections/stack";
 import { Credentials } from "@/components/sections/credentials";
 
+// The GitHub section's live fields refresh hourly. Set on the route too, so a
+// build that couldn't reach GitHub (and so registered no fetch) still revalidates.
+export const revalidate = 3600;
+
 export default function Home() {
   return (
     <>

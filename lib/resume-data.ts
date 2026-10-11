@@ -421,6 +421,7 @@ export const resume: Resume = {
       blurb: "Turns plain English into Robot Framework test files with AI.",
       demonstrates: "AI tooling",
       // Fork: hidden until Mihir supplies his contribution line (questionnaire A3b).
+      upstream: "monkscode/Natural-Language-to-Robot-Framework",
     },
   ],
 };
