@@ -151,13 +151,24 @@ components:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     rounded: "{rounded.md}"
-  evidence-marker:
-    backgroundColor: "{colors.ink-2}"
-    size: "7px"
-  stack-cell:
-    backgroundColor: "{colors.surface-1}"
+  skill-chip-work:
+    backgroundColor: "{colors.surface-3}"
     textColor: "{colors.ink}"
-    padding: "{spacing.cell}"
+    typography: "{typography.body}"
+    rounded: "{rounded.md}"
+    padding: "4px 10px"
+  skill-chip-project:
+    backgroundColor: "{colors.surface-1}"
+    textColor: "{colors.ink-2}"
+    typography: "{typography.body}"
+    rounded: "{rounded.md}"
+    padding: "4px 10px"
+  skill-chip:
+    backgroundColor: "{colors.surface-1}"
+    textColor: "{colors.ink-3}"
+    typography: "{typography.body}"
+    rounded: "{rounded.md}"
+    padding: "4px 10px"
   cert-row:
     backgroundColor: "{colors.surface-1}"
     textColor: "{colors.ink}"
@@ -200,13 +211,13 @@ A cool, blue-tinted near-black ramp with one saturated console blue; colour is s
 
 ### Neutral
 - **Blue Black Canvas** (canvas): the page, the sticky nav (at 85% with backdrop blur), the dialog overlay (at 80%), and the fill of map nodes, diagram nodes, chips and stage chips, which sit "cut into" their zone.
-- **Surface One** (surface-1): the first lift: map figure, proof-ledger and figure-ledger cells at rest, work cards, the experience panel, the facts panel, ownership columns, pager cells, the diagram figure, mobile map strip, stack cells, credential panels, repo cells, copy-email control, dialogs and sheets. Also the knockout stroke behind diagram edge labels.
+- **Surface One** (surface-1): the first lift: map figure, proof-ledger and figure-ledger cells at rest, work cards, the experience panel, the facts panel, ownership columns, pager cells, the diagram figure, mobile map strip, the stack panel, credential panels, repo cells, copy-email control, dialogs and sheets. Also the knockout stroke behind diagram edge labels.
 - **Surface Two** (surface-2): the second lift: map bands and zones, an active ledger cell, the hover fill of work cards, pager cells, secondary and ghost controls, the toast.
-- **Surface Three** (surface-3): the third lift, defined in the theme and reserved; no shipped surface uses it yet. Small ink-3 text must stay off it (exactly 4.50:1).
+- **Surface Three** (surface-3): the third lift: the fill of a "used at work" skill chip, and nothing else yet. Small ink-3 text must stay off it (exactly 4.50:1).
 - **Hairline** (line): the default 1px divider and panel border; also the colour that shows through gap-px rules in the ledger.
 - **Strong Hairline** (line-strong): outlined buttons, map and diagram node strokes, stage-chip borders, dashed diagram groups, control-plane edges, hairline-dash list markers, the resting underline of text links, dialog and toast borders, scrollbar thumb.
 - **Ink** (ink): names, headings, figures at rest, claim lines, primary link text. 13.8–16.4:1.
-- **Ink Two** (ink-2): positioning and provenance prose, case-study summaries and MDX body text, zone and diagram group titles, edge labels, secondary links, and the stack's evidence markers (filled or outlined). 7.4–8.8:1.
+- **Ink Two** (ink-2): positioning and provenance prose, case-study summaries and MDX body text, zone and diagram group titles, edge labels, secondary links, a project skill chip's text, and detail text inside a work chip. 7.4–8.8:1.
 - **Ink Three** (ink-3): metadata, notes, "how measured" asides, card provenance lines, periods and fact terms, hints, inactive nav links, data edges and diagram edges with their arrowheads, stage arrows, unbranded tech dots. 4.85–5.34:1 on canvas through surface-2.
 
 ### Named Rules
@@ -251,7 +262,7 @@ The hero is a 12-column grid that splits only at xl (1280px): 5 columns of ident
 
 The proof ledger is a ruled grid: 1 column, 2 from sm, 3 from lg, cells 20px padded (20px × 16px at xl). Vertical rhythm between blocks runs 16–40px; nothing uses large empty bands.
 
-Home sections below the hero each open on a full-bleed Hairline (the rule spans the viewport; the content does not) and sit inside the same 1280px frame with 64px of vertical padding and the heading 24px above its content. Selected work is a ruled grid of cards, 1 column, 2 from md. The experience entry splits each workstream 4/8 from lg (48px gap): name, summary and case-study link on the left, points on the right. Stack is a ruled grid of the nine skill groups: 1 column, 2 from sm (the odd last cell spans both), 3 from lg. Credentials splits 7/5 from lg (48px gap): certifications on the left, education over recognition on the right, 40px apart. GitHub is a ruled grid of repo cells, 2 from md. Contact is one column. The 404 sits in the same frame with 96px of vertical padding.
+Home sections below the hero each open on a full-bleed Hairline (the rule spans the viewport; the content does not) and sit inside the same 1280px frame with 64px of vertical padding and the heading 24px above its content. Selected work is a ruled grid of cards, 1 column, 2 from md. The experience entry splits each workstream 4/8 from lg (48px gap): name, summary and case-study link on the left, points on the right. Stack is one bordered panel of hairline rows, one per skill group: from md the group name sits in a 192px column (32px gap) with its skills wrapping beside it as chips; below md the name sits above them. Credentials splits 7/5 from lg (48px gap): certifications on the left, education over recognition on the right, 40px apart. GitHub is a ruled grid of repo cells, 2 from md. Contact is one column. The 404 sits in the same frame with 96px of vertical padding.
 
 A case-study page opens 32px under the nav with an "All work" back link, then the content 24px below it. Below xl everything is one column capped at 768px (max-w-3xl), so a 760-wide diagram renders near 1:1. From xl it is a 12-column grid with a 48px column gap: header and MDX body on 8 columns, the facts panel on 4, spanning both rows and sticky 80px from the top. The pager closes the page 64px below the body, and the page ends on 80px of bottom padding.
 
@@ -334,11 +345,12 @@ The selected work as a ruled grid (2 columns from md). Each card is Surface One,
 ### Experience Entry
 One bordered Surface One panel (10px, Hairline, clipped). A header row behind a bottom hairline holds the role title (18px semibold), the legal employer name and location in 14px Ink Two (the only place the legal name appears on the site), and the period in 14px Ink Three, right-aligned and wrapping under on narrow screens. Workstreams follow as hairline-ruled rows, 20px padded, split 4/8 from lg: a 16px semibold name, a 14px Ink Two summary and, where one exists, an underlined "Case study: …" link; then the points as hairline-dash items in 14px Ink Two. A final row behind a top hairline reads "Also built here:" followed by the remaining project links.
 
-### Stack Grid and Evidence Markers
-The resume's nine skill groups as a ruled grid. Each cell is Surface One, 20px padded: a 16px semibold Ink group name, then the skills 8px apart, each a 14px Ink name with an optional 12px Ink Three detail line beneath, in the resume's order.
-- **Evidence marker:** a 7px square in a fixed slot before each name. Filled Ink Two means "Used at work" (in a work project's stack, or named by a workstream); a 1px Ink Two outline means "Used in a project" (only a personal project's stack); an empty slot means the skill is on the resume but not in the work shown. Derived from data (lib/stack.ts), never hand-set.
-- **Why squares:** they never read as tech dots, and being neutral they never spend the accent. They are markers, not bullets.
-- **Key:** a 12px Ink Three row above the grid names both markers and what no marker means. Screen readers hear each marker after the name, as "(Used at work)".
+### Stack Rows and Skill Chips
+The resume's nine skill groups as one bordered Surface One panel of hairline rows (16px × 20px), in the resume's order. Each row is a 14px medium Ink group name and its skills as a wrapping row of chips, 8px apart.
+- **Chip:** 6px radius, 1px border, 4px × 10px, 14px; a detail, where the resume gives one, follows the name inside the chip ("Terraform reusable modules") and wraps inside it on a phone.
+- **Evidence, by emphasis:** a skill "Used at work" (a work project's stack has it, or a workstream names it) is a filled chip: Surface Three, Strong Hairline border, Ink name, Ink Two detail. "Used in a project" (only a personal project's stack) is an outlined chip: Strong Hairline border, Ink Two name. Every other skill is a faint chip: Hairline border, Ink Three. Derived from data (lib/stack.ts), never hand-set.
+- **Dots:** only work and project chips carry a 6px dot before the name, in the technology's brand colour (Ink Three when the brand has none or the skill isn't a product), so the eye lands on the evidence first.
+- **Key:** two sample chips above the panel, "Used at work" and "Used in a project", at 12px with a neutral dot. Faint chips have no key entry. Screen readers hear "(Used at work)" or "(Used in a project)" after a marked skill's name.
 
 ### Credentials
 Three titled panels, each title 16px semibold Ink, 10px above a bordered Surface One list with hairline-ruled rows (16px × 20px).

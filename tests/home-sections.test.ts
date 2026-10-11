@@ -10,6 +10,7 @@ import { RepoList } from "@/components/sections/github-repos";
 import { Contact } from "@/components/sections/contact";
 import type { RepoCard } from "@/lib/github";
 import { evidenceLabel, skillEvidence } from "@/lib/stack";
+import { tech } from "@/lib/tech";
 import { htmlOf, textOf } from "./render";
 
 describe("SelectedWork", () => {
@@ -66,9 +67,15 @@ describe("Stack", () => {
     for (const s of skills) expect(text, s.name).toContain(s.name);
   });
 
-  it("names both markers in a key", () => {
+  it("names the two markers in its key, and only those", () => {
     expect(text).toContain(evidenceLabel.work);
     expect(text).toContain(evidenceLabel.project);
+    expect(text).not.toMatch(/on my resume|no marker/i);
+  });
+
+  it("dots only the skills the work shows, in their brand colour", () => {
+    expect(html).toContain(`background-color:${tech.terraform.color}`); // used at work
+    expect(html).not.toContain(`background-color:${tech.gcp.color}`); // on the resume only
   });
 
   it("marks each skill as derived, for sighted and screen-reader users alike", () => {
