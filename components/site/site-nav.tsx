@@ -18,24 +18,43 @@ function useActiveSection(pathname: string) {
     // Every section currently in the band, so the mark clears when none is
     // (back up at the hero) instead of keeping the last one seen.
     const inView = new Map<string, number>();
+    // The last section can be too short to ever reach the band; at the foot
+    // of the page it is the one being read.
+    const last = sections[sections.length - 1].id;
+    let atEnd = false;
+    const update = () => {
+      if (atEnd && document.getElementById(last)) return setActive(last);
+      const [top] = [...inView].sort((a, b) => b[1] - a[1]);
+      setActive(top ? top[0] : null);
+    };
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) inView.set(entry.target.id, entry.intersectionRatio);
           else inView.delete(entry.target.id);
         }
-        const [top] = [...inView].sort((a, b) => b[1] - a[1]);
-        setActive(top ? top[0] : null);
+        update();
       },
       { rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
     );
+    const onScroll = () => {
+      const end = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      if (end !== atEnd) {
+        atEnd = end;
+        update();
+      }
+    };
 
     sections.forEach((s) => {
       const el = document.getElementById(s.id);
       if (el) observer.observe(el);
     });
+    window.addEventListener("scroll", onScroll, { passive: true });
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
   }, [pathname]);
 
   return active;

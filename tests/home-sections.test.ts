@@ -7,6 +7,7 @@ import { Stack } from "@/components/sections/stack";
 import { Credentials } from "@/components/sections/credentials";
 import { monthYear } from "@/lib/format";
 import { RepoList } from "@/components/sections/github-repos";
+import { Contact } from "@/components/sections/contact";
 import type { RepoCard } from "@/lib/github";
 import { evidenceLabel, skillEvidence } from "@/lib/stack";
 import { htmlOf, textOf } from "./render";
@@ -150,5 +151,21 @@ describe("RepoList", () => {
 
   it("links a repo to its case study", () => {
     expect(html).toContain('href="/work/aws-web-platform"');
+  });
+});
+
+describe("Contact", () => {
+  const html = htmlOf(createElement(Contact));
+
+  it("is #contact and leads with email, then LinkedIn, GitHub and the resume", () => {
+    expect(html).toContain('id="contact"');
+    const at = [`mailto:${resume.email}`, "linkedin.com/in/", "github.com/MihirBhavsar3102", resume.resumeFile].map((s) => html.indexOf(s));
+    expect(at.every((i) => i >= 0), at.join()).toBe(true);
+    expect([...at].sort((a, b) => a - b)).toEqual(at);
+  });
+
+  it("offers the copy control and the resume as a download", () => {
+    expect(html).toContain('aria-label="Copy email address"');
+    expect(html).toMatch(new RegExp(`href="${resume.resumeFile}" download`));
   });
 });

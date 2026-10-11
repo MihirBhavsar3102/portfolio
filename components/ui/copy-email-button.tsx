@@ -6,15 +6,17 @@ import { Check, Copy, X } from "lucide-react";
 
 /**
  * The address as a mailto link, with a copy control beside it. Copying is
- * announced through a Radix toast (an aria-live region); where the Clipboard
- * API is missing — locked-down corporate browsers — the control opens the
- * mail client instead, so it never dead-ends.
+ * announced through a Radix toast (an aria-live region). Where the Clipboard
+ * API is missing (plain-http origins, locked-down browsers) or the write is
+ * refused, the control selects the address and says how to copy it, so it
+ * never dead-ends.
  */
 export function CopyEmailButton({ email, className }: { email: string; className?: string }) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [copied, setCopied] = useState(false);
   const timerRef = useRef(0);
+  const linkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => () => window.clearTimeout(timerRef.current), []);
 
@@ -33,17 +35,27 @@ export function CopyEmailButton({ email, className }: { email: string; className
     timerRef.current = window.setTimeout(() => setOpen(true), 80);
   }
 
-  async function handleCopy() {
-    if (!navigator.clipboard) {
-      window.location.href = `mailto:${email}`;
-      return;
+  /** Select the address so the reader's own copy shortcut takes it. */
+  function selectAddress() {
+    const link = linkRef.current;
+    const selection = window.getSelection();
+    if (link && selection) {
+      const range = document.createRange();
+      range.selectNodeContents(link);
+      selection.removeAllRanges();
+      selection.addRange(range);
     }
+    announce("Address selected. Press Ctrl+C (⌘C on a Mac) to copy it.");
+  }
+
+  async function handleCopy() {
+    if (!navigator.clipboard) return selectAddress();
     try {
       await navigator.clipboard.writeText(email);
       setCopied(true);
       announce("Email address copied");
     } catch {
-      announce("Your browser blocked copying. Select the address to copy it.");
+      selectAddress();
     }
   }
 
@@ -53,6 +65,7 @@ export function CopyEmailButton({ email, className }: { email: string; className
         className={`inline-flex items-center rounded-md border border-line bg-surface-1 ${className ?? ""}`}
       >
         <a
+          ref={linkRef}
           href={`mailto:${email}`}
           className="min-w-0 truncate py-2 pr-2 pl-3 font-mono text-[13px] text-ink-2 transition-colors hover:text-ink"
         >
