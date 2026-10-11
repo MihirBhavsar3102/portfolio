@@ -97,7 +97,7 @@ export interface Project {
 export interface Skill {
   name: string;
   detail?: string;
-  /** Links the skill to evidence in project and workstream stacks (Phase 3). */
+  /** Links the skill to project stacks; its evidence marker is derived from them (lib/stack.ts). */
   tech?: TechId;
 }
 

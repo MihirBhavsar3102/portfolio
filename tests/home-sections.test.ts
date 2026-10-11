@@ -3,6 +3,8 @@ import { createElement } from "react";
 import { resume } from "@/lib/resume-data";
 import { SelectedWork } from "@/components/sections/selected-work";
 import { Experience } from "@/components/sections/experience";
+import { Stack } from "@/components/sections/stack";
+import { evidenceLabel, skillEvidence } from "@/lib/stack";
 import { htmlOf, textOf } from "./render";
 
 describe("SelectedWork", () => {
@@ -45,5 +47,30 @@ describe("Experience", () => {
   it("shows the period, never a duration", () => {
     expect(text).toContain("Dec 2024 – present");
     expect(text).not.toMatch(/\d+ (years?|months?)/);
+  });
+});
+
+describe("Stack", () => {
+  const html = htmlOf(createElement(Stack));
+  const text = textOf(createElement(Stack));
+  const skills = resume.skillGroups.flatMap((g) => g.skills);
+
+  it("is the #stack section with every group and skill", () => {
+    expect(html).toContain('id="stack"');
+    for (const g of resume.skillGroups) expect(text).toContain(g.name);
+    for (const s of skills) expect(text, s.name).toContain(s.name);
+  });
+
+  it("names both markers in a key", () => {
+    expect(text).toContain(evidenceLabel.work);
+    expect(text).toContain(evidenceLabel.project);
+  });
+
+  it("marks each skill as derived, for sighted and screen-reader users alike", () => {
+    for (const e of ["work", "project"] as const) {
+      const n = skills.filter((s) => skillEvidence(s) === e).length;
+      expect(html.split(`data-evidence="${e}"`).length - 1, e).toBe(n);
+      expect(text.split(`(${evidenceLabel[e]})`).length - 1, e).toBe(n);
+    }
   });
 });
