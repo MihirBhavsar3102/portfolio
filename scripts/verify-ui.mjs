@@ -5,12 +5,13 @@
 // Run against `next start` (and `next dev`); exits non-zero if any check fails.
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 
 const [, , BASE = "http://localhost:3100", OUT = ".", LABEL = "prod"] = process.argv;
 const EDGE = "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe";
 const PORT = 9333;
-const PROFILE = join(OUT, `cdp-profile-${Date.now()}`);
+// Absolute: Edge silently fails to start (no CDP) with a relative --user-data-dir.
+const PROFILE = join(resolve(OUT), `cdp-profile-${Date.now()}`);
 mkdirSync(OUT, { recursive: true });
 
 const edge = spawn(EDGE, [
@@ -136,6 +137,14 @@ const key = async (k, code = k, keyCode = 0) => {
   await sleep(150);
 };
 const litCount = () => evaluate("document.querySelectorAll('[data-lit]').length");
+// Poll instead of sleeping a fixed time: dev mode compiles a route on its first visit.
+const waitFor = async (expression, ms = 15000) => {
+  for (let t = 0; t < ms; t += 250) {
+    if (await evaluate(expression)) return true;
+    await sleep(250);
+  }
+  return false;
+};
 
 const DESKTOP = { width: 1440, height: 900, mobile: false };
 const MOBILE = { width: 375, height: 812, mobile: true };
@@ -195,6 +204,49 @@ check("?trace= link restores the pin", (await litCount()) > 0 && (await evaluate
 // Resume download target.
 const pdf = await evaluate(`fetch(document.querySelector('a[download]').getAttribute('href')).then(r => r.status + ' ' + r.headers.get('content-type'))`);
 check("resume link returns a PDF", pdf.startsWith("200") && pdf.includes("pdf"), pdf);
+
+// ---------- Work and experience on the home page ----------
+await load("/", DESKTOP);
+const deadNav = await evaluate(
+  `[...document.querySelectorAll('nav[aria-label=Sections] a')].map(a => a.hash.slice(1)).filter(id => !document.getElementById(id))`,
+);
+check("every nav link has its section on the home page", deadNav.length === 0, deadNav.join(", "));
+const legalCount = await evaluate(`document.body.innerText.split("Parkar Global Technologies Pvt Ltd").length - 1`);
+check("legal employer name appears exactly once", legalCount === 1, String(legalCount));
+const cardHrefs = await evaluate(`[...document.querySelectorAll('#work article h3 a')].map(a => a.getAttribute('href'))`);
+check(
+  "four case-study cards link to /work/*",
+  cardHrefs.length === 4 && cardHrefs.every((h) => /^\/work\/[a-z-]+$/.test(h)),
+  cardHrefs.join(", "),
+);
+
+// Keyboard: Tab reaches a card's title link and its inset ring shows.
+await evaluate("document.activeElement?.blur(); window.scrollTo(0, 0); true");
+let cardRing = null;
+for (let i = 0; i < 60 && !cardRing; i++) {
+  await key("Tab", "Tab", 9);
+  cardRing = await evaluate(
+    `(() => { const a = document.activeElement; return a?.closest('#work article h3') ? getComputedStyle(a, '::after').boxShadow : null; })()`,
+  );
+}
+check("keyboard reaches a card and shows its focus ring", !!cardRing && cardRing !== "none", String(cardRing));
+
+// Client-side round trip: card → case study → All work → the nav still tracks sections.
+await evaluate("document.activeElement?.blur(); true");
+await mouseAt("#work article:nth-child(1) h3 a");
+const opened = await waitFor(`location.pathname === ${JSON.stringify(cardHrefs[0])} && !!document.querySelector('[data-diagram]')`);
+check("a card opens its case study", opened, await evaluate("location.pathname"));
+const homeLinks = await evaluate(
+  `[...document.querySelectorAll('nav[aria-label=Sections] a')].every(a => a.getAttribute('href').startsWith('/#'))`,
+);
+check("nav links point home from a case study", homeLinks);
+await mouseAt("article > a[href='/#work']");
+const back = await waitFor(`location.pathname === '/' && location.hash === '#work' && !!document.getElementById('experience')`);
+check("All work returns to the work section", back, await evaluate("location.pathname + location.hash"));
+await evaluate("document.getElementById('experience').scrollIntoView({ block: 'start' }); true");
+await sleep(800);
+const tracked = await evaluate(`document.querySelector('nav[aria-label=Sections] a[aria-current]')?.dataset.section ?? null`);
+check("nav tracks sections after returning from a case study", tracked === "experience", String(tracked));
 
 // ---------- Map legibility at the narrowest split and below it ----------
 const minSvgFont = () =>

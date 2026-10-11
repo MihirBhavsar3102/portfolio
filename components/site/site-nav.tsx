@@ -9,9 +9,11 @@ import { resume } from "@/lib/resume-data";
 import { sections } from "@/lib/sections";
 
 /** Which section is in view, to drive the active link and its indicator. */
-function useActiveSection() {
+function useActiveSection(pathname: string) {
   const [active, setActive] = useState<string | null>(null);
 
+  // Re-observe on every route change: coming back from a case study mounts
+  // fresh section elements, and an observer on the old ones goes quiet.
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -29,14 +31,16 @@ function useActiveSection() {
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [pathname]);
 
   return active;
 }
 
 export function SiteNav() {
-  const active = useActiveSection();
   const pathname = usePathname();
+  const active = useActiveSection(pathname);
+  // On a case study the Work link stays marked: that's where the reader is.
+  const current = pathname.startsWith("/work/") ? "work" : active;
   const base = pathname === "/" ? "" : "/";
   const navRef = useRef<HTMLElement>(null);
   const barRef = useRef<HTMLSpanElement>(null);
@@ -45,7 +49,7 @@ export function SiteNav() {
   // glides between links on a transition and costs no re-render.
   useEffect(() => {
     const bar = barRef.current;
-    const link = active ? navRef.current?.querySelector<HTMLElement>(`[data-section="${active}"]`) : null;
+    const link = current ? navRef.current?.querySelector<HTMLElement>(`[data-section="${current}"]`) : null;
     if (!bar) return;
     if (!link) {
       bar.style.opacity = "0";
@@ -54,7 +58,7 @@ export function SiteNav() {
     bar.style.setProperty("--x", `${link.offsetLeft + 12}px`);
     bar.style.setProperty("--w", `${link.offsetWidth - 24}px`);
     bar.style.opacity = "1";
-  }, [active]);
+  }, [current]);
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-canvas/85 backdrop-blur-md">
@@ -70,9 +74,9 @@ export function SiteNav() {
                 key={s.id}
                 href={`${base}#${s.id}`}
                 data-section={s.id}
-                aria-current={active === s.id ? "location" : undefined}
+                aria-current={current === s.id ? (pathname === "/" ? "location" : "true") : undefined}
                 className={`px-3 py-4 text-sm transition-colors ${
-                  active === s.id ? "text-ink" : "text-ink-3 hover:text-ink"
+                  current === s.id ? "text-ink" : "text-ink-3 hover:text-ink"
                 }`}
               >
                 {s.label}
