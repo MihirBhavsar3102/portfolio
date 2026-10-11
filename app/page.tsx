@@ -3,6 +3,7 @@ import { SelectedWork } from "@/components/sections/selected-work";
 import { Experience } from "@/components/sections/experience";
 import { Stack } from "@/components/sections/stack";
 import { Credentials } from "@/components/sections/credentials";
+import { GitHubRepos } from "@/components/sections/github-repos";
 
 // The GitHub section's live fields refresh hourly. Set on the route too, so a
 // build that couldn't reach GitHub (and so registered no fetch) still revalidates.
@@ -16,6 +17,7 @@ export default function Home() {
       <Experience />
       <Stack />
       <Credentials />
+      <GitHubRepos />
     </>
   );
 }

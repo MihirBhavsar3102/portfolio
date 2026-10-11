@@ -6,6 +6,8 @@ import { Experience } from "@/components/sections/experience";
 import { Stack } from "@/components/sections/stack";
 import { Credentials } from "@/components/sections/credentials";
 import { monthYear } from "@/lib/format";
+import { RepoList } from "@/components/sections/github-repos";
+import type { RepoCard } from "@/lib/github";
 import { evidenceLabel, skillEvidence } from "@/lib/stack";
 import { htmlOf, textOf } from "./render";
 
@@ -100,5 +102,53 @@ describe("Credentials", () => {
   it("lists education and the NCC letter", () => {
     for (const e of resume.education) for (const v of [e.degree, e.institution, e.years, e.score]) expect(text).toContain(v);
     for (const a of resume.achievements) expect(text).toContain(a.detail);
+  });
+});
+
+describe("RepoList", () => {
+  const repos: RepoCard[] = [
+    {
+      name: "Live-Repo",
+      url: "https://github.com/o/Live-Repo",
+      description: "Live words.",
+      demonstrates: "CI/CD and IaC",
+      language: "HCL",
+      pushedAt: "2025-04-22T05:12:24Z",
+      project: "aws-web-platform",
+    },
+    { name: "Fallback-Repo", url: "https://github.com/o/Fallback-Repo", description: "Curated blurb.", demonstrates: "Applied AI" },
+    {
+      name: "A-Fork",
+      url: "https://github.com/o/A-Fork",
+      description: "Fork words.",
+      demonstrates: "AI tooling",
+      forkOf: "up/A-Fork",
+      contribution: "Added the Y step.",
+    },
+  ];
+  const html = htmlOf(createElement(RepoList, { repos }));
+  const text = textOf(createElement(RepoList, { repos }));
+
+  it("renders nothing when there are no repos to show", () => {
+    expect(htmlOf(createElement(RepoList, { repos: [] }))).toBe("");
+  });
+
+  it("is #github, linking each repo safely in a new tab", () => {
+    expect(html).toContain('id="github"');
+    for (const r of repos) expect(html).toContain(`href="${r.url}" target="_blank" rel="noopener noreferrer"`);
+  });
+
+  it("shows language and last push only for a repo GitHub answered for", () => {
+    expect(text).toContain("HCL · Last pushed Apr 2025");
+    expect(text.split("Last pushed").length - 1).toBe(1);
+  });
+
+  it("labels a fork with its upstream and my contribution", () => {
+    expect(text).toContain("Fork of up/A-Fork");
+    expect(text).toContain("Added the Y step.");
+  });
+
+  it("links a repo to its case study", () => {
+    expect(html).toContain('href="/work/aws-web-platform"');
   });
 });
