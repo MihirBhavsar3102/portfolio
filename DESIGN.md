@@ -28,6 +28,12 @@ typography:
     fontWeight: 500
     lineHeight: 1.33
     letterSpacing: "-0.01em"
+  heading:
+    fontFamily: "Mona Sans, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.5rem"
+    fontWeight: 600
+    lineHeight: 1.33
+    letterSpacing: "-0.01em"
   figure:
     fontFamily: "Mona Sans, ui-sans-serif, system-ui, sans-serif"
     fontSize: "2.25rem"
@@ -69,6 +75,7 @@ spacing:
   gutter-sm: "32px"
   column-gap: "48px"
   cell: "20px"
+  section-y: "64px"
 components:
   button-primary:
     backgroundColor: "{colors.accent}"
@@ -115,6 +122,35 @@ components:
   map-node-lit:
     backgroundColor: "{colors.accent-soft}"
     textColor: "{colors.ink}"
+  project-card:
+    backgroundColor: "{colors.surface-1}"
+    textColor: "{colors.ink}"
+    padding: "{spacing.cell}"
+  project-card-hover:
+    backgroundColor: "{colors.surface-2}"
+    textColor: "{colors.ink}"
+  facts-panel:
+    backgroundColor: "{colors.surface-1}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.lg}"
+    padding: "12px 16px"
+  stage-chip:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    typography: "{typography.body}"
+    rounded: "{rounded.md}"
+    padding: "6px 12px"
+  pager-cell:
+    backgroundColor: "{colors.surface-1}"
+    textColor: "{colors.ink}"
+    padding: "16px 20px"
+  pager-cell-hover:
+    backgroundColor: "{colors.surface-2}"
+    textColor: "{colors.ink}"
+  diagram-node:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
 ---
 
 # Design System: Mihir Bhavsar — Service Map Console
@@ -123,7 +159,7 @@ components:
 
 **Creative North Star: "The Service Map Console"**
 
-The site reads like a cloud console opened on the estate Mihir runs: a blue-tinted near-black canvas, panels lifted one tonal step at a time and split by hairlines, and a single console blue that means "act here", "you are here" or "this is the path". Nothing is decorative. The signature is Trace: every measured figure can be lit, and when it is, the infrastructure that produced it lights with it while everything else dims.
+The site reads like a cloud console opened on the estate Mihir runs: a blue-tinted near-black canvas, panels lifted one tonal step at a time and split by hairlines, and a single console blue that means "act here", "you are here" or "this is the path". Nothing is decorative. The signature is Trace: every measured figure can be lit, and when it is, the infrastructure that produced it lights with it while everything else dims. The case-study pages carry the same grammar into reading: a figure ledger, a facts panel, and architecture drawings built from the same canvas-cut nodes and tech dots as the hero map.
 
 Density is console-like but never cramped: a 1280px (max-w-7xl) frame, ruled grids instead of floating cards, sentence-length cells instead of big-number tiles. Mona Sans carries everything a person reads, including the figures, set slightly condensed through its width axis so numbers look engineered rather than shouted. Motion happens once, on load, as a short settle and edge draw; after that the interface only changes colour and border.
 
@@ -148,15 +184,15 @@ A cool, blue-tinted near-black ramp with one saturated console blue; colour is s
 - **Console Blue Wash** (accent-soft): the fill of a lit service-map node. A state colour only; never a resting background.
 
 ### Neutral
-- **Blue Black Canvas** (canvas): the page, the sticky nav (at 85% with backdrop blur), the dialog overlay (at 80%), and the fill of map nodes and chips, which sit "cut into" their zone.
-- **Surface One** (surface-1): the first lift: map figure, proof-ledger cells at rest, mobile map strip, copy-email control, dialogs and sheets.
-- **Surface Two** (surface-2): the second lift: map bands and zones, an active ledger cell, the hover fill of secondary and ghost controls, the toast.
-- **Surface Three** (surface-3): the third lift, defined in the theme and reserved; Phase 1 does not use it yet. Small ink-3 text must stay off it (exactly 4.50:1).
+- **Blue Black Canvas** (canvas): the page, the sticky nav (at 85% with backdrop blur), the dialog overlay (at 80%), and the fill of map nodes, diagram nodes, chips and stage chips, which sit "cut into" their zone.
+- **Surface One** (surface-1): the first lift: map figure, proof-ledger and figure-ledger cells at rest, work cards, the experience panel, the facts panel, ownership columns, pager cells, the diagram figure, mobile map strip, copy-email control, dialogs and sheets. Also the knockout stroke behind diagram edge labels.
+- **Surface Two** (surface-2): the second lift: map bands and zones, an active ledger cell, the hover fill of work cards, pager cells, secondary and ghost controls, the toast.
+- **Surface Three** (surface-3): the third lift, defined in the theme and reserved; no shipped surface uses it yet. Small ink-3 text must stay off it (exactly 4.50:1).
 - **Hairline** (line): the default 1px divider and panel border; also the colour that shows through gap-px rules in the ledger.
-- **Strong Hairline** (line-strong): outlined buttons, map node strokes, control-plane edges, dialog and toast borders, scrollbar thumb.
+- **Strong Hairline** (line-strong): outlined buttons, map and diagram node strokes, stage-chip borders, dashed diagram groups, control-plane edges, hairline-dash list markers, the resting underline of text links, dialog and toast borders, scrollbar thumb.
 - **Ink** (ink): names, headings, figures at rest, claim lines, primary link text. 13.8–16.4:1.
-- **Ink Two** (ink-2): positioning and provenance prose, zone titles, secondary links. 7.4–8.8:1.
-- **Ink Three** (ink-3): metadata, notes, "how measured" asides, hints, inactive nav links, data edges, unbranded tech dots. 4.85–5.34:1 on canvas through surface-2.
+- **Ink Two** (ink-2): positioning and provenance prose, case-study summaries and MDX body text, zone and diagram group titles, edge labels, secondary links. 7.4–8.8:1.
+- **Ink Three** (ink-3): metadata, notes, "how measured" asides, card provenance lines, periods and fact terms, hints, inactive nav links, data edges and diagram edges with their arrowheads, stage arrows, unbranded tech dots. 4.85–5.34:1 on canvas through surface-2.
 
 ### Named Rules
 **The One Blue Rule.** Console Blue is the only interface colour. If something needs to stand out and it is not an action, a focus, a selection or a lit path, it does not get blue; it gets Ink instead of Ink Two.
@@ -174,13 +210,15 @@ A cool, blue-tinted near-black ramp with one saturated console blue; colour is s
 **Character:** One engineered grotesque does all the talking, tightened through its width axis where it has to carry weight (the name, the figures). The mono is not a costume; it appears only where the text is a literal string a person might copy.
 
 ### Hierarchy
-- **Display** (650, clamp(2.75rem, 5.4vw, 4.5rem), 0.98, -0.035em, width 92%): the name in the hero. One per page.
+- **Display** (650, clamp(2.75rem, 5.4vw, 4.5rem), 0.98, -0.035em, width 92%): the name in the hero. One per page. A case-study page's h1 takes the same face, weight and width at a fixed 2.25rem (36px), 1.08, -0.025em.
 - **Headline** (500, 1.5rem, -0.01em): the role line directly under the name.
-- **Figure** (600, 2.25rem, 1.0, -0.02em, width 88%; 32px at xl): measured values in the proof ledger. Turns Console Blue when its figure is active.
-- **Title** (600, 1rem): section headings such as "Measured outcomes" and "Service map". Dialog titles step up to 1.25–1.5rem, 600, -0.02em.
-- **Body Large** (400, 1.125rem, 1.625, max 42ch, Ink Two): the positioning paragraph.
+- **Heading** (600, 1.5rem, -0.01em, Ink): top-level home section headings ("Selected work", "Experience") and case-study MDX h2s (56px above, none on the first).
+- **Figure** (600, 2.25rem, 1.0, -0.02em, width 88%; 32px at xl): measured values in the proof ledger. Turns Console Blue when its figure is active. Work cards and the case-study figure ledger use it at 36px at every width.
+- **Title** (600, 1rem): subheadings inside a section or panel, such as "Measured outcomes", "Pipeline stages", "Service map" and experience workstream names. Card and role titles step up to 1.125rem, 600, -0.01em; dialog titles to 1.25–1.5rem, 600, -0.02em.
+- **Body Large** (400, 1.125rem, 1.625, max 42ch, Ink Two): the positioning paragraph; the case-study summary under the h1 (max 60ch).
+- **Prose** (400, 1rem, 1.7, max 68ch, Ink Two): case-study MDX paragraphs and list items; strong runs go Ink 600.
 - **Body** (400, 0.875rem, 1.55–1.625): provenance (14px, Ink Two), nav links, buttons (14px, 600). Claim lines in the proof ledger take the Title size (16px, 400, Ink).
-- **Label** (400–500, 0.75–0.8125rem): zone notes, path lines, legends, footer note. Ink Three.
+- **Label** (400–500, 0.75–0.8125rem): zone notes, path lines, legends, footer note, fact terms, pager direction words; card stack marks in Ink Two. Ink Three unless stated.
 - **Mono** (Fragment Mono 400, 13px): the email address inside the copy-email control, and nowhere else.
 
 ### Named Rules
@@ -197,6 +235,10 @@ A centred 1280px frame (max-w-7xl) with 20px side gutters, 32px from sm. The sti
 The hero is a 12-column grid that splits only at xl (1280px): 5 columns of identity and actions on the left, 7 columns of service map on the right, 48px column gap, vertically centred. Below xl the map stacks under the copy at full width, capped at 768px (max-w-3xl). Below md (768px) the drawing is removed and replaced by a ruled three-zone strip placed between the actions and the ledger, so a phone still sees the estate before the figures.
 
 The proof ledger is a ruled grid: 1 column, 2 from sm, 3 from lg, cells 20px padded (20px × 16px at xl). Vertical rhythm between blocks runs 16–40px; nothing uses large empty bands.
+
+Home sections below the hero each open on a full-bleed Hairline (the rule spans the viewport; the content does not) and sit inside the same 1280px frame with 64px of vertical padding and the heading 24px above its content. Selected work is a ruled grid of cards, 1 column, 2 from md. The experience entry splits each workstream 4/8 from lg (48px gap): name, summary and case-study link on the left, points on the right.
+
+A case-study page opens 32px under the nav with an "All work" back link, then the content 24px below it. Below xl everything is one column capped at 768px (max-w-3xl), so a 760-wide diagram renders near 1:1. From xl it is a 12-column grid with a 48px column gap: header and MDX body on 8 columns, the facts panel on 4, spanning both rows and sticky 80px from the top. The pager closes the page 64px below the body, and the page ends on 80px of bottom padding.
 
 **The Ruled Grid Rule.** Collections of peers sit in one bordered, radius-lg container with 1px gaps over the Hairline colour, so the rules are the background showing through. Not separate floating cards with gaps between them.
 
@@ -215,7 +257,7 @@ Depth is tonal. In-page surfaces step up from canvas through surface-1 and surfa
 
 ## Shapes
 
-Quietly rounded, rectangular, console-like. Controls, map nodes and the copy-email control take a 6px radius; panels, the ledger, the mobile strip, dialogs and toasts take 10px; map bands and zones use 8px in SVG units. Dots and the nav indicator are full pills. Borders are always 1px; the only 2px line is the focus outline (2px Console Blue, 3px offset) and the active-nav underline. Containers clip their children (overflow hidden) so ruled grids keep their outer corners.
+Quietly rounded, rectangular, console-like. Controls, map nodes and the copy-email control take a 6px radius; panels, the ledger, the mobile strip, dialogs and toasts take 10px; map bands and zones use 8px in SVG units. Dots and the nav indicator are full pills. Borders are always 1px; the only 2px lines are the focus outline (2px Console Blue, 3px offset), its inset 2px ring form inside clipped ruled grids, and the active-nav underline. Containers clip their children (overflow hidden) so ruled grids keep their outer corners; that clipping is why a link inside a ruled grid takes an inset ring instead of the offset outline. Diagram groups are the one dashed line on the site (4 3 dash, 8px radius in SVG units). Lists in prose and panels use a hairline dash instead of a bullet: an 8px × 1px Strong Hairline line, 16px of indent, pinned to the first line of the item.
 
 ## Components
 
@@ -236,6 +278,13 @@ A joined pair inside one Surface One, 6px-radius container with a Hairline borde
 - **Shadow Strategy:** none in flow (see Elevation & Depth).
 - **Border:** 1px Hairline; a caption row separated by a bottom hairline when the panel has a title.
 - **Internal Padding:** 10–20px; ledger cells 20px.
+
+### Text Links
+Inline links in prose, the experience panel and the facts panel are Ink (medium where they stand alone) with a 1px Strong Hairline underline 4px below the baseline; hover raises the underline to Ink. A link that leads to a case study carries a trailing 14px arrow set inline with its last word (not inline-flex, so a wrapped title keeps the arrow) that nudges 2px on hover; external links carry an up-right arrow and a screen-reader "opens in new tab" note. The case-study back link is 14px Ink Three with a leading arrow that nudges 2px left, Ink on hover.
+
+### Chips
+- **Stage chips:** the pipeline stages on a case study with no single figure: canvas fill, Strong Hairline border, 6px radius, 6px × 12px, 14px Ink, separated by Ink Three arrows in a wrapping row.
+- **Stage line:** on a work card the same stages run as one wrapping 14px Ink Two line with Ink Three arrows, no chips.
 
 ### Navigation
 Sticky, 56px, canvas at 85% with backdrop blur and a bottom hairline. The name sits left in 16px semibold Ink. Section links are 14px Ink Three, Ink on hover and when current (aria-current="location"); a 2px Console Blue underline glides between the current links on a 300ms expo-out transition. An outlined compact Resume button closes the row (12px × 6px, 14px medium). Below md the links collapse into a ghost menu button that opens a right-hand sheet: Surface One, left hairline, hairline-ruled 16px links that turn Console Blue on hover, then a full-width primary Download resume, the copy-email control and social links.
@@ -258,6 +307,35 @@ Six measured outcomes in a ruled 3×2 grid. Each cell is a sentence, not a tile:
 ### Trace (signature interaction)
 Hover or focus on a figure previews its path; click or tap pins it (aria-pressed), a second tap or Escape clears it; the pinned id is mirrored to `?trace=` so a link can carry it. While tracing, lit elements take Console Blue and every unlit traceable element dims to 30% opacity over 220ms expo-out. Every traceable element carries a `data-lit-by` attribute (empty when nothing lights it) so the whole drawing dims around the path. The active cell steps to Surface Two; a pinned cell adds a 1px inset Console Blue ring.
 
+### Section Heading
+Every home section below the hero: a full-bleed Hairline above, the 1280px frame with 64px vertical padding, a Heading (24px, 600, -0.01em, Ink) and the content 24px under it.
+
+### Work Cards
+The selected work as a ruled grid (2 columns from md). Each card is Surface One, 20px padded, stepping to Surface Two on hover over 200ms.
+- **Order:** an 18px semibold title; a 14px Ink Two summary; the lead Figure (36px) with its 16px Ink label and a 14px Ink Three provenance line, or the stage line for the project that has no figure; the stack as tech marks (12px Ink Two, 6px dot) capped at five with an Ink Three "+N more"; then a footer row pushed to the bottom.
+- **Footer:** where it happened (Ink Three) on the left; on the right an optional "Code" link (Ink Two, up-right arrow) and a "Case study" affordance in Ink medium whose arrow nudges 2px on card hover.
+- **Hit area:** the title link is stretched over the whole card with a ::after overlay; focus draws a 2px inset Console Blue ring on that overlay, because the grid's overflow would clip an outline. The Code link is raised above the overlay (relative, z-10) so it stays its own target.
+
+### Experience Entry
+One bordered Surface One panel (10px, Hairline, clipped). A header row behind a bottom hairline holds the role title (18px semibold), the legal employer name and location in 14px Ink Two (the only place the legal name appears on the site), and the period in 14px Ink Three, right-aligned and wrapping under on narrow screens. Workstreams follow as hairline-ruled rows, 20px padded, split 4/8 from lg: a 16px semibold name, a 14px Ink Two summary and, where one exists, an underlined "Case study: …" link; then the points as hairline-dash items in 14px Ink Two. A final row behind a top hairline reads "Also built here:" followed by the remaining project links.
+
+### Case Study Header and Facts
+- **Header:** the Display h1 at 36px, an 18px Ink Two summary, then a "Measured outcomes" (or "Pipeline stages") title over the figure ledger or the stage chips.
+- **Figure ledger:** a ruled grid, 2 columns from sm, an odd last cell spanning both. Each cell is Surface One, 20px padded: the Figure at 36px, a 16px Ink label, then 14px Ink Two provenance with an Ink Three "how measured" aside when known. These figures are static; Trace lives on the hero only.
+- **Facts panel:** a Surface One panel holding one definition list, hairline-ruled rows 12px × 16px: Where, My part, Built with (tech marks) and, when the project has public code, Code (an underlined repo link). Terms 12px Ink Three, values 14px Ink. Sticky 80px from the top from xl.
+- **Ownership:** a ruled grid with a "My part" column; a second column for the team (or what was already in place) appears beside it from md only when the source material says something about it. Each column is Surface One, 20px padded, a 14px semibold Ink heading over hairline-dash items in 14px Ink Two.
+
+### Pager
+A ruled grid of two cells (2 columns from sm) closing every case study. Each cell is Surface One, 16px × 20px, stepping to Surface Two on hover: a 12px Ink Three direction word ("Previous", "Next") over a 16px medium Ink title with an arrow that nudges 2px outward; the next cell is right-aligned from sm. At either end the empty side becomes "Back to / All work". Focus is the 2px inset Console Blue ring, as on work cards.
+
+### Architecture Diagrams
+A per-case-study drawing, server-rendered as SVG at a 760 viewBox width, framed in a Surface One panel with a caption row (14px medium Ink Two title behind a bottom hairline) and 10px of inner padding.
+- **Groups:** unfilled rectangles in Strong Hairline with a 4 3 dash and an 8px radius (the AWS-diagram convention), titled in Ink Two (medium) with an optional Ink Three note under the title.
+- **Nodes:** canvas-filled, Strong Hairline stroked, 6px radius, a 7px tech dot (Ink Three when the brand has no usable colour), an Ink name and optional Ink Three meta, as on the hero map.
+- **Edges:** 1.25px Ink Three orthogonal paths ending in an Ink Three arrowhead. Labels are Ink Two, centred on the edge and knocked out of it with a 6px Surface One stroke painted under the fill (paint-order: stroke).
+- **Type:** 14 viewBox units for node names, 12.5 for everything else; the drawing is shown only from md, where it is never narrower than about 680px, so the smallest rendered text is 11.2px (the Readable Map Rule).
+- **Text equivalent:** below md the drawing is replaced by a nested list (groups with their notes, then the nodes inside each with tech dots and meta, nested under a left hairline) followed by a "Connections" list of "from → to · label" lines. Above md the drawing is aria-hidden and the same list stays in the page as screen-reader-only text.
+
 ## Do's and Don'ts
 
 ### Do:
@@ -269,6 +347,8 @@ Hover or focus on a figure previews its path; click or tap pins it (aria-pressed
 - **Do** keep rendered map text at 11px or larger at the narrowest layout.
 - **Do** limit motion to the one load moment and to colour/border transitions (200–300ms, cubic-bezier(0.16, 1, 0.3, 1)); let reduced motion cancel all of it.
 - **Do** use tabular numerals and the condensed width axis for figures.
+- **Do** give a link inside a clipped ruled grid a 2px inset Console Blue ring instead of the offset outline, and keep any second link raised above a stretched card overlay.
+- **Do** ship every drawing with a text equivalent that carries the same groups, nodes and connections.
 
 ### Don't:
 - **Don't** add a light theme or any second accent hue; no teal, violet, neon, glowing edges or halos, and no gradient beyond the one atmosphere behind the service map.
