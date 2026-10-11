@@ -9,7 +9,9 @@ import "./globals.css";
 /*
  * Schibsted Grotesk carries everything a person reads, from 15px body to the
  * 96px name, set tight and heavy for the statements. Fragment Mono is kept
- * for the literal, copyable email address only.
+ * for the literal, copyable email address only. It isn't preloaded: the
+ * address sits at the foot of the page, and the hero's critical path
+ * shouldn't wait on it.
  */
 const schibsted = Schibsted_Grotesk({
   subsets: ["latin"],
@@ -22,6 +24,7 @@ const fragment = Fragment_Mono({
   weight: "400",
   variable: "--font-fragment",
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {

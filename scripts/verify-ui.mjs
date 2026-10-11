@@ -353,6 +353,8 @@ await mouseAt("#contact button[aria-label='Copy email address']");
 const copiedToast = await waitFor(`document.body.innerText.includes('Email address copied')`, 3000);
 const clip = await evaluate("window.__copied");
 check("Contact: the copy button copies the address and says so", copiedToast && clip === email, `${granted}; toast ${copiedToast}; wrote "${clip}"`);
+const toastBox = await evaluate(`(() => { const t = [...document.querySelectorAll('li')].find(li => li.textContent.includes('Email address copied')); if (!t) return null; const r = t.getBoundingClientRect(); return { right: Math.round(innerWidth - r.right), bottom: Math.round(innerHeight - r.bottom), inBody: t.closest('#contact') === null }; })()`);
+check("the copy toast rises in the viewport's corner, outside the section", !!toastBox && toastBox.inBody && toastBox.right >= 0 && toastBox.right < 40 && toastBox.bottom >= 0 && toastBox.bottom < 40, JSON.stringify(toastBox));
 
 await load("/", DESKTOP);
 await evaluate(`Object.defineProperty(Navigator.prototype, 'clipboard', { get: () => undefined, configurable: true }); true`);
@@ -519,6 +521,9 @@ check(
 await load("/?deep#stack", DESKTOP); // a query makes it a fresh document, not a same-page hash jump
 const deep = await evaluate(`(() => { const r = document.querySelector('#stack .reveal'); return { animate: r.hasAttribute('data-animate'), opacity: getComputedStyle(r).opacity, top: Math.round(document.getElementById('stack').getBoundingClientRect().top) }; })()`);
 check("a deep link leaves the section it lands on at rest", !deep.animate && deep.opacity === "1", JSON.stringify(deep));
+await load("/?land#credentials", DESKTOP); // its own query: a hash-only change from the last URL fires no load
+const landed = await evaluate("Math.round(document.getElementById('credentials').getBoundingClientRect().top)");
+check("a direct #credentials link lands on the section", Math.abs(landed - 80) <= 24, `top ${landed}px`);
 await load("/", DESKTOP);
 await send("Emulation.setEmulatedMedia", { media: "print", features: LIGHT });
 const printed = await evaluate("[...document.querySelectorAll('.reveal')].map(r => getComputedStyle(r).opacity).every(o => o === '1')");

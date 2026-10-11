@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Toast } from "radix-ui";
+import { Portal, Toast } from "radix-ui";
 import { Check, Copy, X } from "lucide-react";
 
 /**
@@ -119,10 +119,13 @@ export function CopyEmailButton({
         </Toast.Close>
       </Toast.Root>
 
-      <Toast.Viewport
-        label="Notifications ({hotkey})"
-        className="fixed right-4 bottom-4 z-100 flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2 outline-none"
-      />
+      {/* At the end of <body>: a transformed ancestor (the section reveal, mid-rise) would otherwise become the fixed viewport's containing block. */}
+      <Portal.Root>
+        <Toast.Viewport
+          label="Notifications ({hotkey})"
+          className="fixed right-4 bottom-4 z-100 flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2 outline-none"
+        />
+      </Portal.Root>
     </Toast.Provider>
   );
 }

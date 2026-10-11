@@ -37,7 +37,7 @@ Cloud & DevOps engineer at Parkar Global Technologies (December 2024 – present
 
 ## Capabilities and Constraints
 
-- **Stack:** Next.js 16.2.10 App Router, React 19.2.4, TypeScript, Tailwind CSS v4 (CSS-first `@theme` config), `framer-motion` (via `LazyMotion`), Radix UI primitives, `lucide-react` for interface icons, MDX for case studies, Vitest for logic and content tests. Deployed via a Dockerfile (`output: "standalone"`); `NEXT_PUBLIC_SITE_URL` configures the canonical URL. Vercel later, not now.
+- **Stack:** Next.js 16.2.10 App Router, React 19.2.4, TypeScript, Tailwind CSS v4 (CSS-first `@theme` config), CSS-only motion (no animation library), Radix UI primitives, `lucide-react` for interface icons, MDX for case studies, Vitest for logic and content tests. Deployed via a Dockerfile (`output: "standalone"`); `NEXT_PUBLIC_SITE_URL` configures the canonical URL. Vercel later, not now.
 - **Light and dark themes**, both first-class, with a toggle in the nav. The visitor's system setting picks the first theme and a chosen one is remembered; with JavaScript off the system setting still applies (decided 2026-10-11, replacing "dark only").
 - **No blog** in this rebuild.
 - All facts live in `lib/resume-data.ts`, typed by `types/resume.ts`; long-form case-study narrative lives in MDX. Content tests guard both.
