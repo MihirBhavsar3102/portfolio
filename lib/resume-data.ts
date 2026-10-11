@@ -38,7 +38,7 @@ const fig = {
   setup: {
     value: "<30 min",
     label: "to stand up a new environment",
-    provenance: "The whole platform is Terraform; plan and apply builds it, and one step replicates it.",
+    provenance: "The platform's infrastructure is defined in Terraform; plan and apply builds it, and one step replicates it.",
   },
   delivery: {
     value: "50%+",
@@ -192,7 +192,7 @@ export const resume: Resume = {
         },
         {
           name: "Linux administration",
-          summary: "Looking after the Linux servers underneath.",
+          summary: "Administering Linux servers.",
           points: ["User and SSH access, permissions, OS patching, web and app server setup, and service troubleshooting."],
         },
       ],

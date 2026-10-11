@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Gitignored tool scratch: review screenshots and browser profiles, plan ledgers.
+    ".impeccable/**",
+    ".superpowers/**",
   ]),
 ]);
 

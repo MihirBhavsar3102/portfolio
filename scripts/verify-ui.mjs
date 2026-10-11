@@ -4,7 +4,7 @@
 // Usage: node scripts/verify-ui.mjs <baseUrl> <outDir> [label]
 // Run against `next start` (and `next dev`); exits non-zero if any check fails.
 import { spawn } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 const [, , BASE = "http://localhost:3100", OUT = ".", LABEL = "prod"] = process.argv;
@@ -248,6 +248,23 @@ await sleep(800);
 const tracked = await evaluate(`document.querySelector('nav[aria-label=Sections] a[aria-current]')?.dataset.section ?? null`);
 check("nav tracks sections after returning from a case study", tracked === "experience", String(tracked));
 
+// The marked section clears when no section is in view: back up at the hero,
+// and after returning home through the name link from a case study.
+const marked = () => evaluate(`document.querySelector('nav[aria-label=Sections] a[aria-current]')?.dataset.section ?? null`);
+await evaluate("window.scrollTo(0, 0); true");
+await sleep(800);
+const atHero = await marked();
+check("scrolling back to the hero clears the marked section", atHero === null, String(atHero));
+await evaluate("document.getElementById('work').scrollIntoView({ block: 'start' }); true");
+await sleep(800);
+await mouseAt("#work article:nth-child(2) h3 a");
+await waitFor(`location.pathname === ${JSON.stringify(cardHrefs[1])} && !!document.querySelector('[data-diagram]')`);
+await mouseAt("header a[href='/']");
+const home = await waitFor(`location.pathname === '/' && !!document.getElementById('work')`);
+await sleep(800);
+const afterName = await marked();
+check("returning home through the name link marks no section", home && afterName === null, `${home} ${afterName}`);
+
 // ---------- Map legibility at the narrowest split and below it ----------
 const minSvgFont = (selector = "figure svg") =>
   evaluate(
@@ -354,7 +371,24 @@ check("no console errors", consoleErrors.length === 0, consoleErrors.slice(0, 3)
 
 writeFileSync(join(OUT, `${LABEL}-results.json`), JSON.stringify(results, null, 2));
 ws.close();
+// Close the browser through CDP. On Windows the msedge.exe we spawned hands
+// off to a separate browser process and exits, so killing it would leave the
+// browser running with the throwaway profile locked.
+try {
+  const { webSocketDebuggerUrl } = await (await fetch(`http://127.0.0.1:${PORT}/json/version`)).json();
+  const browser = new WebSocket(webSocketDebuggerUrl);
+  await new Promise((r, j) => ((browser.onopen = r), (browser.onerror = j)));
+  browser.send(JSON.stringify({ id: 1, method: "Browser.close" }));
+  await sleep(1500);
+} catch {
+  // Already gone.
+}
 edge.kill();
+try {
+  rmSync(PROFILE, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+} catch {
+  console.log(`note  could not remove ${PROFILE}`);
+}
 const failed = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - failed}/${results.length} checks passed`);
 process.exit(failed ? 1 : 0);

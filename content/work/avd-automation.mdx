@@ -2,19 +2,19 @@ export const meta = { slug: "avd-automation" };
 
 ## Context
 
-Five enterprise clients run their virtual desktops on Azure Virtual Desktop, and our team at Parkar Global Technologies runs those estates for them. Bringing up a client's desktops meant a long run of manual steps: build each virtual machine, join it to the domain, give it its secrets, and register it with a host pool.
+Five enterprise clients run their virtual desktops on Azure Virtual Desktop, and our team at Parkar Global Technologies runs those estates for them. Bringing up a client's desktops meant a long run of manual steps: build the virtual machines, join them to the domain, give them their secrets, and register them with a host pool.
 
 The work went in phases. First we learned how each client's environment was set up. Then I built the automation that provisions the virtual machines. After that, the team moved on to cost.
 
 ## Constraints
 
-Requirements and sizing came from each client, so the automation had to fit what each one asked for. Those decisions were the clients' to make, not mine.
+Requirements and sizing were set per client, and the key decisions were the clients' to make, not mine.
 
 ## Architecture
 
 <Diagram />
 
-An Azure DevOps pipeline runs Terraform and PowerShell, with its secrets kept in Azure Key Vault. The pipeline's PowerShell provisioning creates each session host inside the client's host pool from a golden image built by Azure VM Image Builder, and joins it to Active Directory. Session hosts keep user profiles in FSLogix, and the host pool scales automatically. Azure Monitor and Log Analytics watch the estate, queried with KQL.
+An Azure DevOps pipeline runs Terraform and PowerShell, with its secrets kept in Azure Key Vault and the Active Directory domain join automated. My PowerShell provisioning script creates virtual machines inside the client's host pool, end to end. Session hosts are built from golden images that Azure VM Image Builder produces and keep user profiles in FSLogix, and the host pool scales automatically. Azure Monitor and Log Analytics watch the estate, queried with KQL.
 
 ## What I built and what the team did
 

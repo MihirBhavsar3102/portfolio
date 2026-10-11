@@ -49,9 +49,10 @@ export const awsWebPlatform: Diagram = {
     },
     {
       from: "ansible",
-      to: "ec2",
-      path: [[200, 217], [230, 217], [230, 285], [460, 285]],
-      source: "resume: AWS — end-to-end CI/CD pipeline with Terraform, Ansible and GitHub Actions",
+      to: "region",
+      path: [[200, 217], [244, 217]],
+      source:
+        "resume: AWS — end-to-end CI/CD pipeline with Terraform, Ansible and GitHub Actions (what Ansible configures isn't stated, so the edge stops at the region, as on the hero map)",
     },
     {
       from: "cloudwatch",

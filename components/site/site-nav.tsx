@@ -15,12 +15,17 @@ function useActiveSection(pathname: string) {
   // Re-observe on every route change: coming back from a case study mounts
   // fresh section elements, and an observer on the old ones goes quiet.
   useEffect(() => {
+    // Every section currently in the band, so the mark clears when none is
+    // (back up at the hero) instead of keeping the last one seen.
+    const inView = new Map<string, number>();
     const observer = new IntersectionObserver(
       (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) setActive(visible.target.id);
+        for (const entry of entries) {
+          if (entry.isIntersecting) inView.set(entry.target.id, entry.intersectionRatio);
+          else inView.delete(entry.target.id);
+        }
+        const [top] = [...inView].sort((a, b) => b[1] - a[1]);
+        setActive(top ? top[0] : null);
       },
       { rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
     );

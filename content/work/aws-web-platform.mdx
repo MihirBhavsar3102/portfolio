@@ -10,7 +10,7 @@ At Parkar Global Technologies I designed and deployed a WordPress platform on AW
 
 CloudFront, with S3, sits in front of an Application Load Balancer, which spreads traffic across EC2 instances in an Auto Scaling group that spans availability zones. WordPress runs on those instances, with its database in RDS. The platform also uses Lambda; I've left its wiring out of the drawing.
 
-A GitHub Actions pipeline ships changes end to end: Terraform provisions the infrastructure with plan and apply, and Ansible configures the instances. CloudWatch alarms and dashboards watch the platform, and I built Grafana dashboards and alert rules on a Prometheus stack that was already running.
+A GitHub Actions pipeline ships changes end to end: Terraform provisions the infrastructure with plan and apply, and Ansible handles configuration. CloudWatch alarms and dashboards watch the platform, and I built Grafana dashboards and alert rules on a Prometheus stack that was already running.
 
 ## What I built
 
