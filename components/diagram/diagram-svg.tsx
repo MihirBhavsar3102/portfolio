@@ -56,7 +56,7 @@ export function DiagramSvg({ id, diagram }: { id: string; diagram: Diagram }) {
             height={g.h - 1}
             rx={8}
             fill="none"
-            className="stroke-line-strong"
+            className="stroke-line-graphic"
             strokeDasharray="4 3"
           />
           <text x={g.x + GROUP_TEXT.x} y={g.y + GROUP_TEXT.label} className="fill-ink-2 font-sans" fontSize={SIZE.group} fontWeight={500}>

@@ -121,7 +121,7 @@ export function Topology() {
           fill="none"
           strokeWidth={edge.kind === "control" ? 1 : 1.25}
           data-lit-by={by(edge.key)}
-          className={`topo-draw ${edge.kind === "control" ? "stroke-line-strong" : "stroke-ink-3"} data-lit:stroke-accent`}
+          className={`topo-draw ${edge.kind === "control" ? "stroke-line-graphic" : "stroke-ink-3"} data-lit:stroke-accent`}
           style={{ "--len": edge.length, "--d": `${delayOf(edge.key)}ms` } as Vars}
         />
       ))}

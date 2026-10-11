@@ -26,11 +26,13 @@ colors:
   line-dark: "#232323"
   line-strong: "#d5d5d2"
   line-strong-dark: "#303030"
+  line-graphic: "#86878b"
+  line-graphic-dark: "#686866"
   ink: "#0a0a0b"
   ink-dark: "#f4f4f3"
   ink-2: "#47484c"
   ink-2-dark: "#a9a9a6"
-  ink-3: "#6b6c71"
+  ink-3: "#68696e"
   ink-3-dark: "#858582"
 typography:
   display:
@@ -240,10 +242,11 @@ Achromatic grounds and ink in two themes, one warm persimmon accent, and three c
 - **Surface Two** (light `#f0f0ef`, dark `#181818`): hover fills (toggle, pager, ghost controls), map bands and zones, the toast.
 - **Surface Three** (light `#e7e7e5`, dark `#1f1f1f`): the fill of a "used at work" skill chip, and nothing else. Small Ink Three text never sits on it.
 - **Hairline** (light `#e9e9e7`, dark `#232323`): section rules, panel borders, row dividers.
-- **Strong Hairline** (light `#d5d5d2`, dark `#303030`): chip borders, map and diagram node strokes, dashed diagram groups, the trace hint border, link underlines at rest.
+- **Strong Hairline** (light `#d5d5d2`, dark `#303030`): chip borders, map and diagram node strokes, the trace hint border, link underlines at rest.
+- **Graphic Line** (light `#86878b`, dark `#686866`): the strokes a reader needs to read a drawing, the map’s control edges and a diagram’s dashed group outlines. Clears 3:1 on Canvas, Surface One and Surface Two. Node boxes and the map’s zone panels keep their hairlines; their labels identify them.
 - **Ink** (light `#0a0a0b`, dark `#f4f4f3`): names, headings, figures at rest, the primary button fill.
 - **Ink Two** (light `#47484c`, dark `#a9a9a6`): intros, provenance, summaries, prose, nav links.
-- **Ink Three** (light `#6b6c71`, dark `#858582`): metadata, "how measured" asides, card provenance lines, periods, labels.
+- **Ink Three** (light `#68696e`, dark `#858582`): metadata, "how measured" asides, card provenance lines, periods, labels.
 
 ### Named Rules
 **The One Persimmon Rule.** Persimmon is the only interface colour. It marks a text action, focus, a selection or a lit path, and nothing decorative. Buttons are ink, not persimmon.
@@ -254,7 +257,7 @@ Achromatic grounds and ink in two themes, one warm persimmon accent, and three c
 
 **The Two Themes Rule.** Every colour is a token with a light and a dark value; nothing is hard-coded to one theme. With JavaScript off, the system setting chooses through `prefers-color-scheme`.
 
-**The AA Floor Rule.** Every text pairing clears 4.5:1 in both themes; small Ink Three text never goes on Surface Three.
+**The AA Floor Rule.** Every text pairing clears 4.5:1 in both themes; small Ink Three text never goes on Surface Three. Strokes a reader needs (edges, group outlines) clear 3:1 (Graphic Line or Ink Three). `tests/contrast.test.ts` holds every pairing, card tints included.
 
 ## Typography
 

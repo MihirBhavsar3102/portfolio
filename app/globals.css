@@ -12,7 +12,9 @@
  * Light is the default. Dark comes from data-theme="dark" (set before paint
  * by lib/theme.ts from the visitor's choice or the system setting) and, with
  * JavaScript off, straight from prefers-color-scheme. Every text pairing
- * clears WCAG AA in both themes; small ink-3 text stays off surface-3.
+ * clears WCAG AA in both themes (tests/contrast.test.ts); small ink-3 text
+ * stays off surface-3; strokes a reader needs (edges, diagram groups) use
+ * line-graphic at 3:1.
  */
 @theme {
   --color-canvas: #ffffff;
@@ -21,9 +23,10 @@
   --color-surface-3: #e7e7e5;
   --color-line: #e9e9e7;
   --color-line-strong: #d5d5d2;
+  --color-line-graphic: #86878b;
   --color-ink: #0a0a0b;
   --color-ink-2: #47484c;
-  --color-ink-3: #6b6c71;
+  --color-ink-3: #68696e;
   --color-accent: #b93b0a;
   --color-accent-ink: #ffffff;
   --color-accent-soft: rgb(185 59 10 / 0.08);
@@ -57,6 +60,7 @@
   --color-surface-3: #1f1f1f;
   --color-line: #232323;
   --color-line-strong: #303030;
+  --color-line-graphic: #686866;
   --color-ink: #f4f4f3;
   --color-ink-2: #a9a9a6;
   --color-ink-3: #858582;
@@ -78,6 +82,7 @@
     --color-surface-3: #1f1f1f;
     --color-line: #232323;
     --color-line-strong: #303030;
+    --color-line-graphic: #686866;
     --color-ink: #f4f4f3;
     --color-ink-2: #a9a9a6;
     --color-ink-3: #858582;
