@@ -9,7 +9,7 @@ export function StageChips({ stages }: { stages: string[] }) {
               →
             </span>
           )}
-          <span className="rounded-md border border-line-strong bg-canvas px-3 py-1.5 text-sm text-ink">{stage}</span>
+          <span className="rounded-full border border-line-strong bg-canvas px-3.5 py-1.5 text-sm text-ink">{stage}</span>
         </li>
       ))}
     </ol>

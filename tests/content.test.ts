@@ -71,6 +71,13 @@ describe("projects", () => {
     for (const p of resume.projects) expect(p.figures.length + (p.stages?.length ?? 0), p.slug).toBeGreaterThan(0);
   });
 
+  it("name the zone each work project ran in, and none for a personal project", () => {
+    for (const p of resume.projects) {
+      if (p.kind === "work") expect(zoneIds.has(p.zone as never), p.slug).toBe(true);
+      else expect(p.zone, p.slug).toBeUndefined();
+    }
+  });
+
   it("link workstreams only to existing case studies", () => {
     const slugs = new Set(resume.projects.map((p) => p.slug));
     for (const w of resume.experience.flatMap((r) => r.workstreams)) {

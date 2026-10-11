@@ -3,11 +3,10 @@ import { tech } from "@/lib/tech";
 import { litBy } from "@/lib/trace";
 
 /**
- * The service map below `md`: the three workloads as a compact ruled strip
+ * The service map below `md`: the three workloads as a compact ruled list
  * instead of a shrunken drawing — each with its note, its services, and the
- * tools that build and watch it. It sits between the actions and the proof
- * ledger, so a phone's first screens still show the estate, and it carries
- * the same `data-lit-by` marks so Trace lights it.
+ * tools that build and watch it. It carries the same `data-lit-by` marks, so
+ * the figure chips above it light it.
  */
 export function TopologyStack() {
   const { estate } = resume;
@@ -16,11 +15,9 @@ export function TopologyStack() {
   const tools = new Map(estate.controlPlane.flatMap((l) => l.nodes.map((n) => [n.id, { node: n, lane: l.id }] as const)));
 
   return (
-    <section aria-labelledby="map-heading" className="mt-10 md:hidden">
-      <h2 id="map-heading" className="mb-3 text-base font-semibold text-ink">
-        Service map
-      </h2>
-      <ol className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface-1">
+    <div className="mt-10 md:hidden">
+      <h3 className="sr-only">Service map</h3>
+      <ol className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-canvas">
         {estate.zones.map((zone) => {
           const feeding = estate.edges.filter((e) => e.to === zone.id && tools.has(e.from)).map((e) => tools.get(e.from)!);
           return (
@@ -67,6 +64,6 @@ export function TopologyStack() {
           );
         })}
       </ol>
-    </section>
+    </div>
   );
 }

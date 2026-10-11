@@ -5,7 +5,7 @@ import { TechMark } from "@/components/ui/tech-mark";
 
 function Fact({ term, children }: { term: string; children: React.ReactNode }) {
   return (
-    <div className="px-4 py-3">
+    <div className="px-5 py-4">
       <dt className="text-xs text-ink-3">{term}</dt>
       <dd className="mt-1 text-sm leading-relaxed text-ink">{children}</dd>
     </div>
@@ -16,7 +16,7 @@ function Fact({ term, children }: { term: string; children: React.ReactNode }) {
 export function CaseStudyFacts({ project, className = "" }: { project: Project; className?: string }) {
   return (
     <aside aria-label="Project facts" className={className}>
-      <dl className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface-1 xl:sticky xl:top-20">
+      <dl className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface-1 xl:sticky xl:top-20">
         <Fact term="Where">{whereLabel(project)}</Fact>
         <Fact term="My part">{project.role}</Fact>
         <Fact term="Built with">

@@ -14,8 +14,8 @@ const issuers: Record<Certification["issuerId"], string> = {
 function Panel({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {
   return (
     <div className={className}>
-      <h3 className="mb-2.5 text-base font-semibold text-ink">{title}</h3>
-      <ul className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface-1">{children}</ul>
+      <h3 className="mb-4 text-lg font-semibold tracking-tight text-ink">{title}</h3>
+      <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface-1">{children}</ul>
     </div>
   );
 }

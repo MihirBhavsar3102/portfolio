@@ -84,6 +84,8 @@ export interface Project {
   headline: string;
   summary: string;
   kind: ProjectKind;
+  /** The estate zone the work ran in; colours its card. A personal project has none. */
+  zone?: EstateZone["id"];
   /** What Mihir owned, one line. */
   role: string;
   repo?: { owner: string; name: string };

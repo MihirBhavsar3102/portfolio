@@ -53,7 +53,7 @@ export function RepoList({ repos }: { repos: RepoCard[] }) {
   if (repos.length === 0) return null;
   return (
     <Section id="github" title="GitHub">
-      <ul className="grid gap-px overflow-hidden rounded-lg border border-line bg-line md:grid-cols-2">
+      <ul className="grid gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-2">
         {repos.map((repo) => (
           <Repo key={repo.url} repo={repo} />
         ))}

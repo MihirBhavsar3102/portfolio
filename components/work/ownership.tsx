@@ -1,12 +1,12 @@
 function Column({ heading, items }: { heading: string; items: string[] }) {
   return (
     <div className="bg-surface-1 p-5">
-      <h3 className="text-sm font-semibold text-ink">{heading}</h3>
+      <h3 className="text-[15px] font-semibold tracking-tight text-ink">{heading}</h3>
       <ul className="mt-3 space-y-2">
         {items.map((item) => (
           <li
             key={item}
-            className="relative pl-4 text-sm leading-relaxed text-ink-2 before:absolute before:top-[0.7em] before:left-0 before:h-px before:w-2 before:bg-line-strong"
+            className="relative pl-4 text-[15px] leading-relaxed text-ink-2 before:absolute before:top-[0.75em] before:left-0 before:h-px before:w-2 before:bg-line-strong"
           >
             {item}
           </li>
@@ -24,7 +24,7 @@ function Column({ heading, items }: { heading: string; items: string[] }) {
 export function Ownership({ mine, team, teamLabel = "The team" }: { mine: string[]; team?: string[]; teamLabel?: string }) {
   const hasTeam = !!team?.length;
   return (
-    <div className={`mt-6 grid gap-px overflow-hidden rounded-lg border border-line bg-line ${hasTeam ? "md:grid-cols-2" : ""}`}>
+    <div className={`mt-6 grid gap-px overflow-hidden rounded-2xl border border-line bg-line ${hasTeam ? "md:grid-cols-2" : ""}`}>
       <Column heading="My part" items={mine} />
       {hasTeam && <Column heading={teamLabel} items={team} />}
     </div>

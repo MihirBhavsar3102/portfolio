@@ -207,6 +207,7 @@ export const resume: Resume = {
       summary:
         "Provisioning, imaging and scaling Azure Virtual Desktop for five enterprise clients, automated with PowerShell, Image Builder and Azure DevOps pipelines.",
       kind: "work",
+      zone: "azure",
       role: "Built the end-to-end VM provisioning in PowerShell; one of a four-person team running the estate.",
       stack: ["azure-virtual-desktop", "powershell", "azure-image-builder", "azure-devops", "terraform", "key-vault", "fslogix", "azure-monitor"],
       figures: [fig.manual, fig.deploy, fig.spend, fig.users],
@@ -218,6 +219,7 @@ export const resume: Resume = {
       summary:
         "A fault-tolerant WordPress platform on AWS, defined in Terraform and shipped through a Terraform, Ansible and GitHub Actions pipeline.",
       kind: "work",
+      zone: "aws",
       role: "Designed and deployed the platform; built its Terraform and its CI/CD pipeline.",
       repo: { owner: "MihirBhavsar3102", name: "Automatic-Deployment" },
       stack: ["ec2", "auto-scaling", "alb", "rds", "lambda", "s3", "cloudfront", "terraform", "ansible", "github-actions", "cloudwatch", "prometheus", "grafana"],
@@ -229,6 +231,7 @@ export const resume: Resume = {
       headline: "An HR policy assistant on retrieval-augmented generation",
       summary: "A retrieval-augmented chatbot that answers HR policy questions from the policy documents themselves.",
       kind: "work",
+      zone: "ai",
       role: "Built it: FAISS retrieval, Llama inference and the FastAPI service around them.",
       repo: { owner: "MihirBhavsar3102", name: "Rag-Assistant-Chatbot" },
       stack: ["python", "fastapi", "langchain", "faiss", "llama"],

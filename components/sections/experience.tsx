@@ -11,60 +11,59 @@ const textLink = "font-medium text-ink underline decoration-line-strong underlin
 function CaseStudyLink({ slug }: { slug: string }) {
   const project = getProject(slug);
   if (!project) return null;
-  // Inline, not inline-flex: when the title wraps, the arrow stays with its last word.
+  // The last word and the arrow never break apart, so a wrapped title keeps its arrow.
+  const words = project.title.split(" ");
+  const last = words.pop();
   return (
-    <p className="mt-3 text-sm">
+    <p className="mt-6 text-[15px]">
       <Link href={`/work/${slug}`} className={`group ${textLink}`}>
-        Case study: {project.title}
-        <ArrowRight
-          aria-hidden="true"
-          className="ml-1.5 inline size-3.5 align-[-0.125em] transition-transform duration-200 group-hover:translate-x-0.5"
-          strokeWidth={2}
-        />
+        Case study: {words.join(" ")}{" "}
+        <span className="whitespace-nowrap">
+          {last}
+          <ArrowRight
+            aria-hidden="true"
+            className="ml-1.5 inline size-4 align-[-0.15em] transition-transform duration-200 group-hover:translate-x-0.5"
+            strokeWidth={2}
+          />
+        </span>
       </Link>
     </p>
   );
 }
 
-/** The role, with the legal employer name (its one appearance on the site), then each workstream beside its points. */
+/** The role, with the legal employer name (its one appearance on the site), then the workstreams side by side. */
 function RoleEntry({ role }: { role: Role }) {
   const also = unlinkedWorkProjects();
   return (
-    <article className="overflow-hidden rounded-lg border border-line bg-surface-1">
-      <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-line px-5 py-4">
-        <div>
-          <h3 className="text-lg font-semibold tracking-[-0.01em] text-ink">{role.title}</h3>
-          <p className="mt-0.5 text-sm text-ink-2">
-            {role.legalName} · {role.location}
-          </p>
-        </div>
-        <p className="text-sm text-ink-3">{period(role.start)}</p>
+    <article>
+      <header className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2 border-b border-line pb-8">
+        <h3 className="text-2xl font-semibold tracking-tight text-ink">
+          {role.title}, <span className="font-normal text-ink-2">{role.legalName}</span>
+        </h3>
+        <p className="text-ink-3">
+          {period(role.start)} · {role.location}
+        </p>
       </header>
 
-      <ul className="divide-y divide-line">
+      <div className="mt-12 grid gap-x-14 gap-y-14 lg:grid-cols-3">
         {role.workstreams.map((w) => (
-          <li key={w.name} className="grid gap-x-12 gap-y-3 px-5 py-5 lg:grid-cols-12">
-            <div className="lg:col-span-4">
-              <h4 className="text-base font-semibold text-ink">{w.name}</h4>
-              <p className="mt-1 text-sm leading-relaxed text-ink-2">{w.summary}</p>
-              {w.caseStudy && <CaseStudyLink slug={w.caseStudy} />}
-            </div>
-            <ul className="space-y-2 lg:col-span-8">
+          <section key={w.name} aria-label={w.name}>
+            <h4 className="text-xl font-semibold tracking-tight text-ink">{w.name}</h4>
+            <p className="mt-2 leading-relaxed text-ink-2">{w.summary}</p>
+            <ul className="mt-6 space-y-4">
               {w.points.map((point) => (
-                <li
-                  key={point}
-                  className="relative pl-4 text-sm leading-relaxed text-ink-2 before:absolute before:top-[0.7em] before:left-0 before:h-px before:w-2 before:bg-line-strong"
-                >
+                <li key={point} className="text-[15px] leading-relaxed text-ink-2">
                   {point}
                 </li>
               ))}
             </ul>
-          </li>
+            {w.caseStudy && <CaseStudyLink slug={w.caseStudy} />}
+          </section>
         ))}
-      </ul>
+      </div>
 
       {also.length > 0 && (
-        <p className="border-t border-line px-5 py-4 text-sm text-ink-2">
+        <p className="mt-14 border-t border-line pt-8 text-[15px] text-ink-2">
           Also built here:{" "}
           {also.map((p, i) => (
             <span key={p.slug}>

@@ -11,7 +11,30 @@ import { Check, Copy, X } from "lucide-react";
  * refused, the control selects the address and says how to copy it, so it
  * never dead-ends.
  */
-export function CopyEmailButton({ email, className }: { email: string; className?: string }) {
+/** `display` sets the address large, as the close of the page, with a round copy button beside it. */
+const looks = {
+  default: {
+    box: "inline-flex items-center rounded-md border border-line bg-surface-1",
+    link: "min-w-0 truncate py-2 pr-2 pl-3 font-mono text-[13px] text-ink-2 transition-colors hover:text-ink",
+    button: "flex size-9 shrink-0 items-center justify-center border-l border-line text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink",
+  },
+  display: {
+    box: "inline-flex flex-wrap items-center gap-x-4 gap-y-3",
+    link: "min-w-0 font-mono text-[clamp(1.125rem,2.6vw,2rem)] break-all text-accent underline decoration-accent/40 underline-offset-[0.25em] transition-colors hover:decoration-accent",
+    button: "flex size-11 shrink-0 items-center justify-center rounded-full border border-line-strong text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink",
+  },
+};
+
+export function CopyEmailButton({
+  email,
+  className,
+  variant = "default",
+}: {
+  email: string;
+  className?: string;
+  variant?: keyof typeof looks;
+}) {
+  const look = looks[variant];
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [copied, setCopied] = useState(false);
@@ -62,12 +85,12 @@ export function CopyEmailButton({ email, className }: { email: string; className
   return (
     <Toast.Provider swipeDirection="right" duration={3200}>
       <div
-        className={`inline-flex items-center rounded-md border border-line bg-surface-1 ${className ?? ""}`}
+        className={`${look.box} ${className ?? ""}`}
       >
         <a
           ref={linkRef}
           href={`mailto:${email}`}
-          className="min-w-0 truncate py-2 pr-2 pl-3 font-mono text-[13px] text-ink-2 transition-colors hover:text-ink"
+          className={look.link}
         >
           {email}
         </a>
@@ -75,7 +98,7 @@ export function CopyEmailButton({ email, className }: { email: string; className
           type="button"
           onClick={handleCopy}
           aria-label="Copy email address"
-          className="flex size-9 shrink-0 items-center justify-center border-l border-line text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
+          className={look.button}
         >
           {copied ? (
             <Check aria-hidden="true" className="size-4 text-accent" strokeWidth={2.25} />
@@ -88,7 +111,7 @@ export function CopyEmailButton({ email, className }: { email: string; className
       <Toast.Root
         open={open}
         onOpenChange={setOpen}
-        className="anim-toast flex items-center justify-between gap-3 rounded-lg border border-line-strong bg-surface-2 px-4 py-3 shadow-[0_18px_44px_-18px_rgb(0_0_0/0.7)]"
+        className="anim-toast flex items-center justify-between gap-3 rounded-xl border border-line-strong bg-surface-2 px-4 py-3 shadow-[0_18px_44px_-18px_rgb(0_0_0/0.45)]"
       >
         <Toast.Title className="text-sm text-ink">{message}</Toast.Title>
         <Toast.Close aria-label="Dismiss" className="shrink-0 text-ink-3 transition-colors hover:text-ink">

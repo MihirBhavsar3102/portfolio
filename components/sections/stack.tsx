@@ -51,10 +51,10 @@ export function Stack() {
           </li>
         ))}
       </ul>
-      <div className="mt-4 divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface-1">
+      <div className="mt-4 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface-1">
         {resume.skillGroups.map((group) => (
           <div key={group.name} className="grid gap-x-8 gap-y-3 px-5 py-4 md:grid-cols-[12rem_1fr]">
-            <h3 className="pt-1 text-sm font-medium text-ink">{group.name}</h3>
+            <h3 className="pt-1 text-[15px] font-semibold tracking-tight text-ink">{group.name}</h3>
             <ul className="flex flex-wrap gap-2">
               {group.skills.map((skill) => (
                 <SkillChip key={skill.name} skill={skill} />

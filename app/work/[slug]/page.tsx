@@ -10,6 +10,7 @@ import { CaseStudyHeader } from "@/components/work/case-study-header";
 import { Pager } from "@/components/work/pager";
 import { resume } from "@/lib/resume-data";
 import { getProject } from "@/lib/work";
+import { frame } from "@/components/site/frame";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -39,12 +40,12 @@ export default async function CaseStudyPage({ params }: Props) {
   const diagram = diagrams[slug];
 
   return (
-    <article className="mx-auto max-w-7xl px-5 pt-8 pb-20 sm:px-8">
+    <article className={`${frame} pt-10 pb-24`}>
       <Link href="/#work" className="group inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink">
         <ArrowLeft aria-hidden="true" className="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" strokeWidth={2} />
         All work
       </Link>
-      <div className="mt-6 grid gap-x-12 gap-y-10 xl:grid-cols-12">
+      <div className="mt-10 grid gap-x-14 gap-y-12 xl:grid-cols-12">
         <CaseStudyHeader project={project} className="max-w-3xl xl:col-span-8 xl:max-w-none" />
         <CaseStudyFacts project={project} className="max-w-3xl xl:col-span-4 xl:row-span-2 xl:max-w-none" />
         <div className="max-w-3xl xl:col-span-8 xl:max-w-none">

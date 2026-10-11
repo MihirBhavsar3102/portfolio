@@ -3,20 +3,20 @@ import { slugify } from "@/lib/format";
 import { Ownership } from "@/components/work/ownership";
 
 /*
- * Case-study prose in the Service Map Console voice: Mona Sans throughout,
- * Ink Two body text at a reading measure, Ink headings, hairline-dash list
+ * Case-study prose in the Statement voice: Schibsted Grotesk throughout, Ink
+ * Two body text at a reading measure, heavy Ink headings, hairline-dash list
  * markers. <Diagram /> is bound per page by app/work/[slug]/page.tsx.
  */
 const components: MDXComponents = {
   h2: ({ children }) => (
-    <h2 id={slugify(String(children))} className="mt-14 text-2xl font-semibold tracking-[-0.01em] text-ink first:mt-0">
+    <h2 id={slugify(String(children))} className="type-display mt-16 text-[2rem] leading-tight text-ink first:mt-0">
       {children}
     </h2>
   ),
-  p: ({ children }) => <p className="mt-4 max-w-[68ch] text-base leading-[1.7] text-ink-2">{children}</p>,
-  ul: ({ children }) => <ul className="mt-4 max-w-[68ch] space-y-2">{children}</ul>,
+  p: ({ children }) => <p className="mt-5 max-w-[68ch] text-[17px] leading-[1.7] text-ink-2">{children}</p>,
+  ul: ({ children }) => <ul className="mt-5 max-w-[68ch] space-y-2.5">{children}</ul>,
   li: ({ children }) => (
-    <li className="relative pl-4 text-base leading-[1.7] text-ink-2 before:absolute before:top-[0.8em] before:left-0 before:h-px before:w-2 before:bg-line-strong">
+    <li className="relative pl-4 text-[17px] leading-[1.7] text-ink-2 before:absolute before:top-[0.8em] before:left-0 before:h-px before:w-2 before:bg-line-strong">
       {children}
     </li>
   ),
