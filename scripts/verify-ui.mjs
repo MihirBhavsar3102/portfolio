@@ -481,7 +481,8 @@ const head = (path) =>
 const homeHead = await head("/");
 check(
   "home: canonical, its own share block and a Person",
-  /\/$/.test(homeHead.canonical ?? "") && homeHead.ogType === "website" && /\/opengraph-image/.test(homeHead.ogImage ?? "") && homeHead.ld.includes("Person"),
+  // Next prints the root canonical without its slash; http://x and http://x/ are the same URL.
+  new URL(homeHead.canonical ?? "x:").pathname === "/" && homeHead.ogType === "website" && /\/opengraph-image/.test(homeHead.ogImage ?? "") && homeHead.ld.includes("Person"),
   JSON.stringify(homeHead),
 );
 for (const href of cardHrefs) {

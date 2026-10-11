@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { monthYear, period, slugify } from "@/lib/format";
+import { monthYear, period, shortClaim, slugify } from "@/lib/format";
 
 describe("monthYear", () => {
   it("formats an ISO month", () => expect(monthYear("2024-12")).toBe("Dec 2024"));
@@ -15,4 +15,11 @@ describe("slugify", () => {
   it("lowercases and hyphenates", () =>
     expect(slugify("What I built and what the team did")).toBe("what-i-built-and-what-the-team-did"));
   it("drops punctuation at the ends", () => expect(slugify("  What broke? ")).toBe("what-broke"));
+});
+
+describe("shortClaim", () => {
+  it("keeps a figure's claim up to its first comma", () => {
+    expect(shortClaim("less manual effort across 5 clients, with configuration errors near zero")).toBe("less manual effort across 5 clients");
+    expect(shortClaim("uptime on a multi-AZ WordPress platform")).toBe("uptime on a multi-AZ WordPress platform");
+  });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Project, Role } from "@/types/resume";
-import { getProject, pagerFor, repoUrl, unlinkedWorkProjects, whereLabel } from "@/lib/work";
+import { getProject, pagerFor, repoUrl, unlinkedWorkProjects, whereLabel, zoneLabel } from "@/lib/work";
 
 const make = (slug: string, kind: Project["kind"] = "work"): Project => ({
   slug,
@@ -34,6 +34,15 @@ describe("whereLabel", () => {
 describe("repoUrl", () => {
   it("points at the GitHub repo", () =>
     expect(repoUrl({ owner: "o", name: "n" })).toBe("https://github.com/o/n"));
+});
+
+describe("zoneLabel", () => {
+  it("names the cloud a work project ran on, and a personal project as one", () => {
+    expect(zoneLabel({ ...make("a"), zone: "azure" })).toBe("Azure");
+    expect(zoneLabel({ ...make("b"), zone: "aws" })).toBe("AWS");
+    expect(zoneLabel({ ...make("c"), zone: "ai" })).toBe("Applied AI");
+    expect(zoneLabel(make("d", "personal"))).toBe("Personal project");
+  });
 });
 
 describe("unlinkedWorkProjects", () => {

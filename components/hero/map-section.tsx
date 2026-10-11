@@ -1,4 +1,5 @@
 import { resume } from "@/lib/resume-data";
+import { shortClaim } from "@/lib/format";
 import { frame, sectionHeading } from "@/components/site/frame";
 import { InView } from "@/components/hero/in-view";
 import { Topology } from "@/components/hero/topology";
@@ -16,9 +17,6 @@ function mapSummary() {
       .join(", ");
   return `Service map. Three workloads — ${workloads.join("; ")}. Built with ${lane("build")}. Watched by ${lane("observe")}.`;
 }
-
-/** The figure's claim up to its first comma: short enough for a chip. */
-const chipLabel = (label: string) => label.split(",")[0];
 
 /**
  * Screen three: the estate as one drawing, three sibling workloads under one
@@ -45,7 +43,7 @@ export function MapSection() {
               id={id}
               className="rounded-full border border-line-strong px-4 py-2 text-left text-sm text-ink-2 transition-colors hover:border-ink-3 hover:text-ink data-active:border-accent data-active:bg-accent-soft data-active:text-accent"
             >
-              <span className="font-semibold">{figure.value}</span> {chipLabel(figure.label)}
+              <span className="font-semibold">{figure.value}</span> {shortClaim(figure.label)}
             </TraceButton>
           ))}
         </div>

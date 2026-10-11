@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import type { EstateZone, Project } from "@/types/resume";
-import { repoUrl } from "@/lib/work";
+import { repoUrl, zoneLabel } from "@/lib/work";
 import { TechMark } from "@/components/ui/tech-mark";
 import { StageLine } from "@/components/work/stages";
 
@@ -10,12 +10,11 @@ import { StageLine } from "@/components/work/stages";
 const STACK_SHOWN = 4;
 
 /** Colour belongs to where the work ran; a personal project stays neutral. */
-const where: Record<EstateZone["id"], { label: string; tint: string }> = {
-  azure: { label: "Azure", tint: "var(--color-cloud-azure)" },
-  aws: { label: "AWS", tint: "var(--color-cloud-aws)" },
-  ai: { label: "Applied AI", tint: "var(--color-cloud-ai)" },
+const tints: Record<EstateZone["id"], string> = {
+  azure: "var(--color-cloud-azure)",
+  aws: "var(--color-cloud-aws)",
+  ai: "var(--color-cloud-ai)",
 };
-const personal = { label: "Personal project", tint: "var(--color-ink-3)" };
 
 /**
  * A case-study card, tinted by the cloud the work ran on: the title, where it
@@ -25,13 +24,13 @@ const personal = { label: "Personal project", tint: "var(--color-ink-3)" };
  */
 export function ProjectCard({ project }: { project: Project }) {
   const lead = project.figures[0];
-  const at = project.zone ? where[project.zone] : personal;
+  const tint = project.zone ? tints[project.zone] : "var(--color-ink-3)";
   const shown = project.stack.slice(0, STACK_SHOWN);
   const more = project.stack.length - shown.length;
 
   return (
     <article
-      style={{ "--tint": at.tint } as CSSProperties}
+      style={{ "--tint": tint } as CSSProperties}
       className="group relative flex h-full flex-col rounded-2xl border border-[color-mix(in_oklab,var(--tint)_22%,var(--color-line))] bg-[color-mix(in_oklab,var(--tint)_6%,var(--color-surface-1))] p-7 transition-[border-color,translate] duration-300 ease-out-expo hover:-translate-y-0.5 hover:border-[color-mix(in_oklab,var(--tint)_45%,var(--color-line))] sm:p-8"
     >
       <h3 className="text-[1.625rem] leading-tight font-semibold tracking-[-0.02em] text-ink">
@@ -44,7 +43,7 @@ export function ProjectCard({ project }: { project: Project }) {
       </h3>
       <p className="mt-2 inline-flex items-center gap-2 text-[13px] font-medium text-(--tint)">
         <span aria-hidden="true" className="size-2 rounded-full bg-(--tint)" />
-        {at.label}
+        {zoneLabel(project)}
       </p>
       <p className="mt-4 text-[15px] leading-relaxed text-ink-2">{project.summary}</p>
 

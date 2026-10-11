@@ -1,4 +1,4 @@
-import type { Project, Role } from "@/types/resume";
+import type { EstateZone, Project, Role } from "@/types/resume";
 import { resume } from "@/lib/resume-data";
 
 /** The case study for a slug; undefined for an unknown one. */
@@ -20,6 +20,10 @@ export function pagerFor(slug: string, projects: Project[] = resume.projects): {
 export function whereLabel(project: Project, company: string = resume.experience[0].company): string {
   return project.kind === "work" ? company : "Personal project";
 }
+
+/** Where the work ran, as its card names it; a personal project has no cloud. */
+export const zoneNames: Record<EstateZone["id"], string> = { azure: "Azure", aws: "AWS", ai: "Applied AI" };
+export const zoneLabel = (project: Project) => (project.zone ? zoneNames[project.zone] : "Personal project");
 
 export const repoUrl = (repo: { owner: string; name: string }) => `https://github.com/${repo.owner}/${repo.name}`;
 

@@ -11,6 +11,9 @@ export function period(start: string, end?: string): string {
   return `${monthYear(start)} – ${end ? monthYear(end) : "present"}`;
 }
 
+/** A figure's claim up to its first comma: short enough for a chip or a share card. */
+export const shortClaim = (label: string) => label.split(",")[0];
+
 /** Heading text → URL fragment: "What broke?" → "what-broke". */
 export function slugify(text: string): string {
   return text
