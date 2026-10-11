@@ -4,6 +4,8 @@ import { resume } from "@/lib/resume-data";
 import { SelectedWork } from "@/components/sections/selected-work";
 import { Experience } from "@/components/sections/experience";
 import { Stack } from "@/components/sections/stack";
+import { Credentials } from "@/components/sections/credentials";
+import { monthYear } from "@/lib/format";
 import { evidenceLabel, skillEvidence } from "@/lib/stack";
 import { htmlOf, textOf } from "./render";
 
@@ -72,5 +74,31 @@ describe("Stack", () => {
       expect(html.split(`data-evidence="${e}"`).length - 1, e).toBe(n);
       expect(text.split(`(${evidenceLabel[e]})`).length - 1, e).toBe(n);
     }
+  });
+});
+
+describe("Credentials", () => {
+  const html = htmlOf(createElement(Credentials));
+  const text = textOf(createElement(Credentials));
+
+  it("is #credentials with each certification's name, code, issuer and month", () => {
+    expect(html).toContain('id="credentials"');
+    for (const c of resume.certifications) {
+      expect(text).toContain(c.name);
+      if (c.code) expect(text).toContain(c.code);
+      if (c.earned) expect(text).toContain(monthYear(c.earned));
+    }
+    for (const issuer of ["Amazon Web Services", "Microsoft", "Google Cloud"]) expect(text).toContain(issuer);
+  });
+
+  it("links each verification safely in a new tab, and omits the link where there is none", () => {
+    const withUrl = resume.certifications.filter((c) => c.verifyUrl);
+    for (const c of withUrl) expect(html).toContain(`href="${c.verifyUrl}" target="_blank" rel="noopener noreferrer"`);
+    expect(text.split("Verify").length - 1).toBe(withUrl.length);
+  });
+
+  it("lists education and the NCC letter", () => {
+    for (const e of resume.education) for (const v of [e.degree, e.institution, e.years, e.score]) expect(text).toContain(v);
+    for (const a of resume.achievements) expect(text).toContain(a.detail);
   });
 });
