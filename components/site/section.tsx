@@ -21,7 +21,7 @@ export function Section({
 }) {
   return (
     <section id={id} aria-labelledby={`${id}-heading`} className={`border-t border-line ${className}`}>
-      <InView threshold={0} rootMargin="0px 0px -12% 0px" className={`reveal ${frame} py-24 lg:py-28`}>
+      <InView threshold={0} rootMargin="0px 0px -80px 0px" className={`reveal ${frame} py-24 lg:py-28`}>
         <h2 id={`${id}-heading`} className={sectionHeading}>
           {title}
         </h2>

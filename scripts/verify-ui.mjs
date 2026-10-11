@@ -140,10 +140,6 @@ async function shot(name, { fullPage = false } = {}) {
     const m = await send("Page.getLayoutMetrics");
     await send("Emulation.setDeviceMetricsOverride", { ...current, height: Math.ceil(m.cssContentSize.height) });
     await evaluate("window.scrollTo(0, 0); true");
-    // A page-tall viewport has no "bottom of the screen" for the section
-    // reveal's margin to clear, so play every pending entrance, as a reader
-    // scrolling past them would.
-    await evaluate("document.querySelectorAll('[data-animate]').forEach((el) => el.setAttribute('data-inview', '')); true");
     await sleep(2500);
   }
   const { data } = await send("Page.captureScreenshot", { format: "png" });
@@ -415,6 +411,13 @@ await mouseAt("button[aria-label='Open menu']");
 const menuOpen = await evaluate("!!document.querySelector('[role=dialog]')");
 check("mobile menu opens", menuOpen);
 await shot(`${LABEL}-mobile-menu`);
+// Copying from inside the modal menu: its toast must be readable and dismissable while the menu is open.
+await mouseAt("[role=dialog] button[aria-label='Copy email address']");
+const menuToast = await waitFor(`document.body.innerText.includes('Email address copied') || document.body.innerText.includes('Address selected')`, 3000);
+const reach = await evaluate(`(() => { const close = [...document.querySelectorAll('button[aria-label=Dismiss]')].pop(); if (!close) return null; const r = close.getBoundingClientRect(); const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); return { hit: !!hit && close.contains(hit), hidden: !!close.closest('[aria-hidden=true]') }; })()`);
+await mouseAt("button[aria-label=Dismiss]");
+const dismissed = await waitFor("!document.querySelector('button[aria-label=Dismiss]')", 2000);
+check("copying from the mobile menu raises a toast that can be read and dismissed", menuToast && !!reach && reach.hit && !reach.hidden && dismissed, JSON.stringify({ menuToast, reach, dismissed }));
 await key("Escape", "Escape", 27);
 check("mobile menu closes on Escape", !(await evaluate("!!document.querySelector('[role=dialog]')")));
 await mouseAt("#map [role=group] button:nth-child(1)");
@@ -529,6 +532,13 @@ await send("Emulation.setEmulatedMedia", { media: "print", features: LIGHT });
 const printed = await evaluate("[...document.querySelectorAll('.reveal')].map(r => getComputedStyle(r).opacity).every(o => o === '1')");
 await send("Emulation.setEmulatedMedia", { media: "", features: LIGHT });
 check("printing shows every section, revealed or not", printed);
+// A viewport that grows after load (crawlers expand it to the page height) must still reveal every section.
+await load("/", DESKTOP);
+await send("Emulation.setDeviceMetricsOverride", { ...current, height: await evaluate("document.documentElement.scrollHeight") });
+await sleep(1500);
+const tallHidden = await evaluate("[...document.querySelectorAll('.reveal')].filter(r => getComputedStyle(r).opacity !== '1').map(r => r.closest('section')?.id)");
+await send("Emulation.setDeviceMetricsOverride", current);
+check("a viewport grown to the page's height reveals every section", tallHidden.length === 0, tallHidden.join(", "));
 
 // ---------- SEO: each route's own canonical, share block and structured data ----------
 const head = (path) =>

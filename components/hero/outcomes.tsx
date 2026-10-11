@@ -11,7 +11,7 @@ import { InView } from "@/components/site/in-view";
 export function Outcomes() {
   return (
     <section id="outcomes" aria-labelledby="outcomes-heading" className="border-t border-line">
-      <InView threshold={0} rootMargin="0px 0px -12% 0px" className={`reveal ${frame} py-24 lg:py-28`}>
+      <InView threshold={0} rootMargin="0px 0px -80px 0px" className={`reveal ${frame} py-24 lg:py-28`}>
         <h2 id="outcomes-heading" className={sectionHeading}>
           Measured outcomes
         </h2>
