@@ -465,6 +465,44 @@ const nf = await evaluate(
 check("an unknown page is a styled 404 linking home and to the work", unknownStatus === 404 && nf.h1 === "Page not found" && nf.home && nf.work, `${unknownStatus} ${JSON.stringify(nf)}`);
 await shot(`${LABEL}-404-desktop`);
 
+// ---------- SEO: each route's own canonical, share block and structured data ----------
+const head = (path) =>
+  evaluate(`fetch(${JSON.stringify(path)}).then(r => r.text()).then(html => {
+    const d = new DOMParser().parseFromString(html, 'text/html');
+    const meta = (k) => d.querySelector('meta[property="' + k + '"], meta[name="' + k + '"]')?.getAttribute('content') ?? null;
+    return {
+      title: d.title,
+      canonical: d.querySelector('link[rel=canonical]')?.getAttribute('href') ?? null,
+      ogTitle: meta('og:title'), ogUrl: meta('og:url'), ogImage: meta('og:image'), ogType: meta('og:type'), site: meta('og:site_name'),
+      robots: [...d.querySelectorAll('meta[name=robots]')].map(m => m.content),
+      ld: [...d.querySelectorAll('script[type="application/ld+json"]')].map(s => JSON.parse(s.textContent)['@type']),
+    };
+  })`);
+const homeHead = await head("/");
+check(
+  "home: canonical, its own share block and a Person",
+  /\/$/.test(homeHead.canonical ?? "") && homeHead.ogType === "website" && /\/opengraph-image/.test(homeHead.ogImage ?? "") && homeHead.ld.includes("Person"),
+  JSON.stringify(homeHead),
+);
+for (const href of cardHrefs) {
+  const h = await head(href);
+  check(
+    `${href}: its own canonical, title, URL and card, and an Article`,
+    (h.canonical ?? "").endsWith(href) &&
+      (h.ogUrl ?? "").endsWith(href) &&
+      h.ogType === "article" &&
+      h.ogTitle?.startsWith(h.title.split(" — ")[0]) &&
+      (h.ogImage ?? "").includes(`${href}/opengraph-image`) &&
+      h.site === "Mihir Bhavsar" &&
+      h.ld.includes("Article"),
+    JSON.stringify(h),
+  );
+}
+const nfHead = await head("/no-such-page");
+check("the 404 says noindex exactly once", nfHead.robots.length === 1 && nfHead.robots[0].includes("noindex"), JSON.stringify(nfHead.robots));
+const siteMap = await evaluate(`fetch('/sitemap.xml').then(r => r.text())`);
+check("the sitemap lists home and the four case studies", cardHrefs.every((h) => siteMap.includes(`${h}</loc>`)), `${(siteMap.match(/<loc>/g) ?? []).length} urls`);
+
 // ---------- Themes ----------
 const theme = () => evaluate("document.documentElement.dataset.theme ?? null");
 const canvas = () => evaluate("getComputedStyle(document.body).backgroundColor");

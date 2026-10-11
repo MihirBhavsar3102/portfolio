@@ -11,6 +11,8 @@ import { Pager } from "@/components/work/pager";
 import { resume } from "@/lib/resume-data";
 import { getProject } from "@/lib/work";
 import { frame } from "@/components/site/frame";
+import { JsonLd } from "@/components/site/json-ld";
+import { articleJsonLd, pageMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -21,10 +23,11 @@ export function generateStaticParams() {
   return resume.projects.map((p) => ({ slug: p.slug }));
 }
 
-// Title and description only; canonical URLs, OG images and JSON-LD come with the SEO pass.
+// Its own title, description, canonical URL and share block; the card is ./opengraph-image.
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const project = getProject((await params).slug);
-  return project ? { title: project.headline, description: project.summary } : {};
+  if (!project) return {};
+  return pageMetadata({ title: project.headline, description: project.summary, path: `/work/${project.slug}`, type: "article" });
 }
 
 /**
@@ -41,6 +44,7 @@ export default async function CaseStudyPage({ params }: Props) {
 
   return (
     <article className={`${frame} pt-10 pb-24`}>
+      <JsonLd data={articleJsonLd(project)} />
       <Link href="/#work" className="group inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink">
         <ArrowLeft aria-hidden="true" className="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" strokeWidth={2} />
         All work

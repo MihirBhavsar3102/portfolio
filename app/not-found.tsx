@@ -3,8 +3,8 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { frame } from "@/components/site/frame";
 
-// noindex here too, so the layout's "index, follow" doesn't contradict the noindex Next adds.
-export const metadata: Metadata = { title: "Page not found", robots: { index: false } };
+// Next adds noindex to not-found responses itself; a second robots tag here would duplicate it.
+export const metadata: Metadata = { title: "Page not found" };
 
 /** Any unknown URL, including a case study that doesn't exist: a way home and a way to the work. */
 export default function NotFound() {
