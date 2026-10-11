@@ -73,6 +73,26 @@ const evaluate = async (expression) => {
   return r.result.value;
 };
 
+// Browser-level CDP, for what lives on the browser rather than the page (permissions).
+async function browserSend(method, params = {}) {
+  const { webSocketDebuggerUrl } = await (await fetch(`http://127.0.0.1:${PORT}/json/version`)).json();
+  const b = new WebSocket(webSocketDebuggerUrl);
+  await new Promise((r, j) => ((b.onopen = r), (b.onerror = j)));
+  try {
+    return await new Promise((resolve, reject) => {
+      b.onmessage = (m) => {
+        const msg = JSON.parse(m.data);
+        if (msg.id !== 1) return;
+        if (msg.error) reject(new Error(msg.error.message));
+        else resolve(msg.result);
+      };
+      b.send(JSON.stringify({ id: 1, method, params }));
+    });
+  } finally {
+    b.close();
+  }
+}
+
 await send("Page.enable");
 await send("Runtime.enable");
 await send("Network.enable");
@@ -265,6 +285,88 @@ await sleep(800);
 const afterName = await marked();
 check("returning home through the name link marks no section", home && afterName === null, `${home} ${afterName}`);
 
+// ---------- Stack, credentials, GitHub and contact ----------
+await load("/", DESKTOP);
+const navIds = await evaluate(`[...document.querySelectorAll('header nav[aria-label=Sections] a')].map(a => a.dataset.section).join()`);
+check("nav lists the five sections in order", navIds === "work,experience,stack,credentials,contact", navIds);
+const stack = await evaluate(
+  `(() => { const s = document.getElementById('stack'); return { groups: s.querySelectorAll('h3').length, work: s.querySelectorAll('li[data-evidence=work]').length, project: s.querySelectorAll('li[data-evidence=project]').length, key: s.innerText.includes('Used at work') && s.innerText.includes('Used in a project') }; })()`,
+);
+check("stack: nine groups, both markers and a key naming them", stack.groups === 9 && stack.work > 0 && stack.project > 0 && stack.key, JSON.stringify(stack));
+const verifyLinks = await evaluate(`[...document.querySelectorAll('#credentials a[href^="http"]')].map(a => a.target + ' ' + a.rel)`);
+check(
+  "credentials: four verify links open safely in a new tab",
+  verifyLinks.length === 4 && verifyLinks.every((v) => v === "_blank noopener noreferrer"),
+  verifyLinks.join(" | "),
+);
+const repos = await evaluate(
+  `({ names: [...document.querySelectorAll('#github h3 a')].map(a => a.firstChild.textContent.trim()), live: document.getElementById('github')?.innerText.includes('Last pushed') ?? false })`,
+);
+check("GitHub: the two own repos, never the uncredited fork", repos.names.length === 2 && !repos.names.some((n) => n.includes("Robot")), JSON.stringify(repos));
+
+// The Contact section is too short to reach the observer band; at the foot of the page it is still the one marked.
+await evaluate("window.scrollTo(0, 0); true");
+await sleep(500);
+await mouseAt("header nav[aria-label=Sections] a[data-section=contact]");
+await sleep(900);
+const atContact = await marked();
+check(
+  "the Contact link lands at the foot and marks Contact",
+  atContact === "contact",
+  `${atContact}, at ${await evaluate("Math.round(scrollY + innerHeight) + ' of ' + document.documentElement.scrollHeight")}`,
+);
+await shot(`${LABEL}-desktop-contact`);
+
+// Copy: the success path with clipboard permission, then a browser with no Clipboard API (a plain-http origin).
+const email = await evaluate(`document.querySelector('#contact a[href^="mailto:"]').getAttribute('href').slice(7)`);
+let granted = "granted";
+try {
+  await browserSend("Browser.grantPermissions", { origin: new URL(BASE).origin, permissions: ["clipboardReadWrite", "clipboardSanitizedWrite"] });
+} catch (e) {
+  granted = e.message;
+}
+// Headless refuses clipboard reads, so record what the page hands the real writeText.
+await evaluate(`(() => { const write = navigator.clipboard.writeText.bind(navigator.clipboard); window.__copied = null; navigator.clipboard.writeText = (t) => ((window.__copied = t), write(t)); return true; })()`);
+await mouseAt("#contact button[aria-label='Copy email address']");
+const copiedToast = await waitFor(`document.body.innerText.includes('Email address copied')`, 3000);
+const clip = await evaluate("window.__copied");
+check("Contact: the copy button copies the address and says so", copiedToast && clip === email, `${granted}; toast ${copiedToast}; wrote "${clip}"`);
+
+await load("/", DESKTOP);
+await evaluate(`Object.defineProperty(Navigator.prototype, 'clipboard', { get: () => undefined, configurable: true }); true`);
+await mouseAt("#contact button[aria-label='Copy email address']");
+const told = await waitFor(`document.body.innerText.includes('Address selected')`, 3000);
+const selected = await evaluate("window.getSelection().toString()");
+check(
+  "Contact: without the Clipboard API, copy selects the address and says how to copy it",
+  told && selected === email && (await evaluate("location.pathname")) === "/",
+  `selected "${selected}", told ${told}`,
+);
+await shot(`${LABEL}-contact-copy-fallback`);
+
+// md is the narrowest width with the full nav: five links and the Resume button must fit beside the name.
+await load("/", { width: 768, height: 1024, mobile: false });
+const nav768 = await evaluate(`(() => {
+  const row = document.querySelector('header > div').getBoundingClientRect();
+  const name = document.querySelector('header a[href="/"]').getBoundingClientRect();
+  const links = [...document.querySelectorAll('header nav[aria-label=Sections] a')].map(a => a.getBoundingClientRect());
+  const resumeBtn = [...document.querySelectorAll('header a[download]')].find(a => getComputedStyle(a).display !== 'none')?.getBoundingClientRect();
+  return {
+    overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    shown: links.filter(r => r.width > 0 && r.left >= row.left && r.right <= row.right).length,
+    clear: links.length > 0 && name.right <= links[0].left,
+    resume: !!resumeBtn && resumeBtn.right <= row.right,
+    oneLine: links.every(r => Math.round(r.top) === Math.round(links[0].top)),
+  };
+})()`);
+check(
+  "at 768 the nav fits five links and the Resume button beside the name",
+  nav768.overflow === 0 && nav768.shown === 5 && nav768.clear && nav768.resume && nav768.oneLine,
+  JSON.stringify(nav768),
+);
+await shot(`${LABEL}-md-768-viewport`);
+await shot(`${LABEL}-md-768-full`, { fullPage: true });
+
 // ---------- Map legibility at the narrowest split and below it ----------
 const minSvgFont = (selector = "figure svg") =>
   evaluate(
@@ -344,6 +446,14 @@ for (const href of cardHrefs) {
 const missing = await evaluate(`fetch('/work/not-a-case-study').then(r => r.status)`);
 check("an unknown case study is a 404", missing === 404, String(missing));
 
+const unknownStatus = await evaluate(`fetch('/no-such-page').then(r => r.status)`);
+await load("/no-such-page", DESKTOP);
+const nf = await evaluate(
+  `({ h1: document.querySelector('h1')?.textContent, home: !!document.querySelector('main a[href="/"]'), work: !!document.querySelector('main a[href="/#work"]') })`,
+);
+check("an unknown page is a styled 404 linking home and to the work", unknownStatus === 404 && nf.h1 === "Page not found" && nf.home && nf.work, `${unknownStatus} ${JSON.stringify(nf)}`);
+await shot(`${LABEL}-404-desktop`);
+
 // ---------- Reduced motion ----------
 await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
 await load("/", DESKTOP);
@@ -355,8 +465,8 @@ await send("Emulation.setEmulatedMedia", { features: [] });
 await send("Emulation.setScriptExecutionDisabled", { value: true });
 await load("/", DESKTOP, { scripts: false });
 await send("Emulation.setScriptExecutionDisabled", { value: false });
-const noJs = await evaluate(`({ figures: document.querySelectorAll('section[aria-labelledby=proof-heading] ul .type-figure').length, provenance: document.querySelectorAll('[id^=proof-][id$=-how]').length, name: document.querySelector('h1')?.textContent })`);
-check("content complete with JavaScript off", noJs.figures === 6 && noJs.provenance === 6 && !!noJs.name, JSON.stringify(noJs));
+const noJs = await evaluate(`({ figures: document.querySelectorAll('section[aria-labelledby=proof-heading] ul .type-figure').length, provenance: document.querySelectorAll('[id^=proof-][id$=-how]').length, name: document.querySelector('h1')?.textContent, sections: ['work', 'experience', 'stack', 'credentials', 'github', 'contact'].filter(id => document.getElementById(id)).length })`);
+check("content complete with JavaScript off", noJs.figures === 6 && noJs.provenance === 6 && !!noJs.name && noJs.sections === 6, JSON.stringify(noJs));
 await shot(`${LABEL}-desktop-nojs`);
 
 await send("Emulation.setScriptExecutionDisabled", { value: true });
