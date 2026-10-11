@@ -212,7 +212,7 @@ components:
 
 The site reads like a product launch page for an engineer: one idea per screen, set in big, confident, tightly tracked type, with nothing on the page that is not content. Screen one is who and what: the name, the role, and the positioning set as a statement. Screen two proves it, with six measured figures at display size, each attached to the sentence that says how it was achieved. Screen three shows how the estate fits together, and any figure lights the infrastructure that produced it. The rest of the page keeps the same grammar: a statement heading, a short intro, then the evidence.
 
-The palette is pure white or pure black with near-black or near-white ink, in two first-class themes. A single persimmon accent marks what you can act on and what is lit, and colour beyond that appears only where it names something: the cloud a case study ran on, or a technology's brand dot. Depth is quiet: one tinted band behind the map, tinted cards for the work, and hairlines. Motion is a single authored moment, the map settling and its edges drawing when it first scrolls into view; everything else is a colour or 2px lift on hover.
+The palette is pure white or pure black with near-black or near-white ink, in two first-class themes. A single persimmon accent marks what you can act on and what is lit, and colour beyond that appears only where it names something: the cloud a case study ran on, or a technology's brand dot. Depth is quiet: one tinted band behind the map, tinted cards for the work, and hairlines. Motion is two entrances, each played once: the map settling and its edges drawing when it first scrolls into view, and one section reveal, where a home section that starts off screen fades up 8px over 700ms (ease-out-expo) as it arrives. Neither plays on case studies, in print, under reduced motion, or for anything already on screen when the page loads. Everything else is a colour change or a 2px lift on hover.
 
 The register follows PRODUCT.md: premium and plainly professional, "Linear × Apple" in feel. Neon, glow, glassmorphism, gradient text, terminal windows, code-editor chrome and hacker motifs are rejected, as are eyebrow labels and boxed dashboard panels as the page structure.
 
@@ -222,7 +222,7 @@ The register follows PRODUCT.md: premium and plainly professional, "Linear × Ap
 - Schibsted Grotesk from 13px nav to 96px name; Fragment Mono only for the literal email.
 - One idea per screen; full-bleed hairlines between sections on a 76rem measure.
 - Cloud colours tint the work cards; brand colours appear only as small dots.
-- One authored motion moment (the map, on first view); reduced motion cancels everything.
+- Two once-only entrances (the map's draw, the section reveal); everything else is state change, and reduced motion cancels it all.
 
 ## Colors
 

@@ -1,7 +1,7 @@
 import { resume } from "@/lib/resume-data";
 import { shortClaim } from "@/lib/format";
 import { frame, sectionHeading } from "@/components/site/frame";
-import { InView } from "@/components/hero/in-view";
+import { InView } from "@/components/site/in-view";
 import { Topology } from "@/components/hero/topology";
 import { TopologyStack } from "@/components/hero/topology-stack";
 import { TraceButton } from "@/components/hero/trace-button";

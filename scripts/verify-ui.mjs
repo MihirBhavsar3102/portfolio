@@ -113,10 +113,13 @@ async function load(path, { width, height, mobile }, { scripts = true } = {}) {
   current = { width, height, deviceScaleFactor: 1, mobile };
   await send("Emulation.setDeviceMetricsOverride", current);
   responses.length = 0;
-  const loaded = new Promise((r) => {
+  // A same-document navigation (only the hash differs) fires no load event; fail loudly rather than hang.
+  const loaded = new Promise((r, j) => {
+    const timer = setTimeout(() => j(new Error(`no load event for ${path}`)), 30000);
     const l = (m) => {
       if (m.method === "Page.loadEventFired") {
         listeners.splice(listeners.indexOf(l), 1);
+        clearTimeout(timer);
         r();
       }
     };
@@ -137,6 +140,10 @@ async function shot(name, { fullPage = false } = {}) {
     const m = await send("Page.getLayoutMetrics");
     await send("Emulation.setDeviceMetricsOverride", { ...current, height: Math.ceil(m.cssContentSize.height) });
     await evaluate("window.scrollTo(0, 0); true");
+    // A page-tall viewport has no "bottom of the screen" for the section
+    // reveal's margin to clear, so play every pending entrance, as a reader
+    // scrolling past them would.
+    await evaluate("document.querySelectorAll('[data-animate]').forEach((el) => el.setAttribute('data-inview', '')); true");
     await sleep(2500);
   }
   const { data } = await send("Page.captureScreenshot", { format: "png" });
@@ -465,6 +472,26 @@ const nf = await evaluate(
 check("an unknown page is a styled 404 linking home and to the work", unknownStatus === 404 && nf.h1 === "Page not found" && nf.home && nf.work, `${unknownStatus} ${JSON.stringify(nf)}`);
 await shot(`${LABEL}-404-desktop`);
 
+// ---------- Section reveal ----------
+await load("/", DESKTOP);
+const before = await evaluate(`(() => { const r = document.querySelector('#stack .reveal'); return { animate: r.hasAttribute('data-animate'), inview: r.hasAttribute('data-inview'), opacity: getComputedStyle(r).opacity }; })()`);
+await evaluate("document.getElementById('stack').scrollIntoView({ block: 'start' }); true");
+await sleep(1200);
+const after = await evaluate(`(() => { const r = document.querySelector('#stack .reveal'); return { inview: r.hasAttribute('data-inview'), opacity: getComputedStyle(r).opacity, transform: getComputedStyle(r).transform }; })()`);
+check(
+  "an off-screen section waits, then rises into place once it scrolls into view",
+  before.animate && !before.inview && before.opacity === "0" && after.inview && after.opacity === "1" && after.transform === "none",
+  JSON.stringify({ before, after }),
+);
+await load("/?deep#stack", DESKTOP); // a query makes it a fresh document, not a same-page hash jump
+const deep = await evaluate(`(() => { const r = document.querySelector('#stack .reveal'); return { animate: r.hasAttribute('data-animate'), opacity: getComputedStyle(r).opacity, top: Math.round(document.getElementById('stack').getBoundingClientRect().top) }; })()`);
+check("a deep link leaves the section it lands on at rest", !deep.animate && deep.opacity === "1", JSON.stringify(deep));
+await load("/", DESKTOP);
+await send("Emulation.setEmulatedMedia", { media: "print", features: LIGHT });
+const printed = await evaluate("[...document.querySelectorAll('.reveal')].map(r => getComputedStyle(r).opacity).every(o => o === '1')");
+await send("Emulation.setEmulatedMedia", { media: "", features: LIGHT });
+check("printing shows every section, revealed or not", printed);
+
 // ---------- SEO: each route's own canonical, share block and structured data ----------
 const head = (path) =>
   evaluate(`fetch(${JSON.stringify(path)}).then(r => r.text()).then(html => {
@@ -541,14 +568,16 @@ await send("Emulation.setEmulatedMedia", { features: [...LIGHT, { name: "prefers
 await load("/", DESKTOP);
 const running = await evaluate("document.getAnimations().length");
 check("reduced motion runs no animations", running === 0, `${running} running`);
+const restingReduced = await evaluate("getComputedStyle(document.querySelector('#contact .reveal')).opacity");
+check("reduced motion: off-screen sections are fully visible", restingReduced === "1", restingReduced);
 await send("Emulation.setEmulatedMedia", { features: LIGHT });
 
 // ---------- JavaScript off ----------
 await send("Emulation.setScriptExecutionDisabled", { value: true });
 await load("/", DESKTOP, { scripts: false });
 await send("Emulation.setScriptExecutionDisabled", { value: false });
-const noJs = await evaluate(`({ figures: document.querySelectorAll('#outcomes ul .type-figure').length, provenance: document.querySelectorAll('[id^=proof-][id$=-how]').length, name: document.querySelector('h1')?.textContent, sections: ['work', 'experience', 'stack', 'credentials', 'github', 'contact'].filter(id => document.getElementById(id)).length })`);
-check("content complete with JavaScript off", noJs.figures === 6 && noJs.provenance === 6 && !!noJs.name && noJs.sections === 6, JSON.stringify(noJs));
+const noJs = await evaluate(`({ figures: document.querySelectorAll('#outcomes ul .type-figure').length, provenance: document.querySelectorAll('[id^=proof-][id$=-how]').length, name: document.querySelector('h1')?.textContent, sections: ['work', 'experience', 'stack', 'credentials', 'github', 'contact'].filter(id => document.getElementById(id)).length, revealOpacity: getComputedStyle(document.querySelector('#contact .reveal')).opacity })`);
+check("content complete with JavaScript off", noJs.figures === 6 && noJs.provenance === 6 && !!noJs.name && noJs.sections === 6 && noJs.revealOpacity === "1", JSON.stringify(noJs));
 await shot(`${LABEL}-desktop-nojs`);
 
 await send("Emulation.setScriptExecutionDisabled", { value: true });
