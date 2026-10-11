@@ -95,6 +95,8 @@ async function browserSend(method, params = {}) {
 
 await send("Page.enable");
 await send("Runtime.enable");
+const LIGHT = [{ name: "prefers-color-scheme", value: "light" }];
+await send("Emulation.setEmulatedMedia", { features: LIGHT });
 await send("Network.enable");
 const responses = [];
 listeners.push((m) => {
@@ -178,16 +180,21 @@ await shot(`${LABEL}-desktop-full`, { fullPage: true });
 
 const fontsLoaded = await evaluate("[...new Set([...document.fonts].filter(f => f.status === 'loaded').map(f => f.family))].join(', ')");
 const monoFamily = await evaluate("getComputedStyle(document.querySelector('a[href^=mailto]')).fontFamily");
-check("both web fonts load", /Mona/.test(fontsLoaded) && /Fragment/.test(fontsLoaded), fontsLoaded + " | mono: " + monoFamily);
-const figuresInView = await evaluate(`[...document.querySelectorAll('section[aria-labelledby=proof-heading] ul .type-figure')].filter(e => e.getBoundingClientRect().top < innerHeight).length`);
-check("all six figures visible in the first 1440x900 viewport", figuresInView === 6, `${figuresInView} of 6`);
+check("both web fonts load", /Schibsted/.test(fontsLoaded) && /Fragment/.test(fontsLoaded), fontsLoaded + " | mono: " + monoFamily);
+// The statement owns the first screen; the figures are the second (the Statement direction).
+const firstScreen = await evaluate(`(() => { const inView = (el) => el && el.getBoundingClientRect().bottom <= innerHeight; const p = [...document.querySelectorAll('section[aria-labelledby=hero-name] p')]; return { name: inView(document.querySelector('h1')), role: inView(p[0]), positioning: inView(p[1]), outcomes: Math.round(document.getElementById('outcomes').getBoundingClientRect().top) }; })()`);
+check(
+  "name, role and positioning fill the first 1440x900 screen; the figures start the next",
+  firstScreen.name && firstScreen.role && firstScreen.positioning && firstScreen.outcomes <= 900 * 1.1,
+  JSON.stringify(firstScreen),
+);
 
 // Keyboard: focus the first figure button.
 await evaluate("document.activeElement?.blur(); window.scrollTo(0,0); true");
 let lit = 0;
 for (let i = 0; i < 25 && lit === 0; i++) {
   await key("Tab", "Tab", 9);
-  const onFigure = await evaluate("!!document.activeElement?.closest('section[aria-labelledby=proof-heading] ul')");
+  const onFigure = await evaluate("!!document.activeElement?.closest('#outcomes ul')");
   if (onFigure) lit = await litCount();
 }
 check("keyboard focus on a figure lights its path", lit > 0, `${lit} lit elements`);
@@ -197,21 +204,29 @@ check("Escape clears the trace", (await litCount()) === 0);
 
 // Mouse: pin then unpin, with the URL mirroring the pin.
 await evaluate("document.activeElement?.blur(); true");
-await mouseAt("section[aria-labelledby=proof-heading] ul li:nth-child(5) button");
+await mouseAt("#outcomes ul li:nth-child(5) button");
 const pinnedUrl = await evaluate("location.search");
 const pinnedLit = await litCount();
 check("click pins a figure and writes ?trace=", pinnedUrl.includes("trace=uptime") && pinnedLit > 0, `${pinnedUrl}, ${pinnedLit} lit`);
 await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: 5, y: 5 });
 await sleep(250);
 check("a pinned trace survives the pointer leaving", (await litCount()) === pinnedLit);
+const hint = await evaluate(`document.body.innerText.includes('is lit on the map')`);
+check("pinning a figure with the map out of view offers the way to it", hint);
+await mouseAt("a[href='#map']");
+await sleep(900);
+const mapShown = await evaluate(`(() => { const r = document.getElementById('map').getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; })()`);
+check("the hint brings the lit map into view and steps aside", mapShown && !(await evaluate(`document.body.innerText.includes('is lit on the map')`)), String(mapShown));
+await evaluate("window.scrollTo(0, 0); true");
+await sleep(300);
 await shot(`${LABEL}-desktop-trace-pinned`);
-await mouseAt("section[aria-labelledby=proof-heading] ul li:nth-child(5) button");
+await mouseAt("#outcomes ul li:nth-child(5) button");
 await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: 5, y: 5 });
 await sleep(250);
 check("second click unpins and clears the URL", (await litCount()) === 0 && !(await evaluate("location.search")).includes("trace"));
 
 // Escape clears a pin even after focus has moved elsewhere on the page.
-await mouseAt("section[aria-labelledby=proof-heading] ul li:nth-child(2) button");
+await mouseAt("#outcomes ul li:nth-child(2) button");
 await mouseAt("h1");
 await key("Escape", "Escape", 27);
 check("Escape clears a pin with focus outside the hero", (await litCount()) === 0);
@@ -378,10 +393,6 @@ for (const width of [1024, 1280, 1440]) {
   check(`map text >= 11px at ${width}`, px >= 11, `${px}px`);
   if (width === 1024) await shot(`${LABEL}-lg-1024-viewport`);
 }
-// Row two's labels (not just numerals) must be readable at 1440x900.
-await load("/", DESKTOP);
-const labelBottom = await evaluate(`Math.max(...[...document.querySelectorAll('section[aria-labelledby=proof-heading] li')].slice(3).map(li => li.querySelector('button span:last-child').getBoundingClientRect().bottom))`);
-check("row two labels readable above the 900px fold", labelBottom <= 900, `label bottom ${Math.round(labelBottom)}px`);
 
 // ---------- Mobile ----------
 await load("/", MOBILE);
@@ -397,10 +408,10 @@ check("mobile menu opens", menuOpen);
 await shot(`${LABEL}-mobile-menu`);
 await key("Escape", "Escape", 27);
 check("mobile menu closes on Escape", !(await evaluate("!!document.querySelector('[role=dialog]')")));
-await mouseAt("section[aria-labelledby=proof-heading] ul li:nth-child(1) button");
-check("tap pins a figure on mobile and lights the stack", (await litCount()) > 0);
-const pathLit = await evaluate(`getComputedStyle(document.querySelector('section[aria-labelledby=proof-heading] li p:last-child')).color`);
-check("tapped cell's path line turns accent", pathLit.replace(/\s/g, "") === "rgb(76,141,255)", pathLit);
+await mouseAt("#map [role=group] button:nth-child(1)");
+check("tapping a figure chip on mobile lights the map list", (await litCount()) > 0);
+const chipLit = await evaluate(`(() => { const chip = document.querySelector('#map [role=group] button:nth-child(1)'); const probe = document.createElement('span'); probe.style.color = 'var(--color-accent)'; document.body.append(probe); const want = getComputedStyle(probe).color; probe.remove(); return { got: getComputedStyle(chip).color, want }; })()`);
+check("the tapped figure chip turns accent", chipLit.got === chipLit.want, JSON.stringify(chipLit));
 await shot(`${LABEL}-mobile-trace`);
 
 // ---------- Case studies ----------
@@ -454,18 +465,50 @@ const nf = await evaluate(
 check("an unknown page is a styled 404 linking home and to the work", unknownStatus === 404 && nf.h1 === "Page not found" && nf.home && nf.work, `${unknownStatus} ${JSON.stringify(nf)}`);
 await shot(`${LABEL}-404-desktop`);
 
+// ---------- Themes ----------
+const theme = () => evaluate("document.documentElement.dataset.theme ?? null");
+const canvas = () => evaluate("getComputedStyle(document.body).backgroundColor");
+await evaluate("localStorage.clear(); true");
+await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "dark" }] });
+await load("/", DESKTOP);
+const darkFirst = { theme: await theme(), bg: await canvas() };
+await send("Emulation.setEmulatedMedia", { features: LIGHT });
+await load("/", DESKTOP);
+const lightFirst = { theme: await theme(), bg: await canvas() };
+check(
+  "a first visit follows the system theme",
+  darkFirst.theme === "dark" && darkFirst.bg === "rgb(10, 10, 10)" && lightFirst.theme === "light" && lightFirst.bg === "rgb(255, 255, 255)",
+  JSON.stringify({ darkFirst, lightFirst }),
+);
+await mouseAt("header button.theme-toggle");
+const toggled = { theme: await theme(), bg: await canvas(), label: await evaluate("document.querySelector('header button.theme-toggle').getAttribute('aria-label')") };
+await load("/", DESKTOP);
+const remembered = await theme();
+check("the toggle switches the theme and remembers it", toggled.theme === "dark" && toggled.bg === "rgb(10, 10, 10)" && toggled.label === "Switch to light theme" && remembered === "dark", JSON.stringify({ toggled, remembered }));
+await shot(`${LABEL}-desktop-dark`);
+await load("/work/avd-automation", DESKTOP);
+await shot(`${LABEL}-work-dark`);
+await evaluate("localStorage.clear(); true");
+await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "dark" }] });
+await send("Emulation.setScriptExecutionDisabled", { value: true });
+await load("/", DESKTOP, { scripts: false });
+await send("Emulation.setScriptExecutionDisabled", { value: false });
+const noJsTheme = { bg: await canvas(), toggle: await evaluate("getComputedStyle(document.querySelector('header button.theme-toggle')).display") };
+check("without JavaScript the system theme still applies and the toggle hides", noJsTheme.bg === "rgb(10, 10, 10)" && noJsTheme.toggle === "none", JSON.stringify(noJsTheme));
+await send("Emulation.setEmulatedMedia", { features: LIGHT });
+
 // ---------- Reduced motion ----------
-await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
+await send("Emulation.setEmulatedMedia", { features: [...LIGHT, { name: "prefers-reduced-motion", value: "reduce" }] });
 await load("/", DESKTOP);
 const running = await evaluate("document.getAnimations().length");
 check("reduced motion runs no animations", running === 0, `${running} running`);
-await send("Emulation.setEmulatedMedia", { features: [] });
+await send("Emulation.setEmulatedMedia", { features: LIGHT });
 
 // ---------- JavaScript off ----------
 await send("Emulation.setScriptExecutionDisabled", { value: true });
 await load("/", DESKTOP, { scripts: false });
 await send("Emulation.setScriptExecutionDisabled", { value: false });
-const noJs = await evaluate(`({ figures: document.querySelectorAll('section[aria-labelledby=proof-heading] ul .type-figure').length, provenance: document.querySelectorAll('[id^=proof-][id$=-how]').length, name: document.querySelector('h1')?.textContent, sections: ['work', 'experience', 'stack', 'credentials', 'github', 'contact'].filter(id => document.getElementById(id)).length })`);
+const noJs = await evaluate(`({ figures: document.querySelectorAll('#outcomes ul .type-figure').length, provenance: document.querySelectorAll('[id^=proof-][id$=-how]').length, name: document.querySelector('h1')?.textContent, sections: ['work', 'experience', 'stack', 'credentials', 'github', 'contact'].filter(id => document.getElementById(id)).length })`);
 check("content complete with JavaScript off", noJs.figures === 6 && noJs.provenance === 6 && !!noJs.name && noJs.sections === 6, JSON.stringify(noJs));
 await shot(`${LABEL}-desktop-nojs`);
 
