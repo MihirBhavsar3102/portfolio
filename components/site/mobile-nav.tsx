@@ -18,7 +18,7 @@ export function MobileNav() {
       <DialogTrigger
         ref={triggerRef}
         aria-label="Open menu"
-        className="flex size-11 items-center justify-center rounded-md text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink md:hidden"
+        className="flex size-10 items-center justify-center rounded-full text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink md:hidden"
       >
         <Menu aria-hidden="true" className="size-5" strokeWidth={1.75} />
       </DialogTrigger>
@@ -40,7 +40,7 @@ export function MobileNav() {
             <DialogClose key={section.id} asChild>
               <a
                 href={`${base}#${section.id}`}
-                className="border-b border-line py-3.5 text-base text-ink transition-colors hover:text-accent"
+                className="border-b border-line py-4 text-lg font-medium tracking-tight text-ink transition-colors hover:text-accent"
               >
                 {section.label}
               </a>
@@ -52,7 +52,7 @@ export function MobileNav() {
           <a
             href={resume.resumeFile}
             download
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-accent-ink transition-colors hover:bg-ink"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-4 py-3 text-sm font-semibold text-canvas transition-opacity hover:opacity-85"
           >
             <Download aria-hidden="true" className="size-4" strokeWidth={2} />
             Download resume

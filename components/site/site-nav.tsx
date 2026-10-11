@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Download } from "lucide-react";
 import { MobileNav } from "@/components/site/mobile-nav";
+import { ThemeToggle } from "@/components/site/theme-toggle";
+import { frame } from "@/components/site/frame";
 import { resume } from "@/lib/resume-data";
 import { sections } from "@/lib/sections";
 
@@ -85,43 +87,41 @@ export function SiteNav() {
   }, [current]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-canvas/85 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
-        <Link href="/" className="text-base font-semibold tracking-[-0.01em] whitespace-nowrap text-ink">
+    <header className="sticky top-0 z-50 bg-canvas/85 backdrop-blur-md">
+      <div className={`${frame} flex h-14 items-center justify-between gap-4`}>
+        <Link href="/" className="text-[15px] font-semibold tracking-tight whitespace-nowrap text-ink">
           {resume.name}
         </Link>
 
-        <div className="flex items-center gap-2 md:gap-3">
-          <nav ref={navRef} aria-label="Sections" className="relative hidden items-center md:flex">
-            {sections.map((s) => (
-              <a
-                key={s.id}
-                href={`${base}#${s.id}`}
-                data-section={s.id}
-                aria-current={current === s.id ? (pathname === "/" ? "location" : "true") : undefined}
-                className={`px-3 py-4 text-sm transition-colors ${
-                  current === s.id ? "text-ink" : "text-ink-3 hover:text-ink"
-                }`}
-              >
-                {s.label}
-              </a>
-            ))}
-            <span
-              ref={barRef}
-              aria-hidden="true"
-              className="pointer-events-none absolute bottom-0 left-0 h-0.5 w-(--w) translate-x-(--x) rounded-full bg-accent opacity-0 transition-[translate,width,opacity] duration-300 ease-out-expo"
-            />
-          </nav>
+        <nav ref={navRef} aria-label="Sections" className="relative hidden items-center md:flex">
+          {sections.map((s) => (
+            <a
+              key={s.id}
+              href={`${base}#${s.id}`}
+              data-section={s.id}
+              aria-current={current === s.id ? (pathname === "/" ? "location" : "true") : undefined}
+              className={`px-3 py-4 text-[13px] transition-colors ${current === s.id ? "text-ink" : "text-ink-2 hover:text-ink"}`}
+            >
+              {s.label}
+            </a>
+          ))}
+          <span
+            ref={barRef}
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-2 left-0 h-px w-(--w) translate-x-(--x) bg-ink opacity-0 transition-[translate,width,opacity] duration-300 ease-out-expo"
+          />
+        </nav>
 
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
           <a
             href={resume.resumeFile}
             download
-            className="hidden items-center gap-2 rounded-md border border-line-strong px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-ink-3 hover:bg-surface-2 md:inline-flex"
+            className="hidden items-center gap-1.5 px-2 py-2 text-[13px] font-medium text-accent hover:underline md:inline-flex"
           >
             <Download aria-hidden="true" className="size-3.5" strokeWidth={2} />
             Resume
           </a>
-
           <MobileNav />
         </div>
       </div>
