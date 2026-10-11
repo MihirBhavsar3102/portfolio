@@ -327,6 +327,7 @@ Confident and quiet; colour shifts, nothing glows.
 - **Stage chips** (a pipeline case study): pill, Canvas fill, Strong Hairline border, 14px Ink.
 
 ### Cards / Containers
+- **Share cards** (`next/og`, 1200×630, `components/og/share-cards.tsx`): always the dark palette, because an image can't follow a viewer's theme (`SHARE_THEME` in `lib/og.ts` flips it). Schibsted Grotesk 500/700 from static TTFs in `assets/fonts`. Home: an accent dot with the role and where; the name at 136px; three figures on a hairline. Case study: its cloud's colour and dot with where it ran; the headline set word by word, so hyphenated compounds never split; the lead figure (or the pipeline stages, each unbreakable); the name. Every string comes from `resume-data`.
 - **Work card:** 18px radius, 28–32px padding, tinted by its cloud (6% fill, 22% border, 45% border on hover, 2px lift). Order: an Ink 1.625rem title (the stretched link), the "where" label in the cloud colour with its dot, a 15px Ink Two summary, the lead figure (2.75rem) with its label and an Ink Three provenance line (or the stage line), then a footer row of tech marks, an optional "Code ↗" and "Case study →".
 - **Panels:** 18px radius, Surface One, Hairline border, rows split by hairlines (stack rows, credentials, the facts panel, ownership).
 - **Shadow Strategy:** none in flow (see Elevation & Depth).
