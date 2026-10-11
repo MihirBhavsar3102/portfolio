@@ -151,6 +151,21 @@ components:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     rounded: "{rounded.md}"
+  evidence-marker:
+    backgroundColor: "{colors.ink-2}"
+    size: "7px"
+  stack-cell:
+    backgroundColor: "{colors.surface-1}"
+    textColor: "{colors.ink}"
+    padding: "{spacing.cell}"
+  cert-row:
+    backgroundColor: "{colors.surface-1}"
+    textColor: "{colors.ink}"
+    padding: "16px 20px"
+  repo-cell:
+    backgroundColor: "{colors.surface-1}"
+    textColor: "{colors.ink}"
+    padding: "{spacing.cell}"
 ---
 
 # Design System: Mihir Bhavsar — Service Map Console
@@ -185,13 +200,13 @@ A cool, blue-tinted near-black ramp with one saturated console blue; colour is s
 
 ### Neutral
 - **Blue Black Canvas** (canvas): the page, the sticky nav (at 85% with backdrop blur), the dialog overlay (at 80%), and the fill of map nodes, diagram nodes, chips and stage chips, which sit "cut into" their zone.
-- **Surface One** (surface-1): the first lift: map figure, proof-ledger and figure-ledger cells at rest, work cards, the experience panel, the facts panel, ownership columns, pager cells, the diagram figure, mobile map strip, copy-email control, dialogs and sheets. Also the knockout stroke behind diagram edge labels.
+- **Surface One** (surface-1): the first lift: map figure, proof-ledger and figure-ledger cells at rest, work cards, the experience panel, the facts panel, ownership columns, pager cells, the diagram figure, mobile map strip, stack cells, credential panels, repo cells, copy-email control, dialogs and sheets. Also the knockout stroke behind diagram edge labels.
 - **Surface Two** (surface-2): the second lift: map bands and zones, an active ledger cell, the hover fill of work cards, pager cells, secondary and ghost controls, the toast.
 - **Surface Three** (surface-3): the third lift, defined in the theme and reserved; no shipped surface uses it yet. Small ink-3 text must stay off it (exactly 4.50:1).
 - **Hairline** (line): the default 1px divider and panel border; also the colour that shows through gap-px rules in the ledger.
 - **Strong Hairline** (line-strong): outlined buttons, map and diagram node strokes, stage-chip borders, dashed diagram groups, control-plane edges, hairline-dash list markers, the resting underline of text links, dialog and toast borders, scrollbar thumb.
 - **Ink** (ink): names, headings, figures at rest, claim lines, primary link text. 13.8–16.4:1.
-- **Ink Two** (ink-2): positioning and provenance prose, case-study summaries and MDX body text, zone and diagram group titles, edge labels, secondary links. 7.4–8.8:1.
+- **Ink Two** (ink-2): positioning and provenance prose, case-study summaries and MDX body text, zone and diagram group titles, edge labels, secondary links, and the stack's evidence markers (filled or outlined). 7.4–8.8:1.
 - **Ink Three** (ink-3): metadata, notes, "how measured" asides, card provenance lines, periods and fact terms, hints, inactive nav links, data edges and diagram edges with their arrowheads, stage arrows, unbranded tech dots. 4.85–5.34:1 on canvas through surface-2.
 
 ### Named Rules
@@ -236,7 +251,7 @@ The hero is a 12-column grid that splits only at xl (1280px): 5 columns of ident
 
 The proof ledger is a ruled grid: 1 column, 2 from sm, 3 from lg, cells 20px padded (20px × 16px at xl). Vertical rhythm between blocks runs 16–40px; nothing uses large empty bands.
 
-Home sections below the hero each open on a full-bleed Hairline (the rule spans the viewport; the content does not) and sit inside the same 1280px frame with 64px of vertical padding and the heading 24px above its content. Selected work is a ruled grid of cards, 1 column, 2 from md. The experience entry splits each workstream 4/8 from lg (48px gap): name, summary and case-study link on the left, points on the right.
+Home sections below the hero each open on a full-bleed Hairline (the rule spans the viewport; the content does not) and sit inside the same 1280px frame with 64px of vertical padding and the heading 24px above its content. Selected work is a ruled grid of cards, 1 column, 2 from md. The experience entry splits each workstream 4/8 from lg (48px gap): name, summary and case-study link on the left, points on the right. Stack is a ruled grid of the nine skill groups: 1 column, 2 from sm (the odd last cell spans both), 3 from lg. Credentials splits 7/5 from lg (48px gap): certifications on the left, education over recognition on the right, 40px apart. GitHub is a ruled grid of repo cells, 2 from md. Contact is one column. The 404 sits in the same frame with 96px of vertical padding.
 
 A case-study page opens 32px under the nav with an "All work" back link, then the content 24px below it. Below xl everything is one column capped at 768px (max-w-3xl), so a 760-wide diagram renders near 1:1. From xl it is a 12-column grid with a 48px column gap: header and MDX body on 8 columns, the facts panel on 4, spanning both rows and sticky 80px from the top. The pager closes the page 64px below the body, and the page ends on 80px of bottom padding.
 
@@ -270,7 +285,7 @@ Compact and confident; colour shifts, nothing lifts.
 - **Focus:** the global 2px Console Blue outline at 3px offset.
 
 ### Copy Email Control
-A joined pair inside one Surface One, 6px-radius container with a Hairline border: the mailto link in Fragment Mono 13px Ink Two, then a 36px square copy button behind a left hairline. A successful copy swaps the icon for a Console Blue check for 2s and announces through a toast; without the Clipboard API it falls back to opening the mail client.
+A joined pair inside one Surface One, 6px-radius container with a Hairline border: the mailto link in Fragment Mono 13px Ink Two, then a 36px square copy button behind a left hairline. A successful copy swaps the icon for a Console Blue check for 2s and announces through a toast. Without the Clipboard API (a plain-http origin, a locked-down browser), or when the browser refuses the write, it selects the address and the toast says to press Ctrl+C (⌘C on a Mac); it never navigates away.
 
 ### Cards / Containers
 - **Corner Style:** 10px.
@@ -287,7 +302,7 @@ Inline links in prose, the experience panel and the facts panel are Ink (medium 
 - **Stage line:** on a work card the same stages run as one wrapping 14px Ink Two line with Ink Three arrows, no chips.
 
 ### Navigation
-Sticky, 56px, canvas at 85% with backdrop blur and a bottom hairline. The name sits left in 16px semibold Ink. Section links are 14px Ink Three, Ink on hover and when current (aria-current="location"); a 2px Console Blue underline glides between the current links on a 300ms expo-out transition. An outlined compact Resume button closes the row (12px × 6px, 14px medium). Below md the links collapse into a ghost menu button that opens a right-hand sheet: Surface One, left hairline, hairline-ruled 16px links that turn Console Blue on hover, then a full-width primary Download resume, the copy-email control and social links.
+Sticky, 56px, canvas at 85% with backdrop blur and a bottom hairline. The name sits left in 16px semibold Ink. Section links are 14px Ink Three, Ink on hover and when current (aria-current="location"); a 2px Console Blue underline glides between the current links on a 300ms expo-out transition. An outlined compact Resume button closes the row (12px × 6px, 14px medium). The links are Work, Experience, Stack, Credentials and Contact; the GitHub section has none, and the mark clears while it is in view. The current section is the one crossing a band 40–50% down the viewport; at the foot of the page the last link (Contact) is marked, because that section is too short to reach the band. Below md the links collapse into a ghost menu button that opens a right-hand sheet: Surface One, left hairline, hairline-ruled 16px links that turn Console Blue on hover, then a full-width primary Download resume, the copy-email control and social links.
 
 ### Dialogs and Sheets
 Radix dialogs open and close without animation (a measured performance decision: Presence's animation detection made opens lag). Modal: centred, max 672px, Surface One, Strong Hairline border, 10px radius, Dialog lift shadow, over an 80% canvas overlay. Sheet: right edge, 320px (max 85vw). Close is a ghost icon button top right.
@@ -319,6 +334,34 @@ The selected work as a ruled grid (2 columns from md). Each card is Surface One,
 ### Experience Entry
 One bordered Surface One panel (10px, Hairline, clipped). A header row behind a bottom hairline holds the role title (18px semibold), the legal employer name and location in 14px Ink Two (the only place the legal name appears on the site), and the period in 14px Ink Three, right-aligned and wrapping under on narrow screens. Workstreams follow as hairline-ruled rows, 20px padded, split 4/8 from lg: a 16px semibold name, a 14px Ink Two summary and, where one exists, an underlined "Case study: …" link; then the points as hairline-dash items in 14px Ink Two. A final row behind a top hairline reads "Also built here:" followed by the remaining project links.
 
+### Stack Grid and Evidence Markers
+The resume's nine skill groups as a ruled grid. Each cell is Surface One, 20px padded: a 16px semibold Ink group name, then the skills 8px apart, each a 14px Ink name with an optional 12px Ink Three detail line beneath, in the resume's order.
+- **Evidence marker:** a 7px square in a fixed slot before each name. Filled Ink Two means "Used at work" (in a work project's stack, or named by a workstream); a 1px Ink Two outline means "Used in a project" (only a personal project's stack); an empty slot means the skill is on the resume but not in the work shown. Derived from data (lib/stack.ts), never hand-set.
+- **Why squares:** they never read as tech dots, and being neutral they never spend the accent. They are markers, not bullets.
+- **Key:** a 12px Ink Three row above the grid names both markers and what no marker means. Screen readers hear each marker after the name, as "(Used at work)".
+
+### Credentials
+Three titled panels, each title 16px semibold Ink, 10px above a bordered Surface One list with hairline-ruled rows (16px × 20px).
+- **Certifications:** a 14px medium Ink name over a 12px Ink Three line, "code · issuer · Earned Mon YYYY"; a field that isn't known is left out. A 14px Ink Two "Verify" link with an up-right arrow sits on the right, only where a verification URL exists.
+- **Education:** degree (14px medium Ink), institution (14px Ink Two), then years · score (12px Ink Three).
+- **Recognition:** the NCC title over its 14px Ink Two detail.
+
+### GitHub Repos
+The hand-picked repos as a ruled grid, 2 columns from md. Each cell is Surface One, 20px padded:
+- the repo name as a 16px semibold underlined Ink link with an up-right arrow (GitHub, new tab);
+- "Fork of owner/repo" in 12px Ink Three for a fork, and a "My contribution:" line;
+- the description in 14px Ink Two: GitHub's own, or the curated blurb when GitHub has none or doesn't answer;
+- a 12px Ink Three live line, "Language · Last pushed Mon YYYY", only when GitHub answered;
+- a footer row: what the repo demonstrates (Ink Three) and a "Case study" link whose arrow nudges 2px.
+
+Never stars or a contribution graph. A fork without a contribution line is never shown, and the section disappears if no repo can be shown.
+
+### Contact
+One column: an 18px Ink Two line (max 42ch); the primary "Email me" button (mailto, leading mail icon) beside the copy-email control; then a row of 14px Ink Two links, LinkedIn and GitHub (up-right arrows, new tab) and "Resume (PDF)" (download icon).
+
+### Not Found
+The 404 for any unknown URL, inside the site chrome: the 36px Display h1 "Page not found", one 18px Ink Two sentence carrying the error code, then a primary "Back to home" and an outlined "See the work". No eyebrow, no illustration.
+
 ### Case Study Header and Facts
 - **Header:** the Display h1 at 36px, an 18px Ink Two summary, then a "Measured outcomes" (or "Pipeline stages") title over the figure ledger or the stage chips.
 - **Figure ledger:** a ruled grid, 2 columns from sm, an odd last cell spanning both. Each cell is Surface One, 20px padded: the Figure at 36px, a 16px Ink label, then 14px Ink Two provenance with an Ink Three "how measured" aside when known. These figures are static; Trace lives on the hero only.
@@ -349,6 +392,7 @@ A per-case-study drawing, server-rendered as SVG at a 760 viewBox width, framed 
 - **Do** use tabular numerals and the condensed width axis for figures.
 - **Do** give a link inside a clipped ruled grid a 2px inset Console Blue ring instead of the offset outline, and keep any second link raised above a stretched card overlay.
 - **Do** ship every drawing with a text equivalent that carries the same groups, nodes and connections.
+- **Do** derive anything the page claims about a skill (the evidence markers) from project and workstream data; never hand-set it.
 
 ### Don't:
 - **Don't** add a light theme or any second accent hue; no teal, violet, neon, glowing edges or halos, and no gradient beyond the one atmosphere behind the service map.
