@@ -249,8 +249,10 @@ const tracked = await evaluate(`document.querySelector('nav[aria-label=Sections]
 check("nav tracks sections after returning from a case study", tracked === "experience", String(tracked));
 
 // ---------- Map legibility at the narrowest split and below it ----------
-const minSvgFont = () =>
-  evaluate(`(() => { const svg = document.querySelector('figure svg'); const scale = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width; return Math.min(...[...svg.querySelectorAll('text')].map(t => Number(t.getAttribute('font-size')) * scale)).toFixed(2); })()`);
+const minSvgFont = (selector = "figure svg") =>
+  evaluate(
+    `(() => { const svg = document.querySelector(${JSON.stringify(selector)}); const scale = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width; return Math.min(...[...svg.querySelectorAll('text')].map(t => Number(t.getAttribute('font-size')) * scale)).toFixed(2); })()`,
+  );
 for (const width of [1024, 1280, 1440]) {
   await load("/", { width, height: 900, mobile: false });
   const px = Number(await minSvgFont());
@@ -282,6 +284,49 @@ const pathLit = await evaluate(`getComputedStyle(document.querySelector('section
 check("tapped cell's path line turns accent", pathLit.replace(/\s/g, "") === "rgb(76,141,255)", pathLit);
 await shot(`${LABEL}-mobile-trace`);
 
+// ---------- Case studies ----------
+for (const href of cardHrefs) {
+  const slug = href.split("/").pop();
+  await load(href, DESKTOP);
+  const page = await evaluate(
+    `({ h1: document.querySelector('h1')?.textContent ?? '', sections: [...document.querySelectorAll('article h2')].map(h => h.textContent), drawn: getComputedStyle(document.querySelector('[data-diagram] svg').parentElement).display !== 'none' })`,
+  );
+  check(
+    `${slug}: headline, required sections and drawing render`,
+    !!page.h1 && ["Context", "Architecture", "Results"].every((s) => page.sections.includes(s)) && page.drawn,
+    page.sections.join(" | "),
+  );
+  const clipped = await evaluate(
+    `[...document.querySelectorAll('[data-diagram] [data-node]')].filter(g => { const r = g.querySelector('rect').getBBox(); return [...g.querySelectorAll('text')].some(t => { const b = t.getBBox(); return b.x < r.x || b.x + b.width > r.x + r.width - 4 || b.y < r.y || b.y + b.height > r.y + r.height; }); }).map(g => g.dataset.node)`,
+  );
+  check(`${slug}: every node's text fits its box`, clipped.length === 0, clipped.join(", "));
+  const labelHits = await evaluate(
+    `(() => { const rects = [...document.querySelectorAll('[data-diagram] [data-node] rect')].map(r => r.getBBox()); return [...document.querySelectorAll('[data-diagram] [data-edge-label]')].filter(t => { const b = t.getBBox(); return rects.some(r => b.x < r.x + r.width && r.x < b.x + b.width && b.y < r.y + r.height && r.y < b.y + b.height); }).map(t => t.textContent); })()`,
+  );
+  check(`${slug}: edge labels clear of nodes`, labelHits.length === 0, labelHits.join(", "));
+  await shot(`${LABEL}-work-${slug}-desktop-full`, { fullPage: true });
+
+  for (const width of [768, 1024, 1440]) {
+    await load(href, { width, height: 900, mobile: false });
+    const px = Number(await minSvgFont("[data-diagram] svg"));
+    check(`${slug}: diagram text >= 11px at ${width}`, px >= 11, `${px}px`);
+  }
+
+  await load(href, MOBILE);
+  const phone = await evaluate(
+    `({ overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, drawingHidden: getComputedStyle(document.querySelector('[data-diagram] svg').parentElement).display === 'none', listShown: document.querySelector('[data-diagram] [data-connections]').getBoundingClientRect().height > 0 })`,
+  );
+  check(
+    `${slug}: at 375 no horizontal scroll and the diagram is a list`,
+    phone.overflow === 0 && phone.drawingHidden && phone.listShown,
+    JSON.stringify(phone),
+  );
+  await shot(`${LABEL}-work-${slug}-mobile-full`, { fullPage: true });
+}
+
+const missing = await evaluate(`fetch('/work/not-a-case-study').then(r => r.status)`);
+check("an unknown case study is a 404", missing === 404, String(missing));
+
 // ---------- Reduced motion ----------
 await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
 await load("/", DESKTOP);
@@ -296,6 +341,14 @@ await send("Emulation.setScriptExecutionDisabled", { value: false });
 const noJs = await evaluate(`({ figures: document.querySelectorAll('section[aria-labelledby=proof-heading] ul .type-figure').length, provenance: document.querySelectorAll('[id^=proof-][id$=-how]').length, name: document.querySelector('h1')?.textContent })`);
 check("content complete with JavaScript off", noJs.figures === 6 && noJs.provenance === 6 && !!noJs.name, JSON.stringify(noJs));
 await shot(`${LABEL}-desktop-nojs`);
+
+await send("Emulation.setScriptExecutionDisabled", { value: true });
+await load(cardHrefs[0], DESKTOP, { scripts: false });
+await send("Emulation.setScriptExecutionDisabled", { value: false });
+const noJsWork = await evaluate(
+  `({ h1: !!document.querySelector('h1'), sections: document.querySelectorAll('article h2').length, edges: document.querySelectorAll('[data-diagram] [data-edge]').length })`,
+);
+check("a case study is complete with JavaScript off", noJsWork.h1 && noJsWork.sections >= 5 && noJsWork.edges > 0, JSON.stringify(noJsWork));
 
 check("no console errors", consoleErrors.length === 0, consoleErrors.slice(0, 3).join(" | "));
 

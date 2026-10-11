@@ -17,12 +17,13 @@ function itemsIn(diagram: Diagram, parent?: string): Item[] {
   return readingOrder([...groups, ...nodes]);
 }
 
+/** Pinned to the first line (20px line, 6px dot), so a wrapped item still reads as one entry. */
 function Dot({ id }: { id?: TechId }) {
   const color = id ? tech[id].color : undefined;
   return (
     <span
       aria-hidden="true"
-      className={`size-1.5 shrink-0 rounded-full ${color ? "" : "bg-ink-3"}`}
+      className={`mt-1.75 size-1.5 shrink-0 rounded-full ${color ? "" : "bg-ink-3"}`}
       style={color ? { backgroundColor: color } : undefined}
     />
   );
@@ -41,7 +42,7 @@ function Items({ diagram, parent }: { diagram: Diagram; parent?: string }) {
             <Items diagram={diagram} parent={item.group.id} />
           </li>
         ) : (
-          <li key={item.node.id} className="flex items-center gap-2 text-sm text-ink-2">
+          <li key={item.node.id} className="flex items-start gap-2 text-sm text-ink-2">
             <Dot id={item.node.tech} />
             <span>
               {item.node.label}
