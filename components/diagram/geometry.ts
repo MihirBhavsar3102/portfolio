@@ -101,3 +101,26 @@ export const isOrthogonal = (path: Point[]) =>
 /** Items in reading order: top to bottom, then left to right. */
 export const readingOrder = <T extends { x: number; y: number }>(items: T[]) =>
   [...items].sort((a, b) => a.y - b.y || a.x - b.x);
+
+/**
+ * The ids in edge order when the edges between them form one unbranched
+ * chain through all of them (a pipeline), else null. A drawing may snake a
+ * pipeline across rows; its text form should still read in flow order.
+ */
+export function chainOrder(ids: string[], edges: { from: string; to: string }[]): string[] | null {
+  if (ids.length < 2) return null;
+  const set = new Set(ids);
+  const inner = edges.filter((e) => set.has(e.from) && set.has(e.to));
+  const next = new Map<string, string>();
+  const hasIn = new Set<string>();
+  for (const e of inner) {
+    if (next.has(e.from) || hasIn.has(e.to)) return null;
+    next.set(e.from, e.to);
+    hasIn.add(e.to);
+  }
+  const heads = ids.filter((id) => !hasIn.has(id));
+  if (heads.length !== 1) return null;
+  const order = [heads[0]];
+  while (next.has(order[order.length - 1]) && order.length <= ids.length) order.push(next.get(order[order.length - 1])!);
+  return order.length === ids.length && new Set(order).size === ids.length ? order : null;
+}

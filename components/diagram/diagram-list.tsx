@@ -1,19 +1,25 @@
 import { tech, type TechId } from "@/lib/tech";
 import type { Diagram, DiagramGroup, DiagramNode } from "@/types/diagram";
-import { labelOf, readingOrder } from "@/components/diagram/geometry";
+import { chainOrder, labelOf, readingOrder } from "@/components/diagram/geometry";
 
 type Item =
   | { kind: "group"; group: DiagramGroup; x: number; y: number }
   | { kind: "node"; node: DiagramNode; x: number; y: number };
 
-/** The groups and nodes directly inside `parent` (the top level when undefined), in reading order. */
+/**
+ * The groups and nodes directly inside `parent` (the top level when
+ * undefined), in reading order, except that a group holding just a pipeline
+ * of nodes lists them in pipeline order.
+ */
 function itemsIn(diagram: Diagram, parent?: string): Item[] {
   const groups = diagram.groups
     .filter((g) => g.parent === parent)
     .map((g): Item => ({ kind: "group", group: g, x: g.x, y: g.y }));
   const nodes = diagram.nodes
     .filter((n) => n.group === parent)
-    .map((n): Item => ({ kind: "node", node: n, x: n.x, y: n.y }));
+    .map((n) => ({ kind: "node" as const, node: n, x: n.x, y: n.y }));
+  const chain = parent !== undefined && groups.length === 0 ? chainOrder(nodes.map((i) => i.node.id), diagram.edges) : null;
+  if (chain) return chain.map((id) => nodes.find((i) => i.node.id === id)!);
   return readingOrder([...groups, ...nodes]);
 }
 

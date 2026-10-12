@@ -14,6 +14,7 @@ import {
   overlaps,
   pathD,
   readingOrder,
+  chainOrder,
   segmentEntersRect,
   segmentsCross,
   titleBox,
@@ -127,5 +128,18 @@ describe("readingOrder", () => {
   it("sorts top to bottom, then left to right", () => {
     const items = [{ id: "c", x: 0, y: 20 }, { id: "b", x: 50, y: 0 }, { id: "a", x: 0, y: 0 }];
     expect(readingOrder(items).map((i) => i.id)).toEqual(["a", "b", "c"]);
+  });
+});
+
+describe("chainOrder", () => {
+  const e = (from: string, to: string) => ({ from, to });
+  it("follows the edges through ids that form one chain, however they are drawn", () => {
+    expect(chainOrder(["d", "c", "a", "b"], [e("a", "b"), e("b", "c"), e("c", "d"), e("x", "a")])).toEqual(["a", "b", "c", "d"]);
+  });
+  it("returns null when the ids branch, break, loop or stand alone", () => {
+    expect(chainOrder(["a", "b", "c"], [e("a", "b"), e("a", "c")])).toBeNull();
+    expect(chainOrder(["a", "b", "c"], [e("a", "b")])).toBeNull();
+    expect(chainOrder(["a", "b"], [e("a", "b"), e("b", "a")])).toBeNull();
+    expect(chainOrder(["a"], [])).toBeNull();
   });
 });

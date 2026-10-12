@@ -5,6 +5,15 @@ import { ArchitectureDiagram } from "@/components/diagram/diagram";
 import { DiagramList } from "@/components/diagram/diagram-list";
 import { htmlOf, textOf } from "./render";
 
+describe("DiagramList order", () => {
+  it("lists a group that is one pipeline in pipeline order, not drawing order", () => {
+    const text = textOf(createElement(DiagramList, { diagram: diagrams["devsecops-pipeline"] }));
+    const at = ["Maven build", "SonarQube", "Dependency-Check", "Docker image", "Trivy", "Deploy"].map((label) => text.indexOf(label));
+    expect(at.every((i) => i >= 0)).toBe(true);
+    expect([...at].sort((a, b) => a - b)).toEqual(at);
+  });
+});
+
 describe.each(Object.entries(diagrams))("rendered diagram %s", (slug, d) => {
   const html = htmlOf(createElement(ArchitectureDiagram, { id: slug, diagram: d }));
   const count = (needle: string) => html.split(needle).length - 1;
