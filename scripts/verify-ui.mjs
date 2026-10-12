@@ -472,7 +472,8 @@ const seen = new Set();
 const unringed = [];
 for (let i = 0; i < focusables + 10; i++) {
   await key("Tab", "Tab", 9);
-  const f = await evaluate(`(() => { const a = document.activeElement; if (!a || a === document.body) return null; const s = getComputedStyle(a), after = getComputedStyle(a, '::after'); const ring = (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) || s.boxShadow !== 'none' || after.boxShadow !== 'none'; const id = a.getAttribute('href') || a.getAttribute('aria-label') || a.textContent.trim().slice(0, 30); return { id: a.tagName + ':' + id + ':' + [...document.querySelectorAll(a.tagName)].indexOf(a), label: id, ring }; })()`);
+  // A custom-element host (next dev's tools badge, nextjs-portal) isn't part of the site.
+  const f = await evaluate(`(() => { const a = document.activeElement; if (!a || a === document.body || a.tagName.includes('-')) return null; const s = getComputedStyle(a), after = getComputedStyle(a, '::after'); const ring = (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) || s.boxShadow !== 'none' || after.boxShadow !== 'none'; const id = a.getAttribute('href') || a.getAttribute('aria-label') || a.textContent.trim().slice(0, 30); return { id: a.tagName + ':' + id + ':' + [...document.querySelectorAll(a.tagName)].indexOf(a), label: id, ring }; })()`);
   if (!f || seen.has(f.id)) continue;
   seen.add(f.id);
   if (!f.ring) unringed.push(f.label);
