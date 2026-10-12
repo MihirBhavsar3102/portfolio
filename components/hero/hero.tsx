@@ -15,8 +15,12 @@ export function Hero() {
       <h1 id="hero-name" className="type-display text-display text-ink">
         {resume.name}
       </h1>
+      {/* On phones the location takes its own line rather than leaving the separator at a line end. */}
       <p className="mt-6 text-[clamp(1.25rem,2.2vw,1.75rem)] font-medium tracking-tight text-ink-2">
-        {resume.role} · {resume.location}
+        {resume.role}
+        <span aria-hidden="true" className="hidden sm:inline"> · </span>
+        <span className="sr-only">, </span>
+        <span className="block sm:inline">{resume.location}</span>
       </p>
       <p className="mt-10 max-w-[30ch] text-[clamp(1.5rem,3vw,2.375rem)] leading-[1.22] font-medium tracking-[-0.02em] text-ink">
         {resume.positioning}

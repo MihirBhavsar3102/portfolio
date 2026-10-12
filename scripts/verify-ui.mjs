@@ -482,6 +482,31 @@ check("every focused control shows a visible focus indicator", unringed.length =
 const ogMissing = await evaluate(`fetch('/work/not-a-case-study/opengraph-image').then(r => r.status)`);
 check("an unknown case study has no share card", ogMissing === 404, String(ogMissing));
 
+// ---------- Stack chips keep their height; the hero's separator never dangles ----------
+await load("/", DESKTOP);
+const chipH = await evaluate("[...document.querySelectorAll('#stack h3 + ul > li')].map(li => Math.round(li.getBoundingClientRect().height))");
+check("Stack chips are one height at 1440, whatever their row's heading does", chipH.length > 40 && Math.max(...chipH) - Math.min(...chipH) <= 2, `${Math.min(...chipH)}–${Math.max(...chipH)}px over ${chipH.length}`);
+const danglingSeparator = () =>
+  evaluate(`(() => {
+    const p = document.querySelector('section[aria-labelledby=hero-name] p');
+    const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT);
+    const chars = [];
+    for (let n; (n = walker.nextNode()); ) {
+      if (n.parentElement.closest('.sr-only')) continue;
+      for (let i = 0; i < n.length; i++) {
+        if (!n.data[i].trim()) continue;
+        const r = document.createRange(); r.setStart(n, i); r.setEnd(n, i + 1);
+        const b = r.getBoundingClientRect();
+        if (b.width > 0) chars.push({ c: n.data[i], top: Math.round(b.top) });
+      }
+    }
+    return chars.some((ch, i) => ch.c === '·' && (i === chars.length - 1 || chars[i + 1].top > ch.top + 4 || (i > 0 && chars[i - 1].top < ch.top - 4)));
+  })()`);
+for (const v of [MOBILE, DESKTOP]) {
+  await load("/", v);
+  check(`at ${v.width} the hero's role line never starts or ends a line on its separator`, !(await danglingSeparator()));
+}
+
 // ---------- Case studies ----------
 for (const href of cardHrefs) {
   const slug = href.split("/").pop();
@@ -535,17 +560,19 @@ await shot(`${LABEL}-404-desktop`);
 
 // ---------- Section reveal ----------
 await load("/", DESKTOP);
-const before = await evaluate(`(() => { const r = document.querySelector('#stack .reveal'); return { animate: r.hasAttribute('data-animate'), inview: r.hasAttribute('data-inview'), opacity: getComputedStyle(r).opacity }; })()`);
-await evaluate("document.getElementById('stack').scrollIntoView({ block: 'start' }); true");
+const before = await evaluate(`(() => { const r = document.querySelector('#work .reveal'); return { animate: r.hasAttribute('data-animate'), inview: r.hasAttribute('data-inview'), opacity: getComputedStyle(r).opacity }; })()`);
+await evaluate("document.getElementById('work').scrollIntoView({ block: 'start' }); true");
 await sleep(1200);
-const after = await evaluate(`(() => { const r = document.querySelector('#stack .reveal'); return { inview: r.hasAttribute('data-inview'), opacity: getComputedStyle(r).opacity, transform: getComputedStyle(r).transform }; })()`);
+const after = await evaluate(`(() => { const r = document.querySelector('#work .reveal'); return { inview: r.hasAttribute('data-inview'), opacity: getComputedStyle(r).opacity, transform: getComputedStyle(r).transform }; })()`);
 check(
   "an off-screen section waits, then rises into place once it scrolls into view",
   before.animate && !before.inview && before.opacity === "0" && after.inview && after.opacity === "1" && after.transform === "none",
   JSON.stringify({ before, after }),
 );
-await load("/?deep#stack", DESKTOP); // a query makes it a fresh document, not a same-page hash jump
-const deep = await evaluate(`(() => { const r = document.querySelector('#stack .reveal'); return { animate: r.hasAttribute('data-animate'), opacity: getComputedStyle(r).opacity, top: Math.round(document.getElementById('stack').getBoundingClientRect().top) }; })()`);
+const reveals = await evaluate("[...document.querySelectorAll('.reveal')].map(r => r.closest('section')?.id)");
+check("the page has one section reveal, on Selected work", reveals.length === 1 && reveals[0] === "work", reveals.join(", "));
+await load("/?deep#work", DESKTOP); // a query makes it a fresh document, not a same-page hash jump
+const deep = await evaluate(`(() => { const r = document.querySelector('#work .reveal'); return { animate: r.hasAttribute('data-animate'), opacity: getComputedStyle(r).opacity, top: Math.round(document.getElementById('work').getBoundingClientRect().top) }; })()`);
 check("a deep link leaves the section it lands on at rest", !deep.animate && deep.opacity === "1", JSON.stringify(deep));
 await load("/?land#credentials", DESKTOP); // its own query: a hash-only change from the last URL fires no load
 const landed = await evaluate("Math.round(document.getElementById('credentials').getBoundingClientRect().top)");
@@ -642,7 +669,7 @@ await send("Emulation.setEmulatedMedia", { features: [...LIGHT, { name: "prefers
 await load("/", DESKTOP);
 const running = await evaluate("document.getAnimations().length");
 check("reduced motion runs no animations", running === 0, `${running} running`);
-const restingReduced = await evaluate("getComputedStyle(document.querySelector('#contact .reveal')).opacity");
+const restingReduced = await evaluate("getComputedStyle(document.querySelector('#work .reveal')).opacity");
 check("reduced motion: off-screen sections are fully visible", restingReduced === "1", restingReduced);
 await send("Emulation.setEmulatedMedia", { features: LIGHT });
 
@@ -650,7 +677,7 @@ await send("Emulation.setEmulatedMedia", { features: LIGHT });
 await send("Emulation.setScriptExecutionDisabled", { value: true });
 await load("/", DESKTOP, { scripts: false });
 await send("Emulation.setScriptExecutionDisabled", { value: false });
-const noJs = await evaluate(`({ figures: document.querySelectorAll('#outcomes ul .type-figure').length, provenance: document.querySelectorAll('[id^=proof-][id$=-how]').length, name: document.querySelector('h1')?.textContent, sections: ['work', 'experience', 'stack', 'credentials', 'github', 'contact'].filter(id => document.getElementById(id)).length, revealOpacity: getComputedStyle(document.querySelector('#contact .reveal')).opacity })`);
+const noJs = await evaluate(`({ figures: document.querySelectorAll('#outcomes ul .type-figure').length, provenance: document.querySelectorAll('[id^=proof-][id$=-how]').length, name: document.querySelector('h1')?.textContent, sections: ['work', 'experience', 'stack', 'credentials', 'github', 'contact'].filter(id => document.getElementById(id)).length, revealOpacity: getComputedStyle(document.querySelector('#work .reveal')).opacity })`);
 check("content complete with JavaScript off", noJs.figures === 6 && noJs.provenance === 6 && !!noJs.name && noJs.sections === 6 && noJs.revealOpacity === "1", JSON.stringify(noJs));
 await shot(`${LABEL}-desktop-nojs`);
 

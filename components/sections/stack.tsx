@@ -55,7 +55,8 @@ export function Stack() {
         {resume.skillGroups.map((group) => (
           <div key={group.name} className="grid gap-x-8 gap-y-2.5 px-4 py-3.5 sm:gap-y-3 sm:px-5 sm:py-4 md:grid-cols-[12rem_1fr]">
             <h3 className="pt-1 text-[15px] font-semibold tracking-tight text-ink">{group.name}</h3>
-            <ul className="flex flex-wrap gap-1.5 sm:gap-2">
+            {/* Packed to the top: beside a two-line heading the grid stretches this list, and its chips must not follow. */}
+            <ul className="flex flex-wrap content-start items-start gap-1.5 sm:gap-2">
               {group.skills.map((skill) => (
                 <SkillChip key={skill.name} skill={skill} />
               ))}

@@ -242,8 +242,8 @@
 }
 
 /*
- * The section reveal, the page's one entrance besides the map's: a home
- * section that starts off screen fades up 8px, once, as it first scrolls into
+ * The section reveal, the page's one entrance besides the map's: Selected
+ * work, if it starts off screen, fades up 8px, once, as it first scrolls into
  * view (components/site/in-view.tsx). Screen only, so a printout never
  * inherits the start state.
  */

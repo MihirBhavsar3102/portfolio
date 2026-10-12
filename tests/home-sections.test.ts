@@ -176,3 +176,14 @@ describe("Contact", () => {
     expect(html).toMatch(new RegExp(`href="${resume.resumeFile}" download`));
   });
 });
+
+describe("the section reveal", () => {
+  const hasReveal = (el: Parameters<typeof htmlOf>[0]) => /class="reveal[ "]/.test(htmlOf(el));
+
+  it("plays on Selected work only, the page's product shots (spec §9: at most one)", () => {
+    expect(hasReveal(createElement(SelectedWork))).toBe(true);
+    for (const [name, C] of [["Experience", Experience], ["Stack", Stack], ["Credentials", Credentials], ["Contact", Contact]] as const) {
+      expect(hasReveal(createElement(C)), name).toBe(false);
+    }
+  });
+});

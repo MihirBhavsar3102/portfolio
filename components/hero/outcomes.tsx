@@ -1,7 +1,6 @@
 import { resume } from "@/lib/resume-data";
 import { frame, sectionHeading } from "@/components/site/frame";
 import { TraceButton } from "@/components/hero/trace-button";
-import { InView } from "@/components/site/in-view";
 
 /**
  * Screen two: the six measured outcomes, set huge, each with the sentence that
@@ -11,7 +10,7 @@ import { InView } from "@/components/site/in-view";
 export function Outcomes() {
   return (
     <section id="outcomes" aria-labelledby="outcomes-heading" className="border-t border-line">
-      <InView threshold={0} rootMargin="0px 0px -80px 0px" className={`reveal ${frame} py-24 lg:py-28`}>
+      <div className={`${frame} py-24 lg:py-28`}>
         <h2 id="outcomes-heading" className={sectionHeading}>
           Measured outcomes
         </h2>
@@ -35,7 +34,7 @@ export function Outcomes() {
             </li>
           ))}
         </ul>
-      </InView>
+      </div>
     </section>
   );
 }
