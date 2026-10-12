@@ -459,6 +459,29 @@ await load("/", MOBILE);
 const stackHeight = await evaluate("Math.round(document.getElementById('stack').getBoundingClientRect().height)");
 check("Stack at 375 is shorter than the 2,180px it started at", stackHeight < 1900, `${stackHeight}px`);
 
+// ---------- Reflow at 320 (WCAG 1.4.10), keyboard reach and focus, unknown share-card slug ----------
+for (const path of ["/", cardHrefs[0]]) {
+  await load(path, { width: 320, height: 640, mobile: true });
+  const o = await evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth");
+  check(`${path} at 320: no horizontal scroll`, o === 0, `overflow ${o}px`);
+}
+await load("/", DESKTOP);
+await evaluate("document.activeElement?.blur(); window.scrollTo(0, 0); true");
+const focusables = await evaluate(`[...document.querySelectorAll('a[href], button:not([disabled])')].filter(el => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && !el.closest('[aria-hidden=true]') && getComputedStyle(el).visibility !== 'hidden'; }).length`);
+const seen = new Set();
+const unringed = [];
+for (let i = 0; i < focusables + 10; i++) {
+  await key("Tab", "Tab", 9);
+  const f = await evaluate(`(() => { const a = document.activeElement; if (!a || a === document.body) return null; const s = getComputedStyle(a), after = getComputedStyle(a, '::after'); const ring = (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) || s.boxShadow !== 'none' || after.boxShadow !== 'none'; const id = a.getAttribute('href') || a.getAttribute('aria-label') || a.textContent.trim().slice(0, 30); return { id: a.tagName + ':' + id + ':' + [...document.querySelectorAll(a.tagName)].indexOf(a), label: id, ring }; })()`);
+  if (!f || seen.has(f.id)) continue;
+  seen.add(f.id);
+  if (!f.ring) unringed.push(f.label);
+}
+check("Tab reaches every visible control on the home page", seen.size >= focusables, `${seen.size} reached of ${focusables}`);
+check("every focused control shows a visible focus indicator", unringed.length === 0, unringed.slice(0, 6).join(" | "));
+const ogMissing = await evaluate(`fetch('/work/not-a-case-study/opengraph-image').then(r => r.status)`);
+check("an unknown case study has no share card", ogMissing === 404, String(ogMissing));
+
 // ---------- Case studies ----------
 for (const href of cardHrefs) {
   const slug = href.split("/").pop();
@@ -600,6 +623,9 @@ await load("/", DESKTOP);
 const remembered = await theme();
 check("the toggle switches the theme and remembers it", toggled.theme === "dark" && toggled.bg === "rgb(10, 10, 10)" && toggled.label === "Switch to light theme" && remembered === "dark", JSON.stringify({ toggled, remembered }));
 await shot(`${LABEL}-desktop-dark`);
+await shot(`${LABEL}-desktop-dark-full`, { fullPage: true });
+await load("/", MOBILE);
+await shot(`${LABEL}-mobile-dark-full`, { fullPage: true });
 await load("/work/avd-automation", DESKTOP);
 await shot(`${LABEL}-work-dark`);
 await evaluate("localStorage.clear(); true");
