@@ -323,7 +323,7 @@ Confident and quiet; colour shifts, nothing glows.
 
 ### Chips
 - **Figure chips** (the map section): pill, Strong Hairline border, 14px Ink Two with the value in semibold. Active (hover, focus or pinned): persimmon border, Persimmon Wash fill, persimmon text.
-- **Skill chips** (Stack): 6px radius, 14px (13px with tighter padding below sm, so the nine rows stay short on a phone); filled Surface Three with Ink text and a brand dot when used at work, outlined Strong Hairline with Ink Two text and a dot when used in a personal project, Hairline with Ink Three and no dot otherwise.
+- **Skill chips** (Stack): 6px radius, 14px (13px with tighter padding below sm, so the nine rows stay short on a phone); a chip keeps its own height, even beside a group heading that wraps to two lines; filled Surface Three with Ink text and a brand dot when used at work, outlined Strong Hairline with Ink Two text and a dot when used in a personal project, Hairline with Ink Three and no dot otherwise.
 - **Stage chips** (a pipeline case study): pill, Canvas fill, Strong Hairline border, 14px Ink.
 
 ### Cards / Containers
