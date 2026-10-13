@@ -1,30 +1,77 @@
-// Browser verification for the portfolio: drives Edge headless over the Chrome
-// DevTools Protocol (Node 24 global WebSocket, zero dependencies), captures
-// desktop/mobile screenshots and checks Trace, nav, a11y and motion behaviour.
+// Browser verification for the portfolio: drives a Chromium-family browser
+// (Edge, Chrome or Chromium) headless over the Chrome DevTools Protocol (Node
+// 24 global WebSocket, zero dependencies), captures desktop/mobile screenshots
+// and checks Trace, nav, a11y and motion behaviour.
 // Usage: node scripts/verify-ui.mjs <baseUrl> <outDir> [label]
-// Run against `next start` (and `next dev`); exits non-zero if any check fails.
+// Set BROWSER_PATH to choose the browser; otherwise the first one found is used.
+// Run against `next start` (and `next dev`); exits non-zero if any check fails
+// or the run itself breaks.
 import { spawn } from "node:child_process";
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { delimiter, join, resolve } from "node:path";
 
 const [, , BASE = "http://localhost:3100", OUT = ".", LABEL = "prod"] = process.argv;
-const EDGE = "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe";
-const PORT = 9333;
+
+/**
+ * BROWSER_PATH if set; else Edge or Chrome at their install paths on Windows
+ * and macOS; else Chrome, Chromium or Edge on the PATH (GitHub's Linux runners
+ * ship Google Chrome).
+ */
+function findBrowser() {
+  const chosen = process.env.BROWSER_PATH;
+  if (chosen) {
+    if (!existsSync(chosen)) throw new Error(`BROWSER_PATH does not exist: ${chosen}`);
+    return chosen;
+  }
+  const installed = {
+    win32: [
+      "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
+      "C:/Program Files/Microsoft/Edge/Application/msedge.exe",
+      "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    ],
+    darwin: ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"],
+  };
+  const onPath = ["google-chrome-stable", "google-chrome", "chromium", "chromium-browser", "microsoft-edge-stable", "microsoft-edge"].flatMap((name) =>
+    (process.env.PATH ?? "").split(delimiter).filter(Boolean).map((dir) => join(dir, name)),
+  );
+  const found = [...(installed[process.platform] ?? []), ...onPath].find((p) => existsSync(p));
+  if (!found) throw new Error("No Chrome, Chromium or Edge found. Set BROWSER_PATH to one.");
+  return found;
+}
+
+let BROWSER;
+try {
+  BROWSER = findBrowser();
+} catch (error) {
+  console.error(`FAIL  ${error.message}`);
+  process.exit(1);
+}
 // Absolute: Edge silently fails to start (no CDP) with a relative --user-data-dir.
 const PROFILE = join(resolve(OUT), `cdp-profile-${Date.now()}`);
 mkdirSync(OUT, { recursive: true });
+console.log(`browser  ${BROWSER}`);
 
-const edge = spawn(EDGE, [
+const browser = spawn(BROWSER, [
   "--headless=new",
-  `--remote-debugging-port=${PORT}`,
+  // Port 0: the browser picks a free port and writes it to DevToolsActivePort in
+  // the profile, so a browser left over from an earlier run can never be the one
+  // this run attaches to.
+  "--remote-debugging-port=0",
   `--user-data-dir=${PROFILE}`,
   "--disable-extensions",
   "--disable-component-extensions-with-background-pages",
   "--disable-sync",
   "--no-first-run",
   "--hide-scrollbars",
+  // Containers give /dev/shm 64MB, too little for Chrome; and Chrome refuses to sandbox as root.
+  ...(process.platform === "linux" ? ["--disable-dev-shm-usage"] : []),
+  ...(process.getuid?.() === 0 ? ["--no-sandbox"] : []),
   "about:blank",
 ]);
+browser.on("error", (error) => {
+  console.error(`FAIL  could not start ${BROWSER}: ${error.message}`);
+  process.exit(1);
+});
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const results = [];
@@ -33,7 +80,67 @@ const check = (name, ok, detail = "") => {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}${detail ? "  — " + detail : ""}`);
 };
 
+let PORT = 0;
+let closed = false;
+/** Closes the browser through CDP and removes its profile. Safe to call twice. */
+async function closeBrowser() {
+  if (closed) return;
+  closed = true;
+  // On Windows the msedge.exe we spawned hands off to a separate browser
+  // process and exits, so killing it would leave the browser running with the
+  // throwaway profile locked; close it through CDP first.
+  try {
+    if (PORT) {
+      const { webSocketDebuggerUrl } = await (await fetch(`http://127.0.0.1:${PORT}/json/version`, { signal: AbortSignal.timeout(3000) })).json();
+      const b = new WebSocket(webSocketDebuggerUrl);
+      await new Promise((r, j) => ((b.onopen = r), (b.onerror = j)));
+      b.send(JSON.stringify({ id: 1, method: "Browser.close" }));
+      await sleep(1500);
+    }
+  } catch {
+    // Already gone.
+  }
+  browser.kill();
+  try {
+    rmSync(PROFILE, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  } catch {
+    console.log(`note  could not remove ${PROFILE}`);
+  }
+}
+
+// A run that breaks (a page that never loads, a browser that dies) must close
+// the browser and fail. Installing this handler makes Node exit 0 after an
+// uncaught error or a rejected top-level await, so it sets the code itself.
+// One failure can surface twice (a rejection and the await it breaks); only
+// the first cleans up, because exiting mid-cleanup aborts Node on Windows.
+let crashed = false;
+const crash = async (error) => {
+  process.exitCode = 1;
+  if (crashed) return;
+  crashed = true;
+  console.error(`FAIL  the verifier crashed: ${error?.stack ?? error}`);
+  await closeBrowser();
+  process.exit(1);
+};
+process.on("uncaughtException", crash);
+process.on("unhandledRejection", crash);
+
+async function devtoolsPort() {
+  const file = join(PROFILE, "DevToolsActivePort");
+  for (let i = 0; i < 150; i++) {
+    try {
+      const port = Number(readFileSync(file, "utf8").split("\n")[0]);
+      if (port > 0) return port;
+    } catch {
+      // Not written yet.
+    }
+    await sleep(100);
+  }
+  throw new Error(`${BROWSER} did not open a DevTools port within 15s`);
+}
+
 async function connect() {
+  PORT = await devtoolsPort();
   for (let i = 0; i < 50; i++) {
     try {
       const res = await fetch(`http://127.0.0.1:${PORT}/json/new?about:blank`, { method: "PUT" });
@@ -43,12 +150,12 @@ async function connect() {
       await sleep(200);
     }
   }
-  throw new Error("Edge did not expose CDP");
+  throw new Error("the browser did not expose CDP");
 }
 
 const wsUrl = await connect();
 const ws = new WebSocket(wsUrl);
-await new Promise((r) => (ws.onopen = r));
+await new Promise((r, j) => ((ws.onopen = r), (ws.onerror = () => j(new Error("could not open the CDP socket")))));
 let seq = 0;
 const pending = new Map();
 const listeners = [];
@@ -61,10 +168,23 @@ ws.onmessage = (m) => {
     else resolve(msg.result);
   } else if (msg.method) listeners.forEach((l) => l(msg));
 };
+// A browser that dies mid-run fails every call in flight instead of hanging the run.
+ws.onclose = () => {
+  for (const { reject } of pending.values()) reject(new Error("the browser connection closed"));
+  pending.clear();
+};
+/** One CDP call; one that gets no answer within 60s fails rather than hangs. */
 const send = (method, params = {}) =>
   new Promise((resolve, reject) => {
     const id = ++seq;
-    pending.set(id, { resolve, reject });
+    const timer = setTimeout(() => {
+      pending.delete(id);
+      reject(new Error(`CDP ${method} got no answer within 60s`));
+    }, 60000);
+    pending.set(id, {
+      resolve: (v) => (clearTimeout(timer), resolve(v)),
+      reject: (e) => (clearTimeout(timer), reject(e)),
+    });
     ws.send(JSON.stringify({ id, method, params }));
   });
 const evaluate = async (expression) => {
@@ -798,24 +918,7 @@ check("no console errors", consoleErrors.length === 0, consoleErrors.slice(0, 3)
 
 writeFileSync(join(OUT, `${LABEL}-results.json`), JSON.stringify(results, null, 2));
 ws.close();
-// Close the browser through CDP. On Windows the msedge.exe we spawned hands
-// off to a separate browser process and exits, so killing it would leave the
-// browser running with the throwaway profile locked.
-try {
-  const { webSocketDebuggerUrl } = await (await fetch(`http://127.0.0.1:${PORT}/json/version`)).json();
-  const browser = new WebSocket(webSocketDebuggerUrl);
-  await new Promise((r, j) => ((browser.onopen = r), (browser.onerror = j)));
-  browser.send(JSON.stringify({ id: 1, method: "Browser.close" }));
-  await sleep(1500);
-} catch {
-  // Already gone.
-}
-edge.kill();
-try {
-  rmSync(PROFILE, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
-} catch {
-  console.log(`note  could not remove ${PROFILE}`);
-}
+await closeBrowser();
 const failed = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - failed}/${results.length} checks passed`);
 process.exit(failed ? 1 : 0);
