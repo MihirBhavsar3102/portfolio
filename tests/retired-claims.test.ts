@@ -16,8 +16,8 @@ const RETIRED = [
 ];
 
 describe("retired claims", () => {
-  it("do not appear in site source", () => {
-    const hits = listSourceFiles(["lib", "components", "app", "content"]).flatMap((f) => {
+  it("do not appear in site source or the README", () => {
+    const hits = [...listSourceFiles(["lib", "components", "app", "content"]), "README.md"].flatMap((f) => {
       const text = readSource(f).toLowerCase();
       return RETIRED.filter((c) => text.includes(c.toLowerCase())).map((c) => `${f}: ${c}`);
     });

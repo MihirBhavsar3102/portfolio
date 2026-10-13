@@ -1,64 +1,83 @@
 # Mihir Bhavsar — Portfolio
 
-The personal site of a Cloud & DevOps engineer. It's written like a product launch page: one idea per screen, big type, and every number attached to how it was achieved. There are light and dark themes, a service map that lights up whatever produced each figure, and four case studies with server-rendered architecture diagrams.
+The source of my personal site. I'm a Cloud & DevOps engineer in Ahmedabad, India. I automate how Azure and AWS infrastructure is built, shipped and monitored, and I build applied AI.
 
-**Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, Radix UI primitives, lucide-react, and MDX for the case studies. Motion is plain CSS. Tests run on Vitest, plus a headless-browser verifier.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/home-dark.png">
+  <img src="docs/images/home-light.png" alt="The site's first screen: my name, role and one-line positioning statement, beside a small diagram of my Azure, AWS and AI workloads and the tools that build and monitor them.">
+</picture>
 
-## Run locally
+## About me
 
-```bash
-npm install
-npm run dev        # development server
-npm run build      # production build
-npm start          # serve the production build
-```
+I'm a Cloud Operations Engineer at Parkar Global Technologies, where I've worked across AWS, Azure and GCP since December 2024. Most of my work is infrastructure as code and delivery pipelines with Terraform, GitHub Actions and Azure DevOps, along with Linux administration and monitoring with Prometheus, Grafana and CloudWatch. I've also used Docker, Kubernetes, Helm and ArgoCD in project work.
 
-## Check it
+Some results from that work. The site explains how each one was achieved:
 
-```bash
-npm test           # Vitest: content integrity, claims, contrast, SEO, components
-npm run typecheck  # tsc --noEmit
-npx eslint .
-node scripts/verify-ui.mjs http://localhost:3000 ./out prod   # browser checks against a running server
-```
+- **40%** faster Azure Virtual Desktop deployments across clients, from about 8 hours to about 5
+- **70%+** less manual effort across five clients, with configuration errors near zero
+- **450+** concurrent virtual desktop users supported
+- **99.9%** uptime on a multi-AZ WordPress platform on AWS
+- **~60%** faster answers to HR policy questions, from a retrieval-augmented assistant
 
-`scripts/verify-ui.mjs` drives Microsoft Edge headless over the Chrome DevTools Protocol, with no dependencies. It expects Edge at its default Windows install path. It checks the Trace, keyboard reach and focus, themes, responsive widths, reduced motion, JavaScript-off content, metadata, and more, and saves screenshots to the output folder.
+**Certifications:** AWS Certified Solutions Architect – Associate, AWS Certified Cloud Practitioner, Microsoft Certified: Azure Fundamentals and Azure AI Fundamentals, and Google Cloud Digital Leader.
 
-## Where things live
+**Education:** B.E. in Computer Science and Engineering from The Maharaja Sayajirao University of Baroda, after a diploma in Computer Engineering from Gujarat Technological University.
+
+## What's on the site
+
+- **What I do, on the first screen.** One line whose last word rolls through *built*, *shipped* and *monitored*, beside a small live diagram of my workloads that lights up the matching step.
+- **Measured outcomes.** Six figures set large, each with the sentence that says how it was achieved and, where known, how it was measured.
+- **How it fits together.** A service map of three workloads under one way of building and monitoring them. Pick a figure and the map lights up whatever produced it.
+- **Selected work.** Four case studies, each with its own page and architecture diagram: [Azure Virtual Desktop automation](content/work/avd-automation.mdx), a [multi-AZ AWS web platform](content/work/aws-web-platform.mdx), an [HR policy assistant](content/work/hr-policy-assistant.mdx) and a [DevSecOps CI/CD pipeline](content/work/devsecops-pipeline.mdx).
+- **Experience, stack, credentials, GitHub and contact.** Skills I've used at work or in a project are marked that way. The GitHub section shows hand-picked repositories with live details.
+
+The design reads like a product launch page: one idea per screen, big type, white or black backgrounds and one accent colour, in light and dark themes. The full visual system is in [DESIGN.md](DESIGN.md).
+
+## Tech stack
+
+| Area | Choice |
+| --- | --- |
+| Framework | Next.js 16 (App Router), React 19, TypeScript |
+| Styling | Tailwind CSS v4 with CSS-first design tokens; light and dark themes |
+| UI | Radix UI primitives, lucide-react icons |
+| Content | One typed data file for every fact; MDX for the case-study narratives |
+| Diagrams | Server-rendered SVG, with no diagram library in the browser |
+| Motion | Plain CSS, with no animation library |
+| Share images | Generated for each page with `next/og` |
+| Fonts | Schibsted Grotesk and Fragment Mono through `next/font` |
+| Testing | Vitest, plus a headless-browser verifier with no dependencies |
+| Hosting | A standalone Node server in a Docker image |
+
+## How it's built
+
+- **Every fact has one source.** Roles, figures, projects, skills and credentials live in [lib/resume-data.ts](lib/resume-data.ts). Each figure carries the sentence that explains it. Tests fail if a retired or unsourced claim creeps back into the copy, or if my phone number appears anywhere.
+- **Accessible by default.** Every text colour pairing passes WCAG AA contrast in both themes, and a test holds it there. The whole site works from the keyboard, respects reduced-motion settings and shows all its content with JavaScript off.
+- **Light on the browser.** The map and the case-study diagrams render on the server, motion is plain CSS, and no animation or diagram library is sent to the browser.
+- **Easy to find and share.** The home page and each case study have their own canonical URL, share image and structured data, and the sitemap lists them all.
+- **Checked in a real browser.** [A script](scripts/verify-ui.mjs) drives headless Microsoft Edge to test the map's interactions, keyboard focus, both themes, widths from phone to desktop, reduced motion and JavaScript-off rendering.
+- **Live GitHub data, with a fallback.** Repository details refresh hourly. When GitHub can't be reached, the section shows curated descriptions instead.
+
+## Repository layout
 
 | Path | What it holds |
 | --- | --- |
-| [lib/resume-data.ts](lib/resume-data.ts) | **The site's data:** roles, figures with their provenance, projects, skills, credentials, links. The case-study narrative is in `content/work/`. |
-| [types/resume.ts](types/resume.ts) | The content model |
-| [content/work/](content/work/) | Case-study narrative in MDX (no figures; those come from `resume-data`), and each diagram's data |
-| [app/](app/) | Routes: the home page, `/work/[slug]`, share images, the sitemap, robots and the 404 |
-| [app/globals.css](app/globals.css) | Design tokens for both themes, the map's draw-in, the Trace dimming |
-| [components/](components/) | `site/` chrome, `hero/` (figures, map, Trace), `sections/`, `work/`, `diagram/`, `og/` share cards, `ui/` |
-| [lib/](lib/) | Logic: the Trace, stack evidence, GitHub fetch with fallbacks, SEO and JSON-LD, the theme script |
-| [tests/](tests/) | Unit and render tests, including the guards that keep retired or unsourced claims out of the copy |
-| [DESIGN.md](DESIGN.md) | The visual system: tokens, type, components and rules |
-| [PRODUCT.md](PRODUCT.md) | Who the site is for and what it must prove |
+| [lib/resume-data.ts](lib/resume-data.ts) | Everything the site says: roles, figures and their provenance, projects, skills, credentials, links |
+| [content/work/](content/work/) | Case-study narratives in MDX, and each diagram's data |
+| [app/](app/) | Routes: the home page, the case studies, share images, the sitemap, robots and the 404 page |
+| [components/](components/) | Site chrome, the hero and map, home sections, case-study parts, diagrams and share cards |
+| [tests/](tests/) | Unit, render, content and contrast tests |
+| [DESIGN.md](DESIGN.md) | The visual system: colours, type, components and rules |
+| [PRODUCT.md](PRODUCT.md) | Who the site is for and what it has to show |
 
-## Content rules
+## Contact
 
-- Facts come from the resume only, paraphrased for the web.
-- Every figure carries a provenance sentence, shown wherever the figure is.
-- `npm test` fails if a retired claim reappears, or if the phone number appears anywhere in the source.
+- **Email:** [mihirbhavsar2001@gmail.com](mailto:mihirbhavsar2001@gmail.com)
+- **LinkedIn:** [linkedin.com/in/mihirbhavsar3102](https://www.linkedin.com/in/mihirbhavsar3102/)
+- **GitHub:** [@MihirBhavsar3102](https://github.com/MihirBhavsar3102)
+- **Resume:** [MihirBhavsar_Resume.pdf](public/MihirBhavsar_Resume.pdf)
 
-## Deploy
+## Using this code
 
-The site builds to a standalone Node server (`output: "standalone"`) with the [Dockerfile](Dockerfile). The container listens on port 3001.
+This is my personal site. You're welcome to read the code and borrow ideas from it, but please don't reuse its content (the writing, case studies and resume) or present the site as your own.
 
-```bash
-docker build --build-arg NEXT_PUBLIC_SITE_URL=https://your-domain.example -t portfolio .
-docker run -p 3001:3001 -e GITHUB_TOKEN=... portfolio
-```
-
-- **`NEXT_PUBLIC_SITE_URL` is required for a real deploy.** It's inlined at build time and used for canonical URLs, Open Graph tags, JSON-LD, the sitemap and robots.txt. Without it they point at `http://localhost:3001`. See [.env.example](.env.example).
-- **`GITHUB_TOKEN` is optional.** It's read when the home page is built and on each hourly refresh, and it raises the rate limit for the GitHub section's live repo details. Without it, or whenever GitHub is unavailable, the section shows its curated descriptions.
-
-`public/MihirBhavsar_Resume.pdf` is the resume the download links serve. Replace it at that path to update it.
-
-## Fonts
-
-Schibsted Grotesk and Fragment Mono load through `next/font`. The share cards use static Schibsted Grotesk files in [assets/fonts/](assets/fonts/), under the SIL Open Font License ([OFL.txt](assets/fonts/OFL.txt)).
+The Schibsted Grotesk files in [assets/fonts/](assets/fonts/) are under the SIL Open Font License ([OFL.txt](assets/fonts/OFL.txt)).
