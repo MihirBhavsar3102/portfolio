@@ -194,6 +194,21 @@ components:
     textColor: "{colors.ink-2}"
     typography: "{typography.small}"
     rounded: "{rounded.pill}"
+  nav-monogram:
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.canvas}"
+    rounded: "{rounded.lg}"
+    size: "28px"
+  hero-preview-lane:
+    backgroundColor: "{colors.surface-2}"
+    textColor: "{colors.ink-3}"
+    typography: "{typography.label}"
+    rounded: "{rounded.2xl}"
+    padding: "16px"
+  hero-preview-tool-lit:
+    backgroundColor: "{colors.persimmon-wash}"
+    textColor: "{colors.persimmon}"
+    rounded: "{rounded.pill}"
   theme-toggle:
     textColor: "{colors.ink-2}"
     rounded: "{rounded.pill}"
@@ -210,9 +225,9 @@ components:
 
 **Creative North Star: "The Statement"**
 
-The site reads like a product launch page for an engineer: one idea per screen, set in big, confident, tightly tracked type, with nothing on the page that is not content. Screen one is who and what: the name, the role, and the positioning set as a statement. Screen two proves it, with six measured figures at display size, each attached to the sentence that says how it was achieved. Screen three shows how the estate fits together, and any figure lights the infrastructure that produced it. The rest of the page keeps the same grammar: a statement heading, a short intro, then the evidence.
+The site reads like a product launch page for an engineer: one idea per screen, set in big, confident, tightly tracked type, with nothing on the page that is not content. Screen one is who and what: the name, the role, and one crisp positioning line whose last word rolls through built, shipped and monitored, while the estate in miniature beside it plays the same three steps. Screen two proves it, with six measured figures at display size, each attached to the sentence that says how it was achieved. Screen three shows how the estate fits together, and any figure lights the infrastructure that produced it. The rest of the page keeps the same grammar: a statement heading, a short intro, then the evidence.
 
-The palette is pure white or pure black with near-black or near-white ink, in two first-class themes. A single persimmon accent marks what you can act on and what is lit, and colour beyond that appears only where it names something: the cloud a case study ran on, or a technology's brand dot. Depth is quiet: one tinted band behind the map, tinted cards for the work, and hairlines. Motion is two entrances, each played once: the map settling and its edges drawing when it first scrolls into view, and one section reveal, where Selected work (the case-study cards, the page's product shots) fades up 8px over 700ms (ease-out-expo) as it arrives, if it started off screen. Neither plays on case studies, in print, under reduced motion, or for anything already on screen when the page loads. Everything else is a colour change or a 2px lift on hover.
+The palette is pure white or pure black with near-black or near-white ink, in two first-class themes. A single persimmon accent marks what you can act on and what is lit, and colour beyond that appears only where it names something: the cloud a case study ran on, or a technology's brand dot. Depth is quiet: one tinted band behind the map, tinted cards for the work, and hairlines. Motion is one story and two entrances. The story is the hero's: every 3.2s the positioning line's last word rolls up to the next verb and the estate preview lights that step (tools and parts, then packets down to the workloads, then monitoring); it runs only while the hero is on screen and the tab is visible. The entrances each play once: the map settling and its edges drawing when it first scrolls into view, and one section reveal, where Selected work (the case-study cards, the page's product shots) fades up 8px over 700ms (ease-out-expo) as it arrives, if it started off screen. Neither entrance plays on case studies, in print, under reduced motion, or for anything already on screen when the page loads; under reduced motion, in print and without JavaScript the hero rests, its line read as one sentence. Everything else is a colour change or a 2px lift on hover.
 
 The register follows PRODUCT.md: premium and plainly professional, "Linear × Apple" in feel. Neon, glow, glassmorphism, gradient text, terminal windows, code-editor chrome and hacker motifs are rejected, as are eyebrow labels and boxed dashboard panels as the page structure.
 
@@ -222,7 +237,7 @@ The register follows PRODUCT.md: premium and plainly professional, "Linear × Ap
 - Schibsted Grotesk from 13px nav to 96px name; Fragment Mono only for the literal email.
 - One idea per screen; full-bleed hairlines between sections on a 76rem measure.
 - Cloud colours tint the work cards; brand colours appear only as small dots.
-- Two once-only entrances (the map's draw, the section reveal); everything else is state change, and reduced motion cancels it all.
+- The hero's story (the rolling verb and the lit preview, paused off screen) and two once-only entrances (the map's draw, the section reveal); everything else is state change, and reduced motion cancels it all.
 
 ## Colors
 
@@ -268,13 +283,13 @@ Achromatic grounds and ink in two themes, one warm persimmon accent, and three c
 **Character:** One sturdy newspaper grotesk does all the talking, heavy and tight at the top of the scale so headings read as statements, plain and open in the body. Numerals are proportional: Schibsted's tabular set widens the comma and full stop.
 
 ### Hierarchy
-- **Display** (700, clamp(3.5rem, 9vw, 6rem), 0.92, -0.04em): the name. One per page.
+- **Display** (700, clamp(3.5rem, 9vw, 6rem), 0.92, -0.04em): the name. One per page. From lg, where it shares the screen with the preview, clamp(3.5rem, 6.8vw, 6rem), so it holds one line at 1024.
 - **Headline** (700, clamp(2.5rem, 5.5vw, 4.25rem), 1.0, -0.04em): every home section heading ("Measured outcomes", "How it fits together", "Let's talk."). Case-study h1 uses the same voice at clamp(2.5rem, 5vw, 4rem); the 404 at clamp(3rem, 7vw, 5rem).
-- **Statement** (500, clamp(1.5rem, 3vw, 2.375rem), 1.22, -0.02em, max 30ch, Ink): the positioning line in the hero.
+- **Statement** (500, clamp(1.5rem, 3vw, 2.375rem), 1.22, -0.02em, max 25ch): the positioning line in the hero, its lead in Ink Two and its verbs in Ink at 600.
 - **Figure** (700, clamp(4rem, 7vw, 5.75rem), 1.0, -0.04em): the six outcomes. 3.25rem in a case study's ledger, 2.75rem on a work card.
 - **Title** (600, 1.625rem, -0.02em): work card titles; experience role 1.5rem, workstream names 1.25rem, credential panel titles 1.125rem.
 - **Prose heading** (700, 2rem, -0.04em): case-study MDX h2s.
-- **Lede** (400, 1.25rem, 1.625, max 56ch, Ink Two): section intros and case-study summaries; the role line in the hero runs 500 at clamp(1.25rem, 2.2vw, 1.75rem).
+- **Lede** (400, 1.25rem, 1.625, max 56ch, Ink Two): section intros and case-study summaries; the role line in the hero runs 500 at clamp(1.25rem, 2.2vw, 1.75rem), clamp(1.125rem, 1.7vw, 1.5rem) from lg so it keeps one line beside the preview.
 - **Prose** (400, 17px, 1.7, max 68ch, Ink Two): case-study MDX paragraphs and lists.
 - **Body** (400, 15px, 1.625): provenance, summaries, points, buttons (600).
 - **Small / Nav / Label** (14px, 13px, 12px): chips, nav links, metadata.
@@ -291,7 +306,7 @@ Achromatic grounds and ink in two themes, one warm persimmon accent, and three c
 
 One centred measure (`76rem`) with 20px gutters, 40px from sm, shared by the nav, every section and the footer. The sticky nav is 56px; anchor scroll is offset 80px.
 
-The home page paces one idea per screen. The hero fills the first screen (min(100svh − 56px, 56rem)), vertically centred and left-aligned. Every following section opens on a full-bleed hairline and sits at 96px vertical padding (112px from lg), its heading 56–64px above its content; a section with an intro carries it 24px under the heading. "How it fits together" is the one tinted band (Surface One), with the heading and intro split 6/6 from lg and the map capped at 52rem so its type stays near 1:1.
+The home page paces one idea per screen. The hero fills the first screen (min(100svh − 56px, 56rem)), vertically centred and left-aligned; from lg it splits into the copy and the estate preview (27rem, 30rem from xl). Below lg the hero is text only. Every following section opens on a full-bleed hairline and sits at 96px vertical padding (112px from lg), its heading 56–64px above its content; a section with an intro carries it 24px under the heading. "How it fits together" is the one tinted band (Surface One), with the heading and intro split 6/6 from lg and the map capped at 52rem so its type stays near 1:1.
 
 Grids: outcomes 1 / 2 from sm / 3 from lg with 56px column and 64–80px row gaps; work cards 1 / 2 from md with 16px gaps; experience workstreams 3 columns from lg; stack rows put the group name in a 192px column from md; credentials split 7/5 from lg; GitHub 2 from md.
 
@@ -333,7 +348,7 @@ Confident and quiet; colour shifts, nothing glows.
 - **Shadow Strategy:** none in flow (see Elevation & Depth).
 
 ### Navigation
-Sticky, 56px, Canvas at 85% with backdrop blur and no border. The name sits left in 15px semibold Ink; the section links (Work, Experience, Stack, Credentials, Contact) sit centred in 13px Ink Two, Ink when current, with a 1px Ink underline that glides between them. The theme toggle and the persimmon Resume link close the row. Below md the links fold into a right-hand sheet with 18px links, an ink pill "Download resume", the copy-email control and social links. At the foot of the page the last link (Contact) is marked.
+Sticky, 56px, Canvas at 85% with backdrop blur and no border. The home link sits left: a 28px Ink monogram ("MB", 11px bold Canvas, 10px radius) and, beside it, the name in 15px semibold Ink. On the home page the name waits until the hero's own has scrolled up under the nav, then slides in (500ms, ease-out-expo), and leaves again at the top, so the first screen never says it twice; on every other page, and on keyboard focus, it shows from the start. Screen readers hear the link as the full name; the section links (Work, Experience, Stack, Credentials, Contact) sit centred in 13px Ink Two, Ink when current, with a 1px Ink underline that glides between them. The theme toggle and the persimmon Resume link close the row. Below md the links fold into a right-hand sheet with 18px links, an ink pill "Download resume", the copy-email control and social links. At the foot of the page the last link (Contact) is marked.
 
 ### Theme Toggle
 A 36px round ghost button showing a moon in light and a sun in dark (chosen by CSS from `<html data-theme>`, so it is right from the first paint). It switches the theme and stores the choice; its label names the theme it switches to. Without JavaScript it hides and the system decides.
@@ -343,6 +358,9 @@ Six figures in a three-column grid, each a button: the Figure in Ink (persimmon 
 
 ### Service Map and Trace (signature)
 The estate drawn as a server SVG on the Surface One band: a Build band over three sibling workload zones (Azure, AWS, AI) and an Observe band beneath, nodes cut into their zones with brand dots. A row of figure chips above it traces any figure: lit nodes take Persimmon Wash and a persimmon stroke, lit edges turn persimmon, and everything else dims to 30% over 220ms. A pinned figure is mirrored to `?trace=`. Below md the drawing becomes a list of the three zones with the same trace marks. The map's one motion moment plays when it first scrolls into view: zones settle from 45% opacity and 4px, then edges draw out, about 1.1s, once.
+
+### Hero Story (signature)
+The first screen's one moving idea. The positioning line is a lead ("I automate how Azure and AWS infrastructure is") and three verbs sharing one inline cell as wide as the longest, so nothing reflows: the current verb sits in place and the one it replaces rolls up and out over 750ms (ease-out-expo). Beside it, from lg, the estate in miniature, built from the same data as the map: the Build and ship lane (Surface Two, tool chips on Canvas with brand dots), the three workloads as Canvas cards with their first three parts on Surface One, and the Observe lane, joined by straight connectors only where the estate has an edge, so nothing runs into the AI workload. Each verb is a step. **Built** lights the tools and the parts (Persimmon text, a 40% persimmon border and the wash over Canvas, staggered 90ms). **Shipped** turns the build connectors persimmon, sends packets down them and edges the Azure and AWS cards. **Monitored** does the same for the Observe lane. A lit tool keeps its Canvas chip under the wash, because the wash straight over Surface Two misses AA. The preview is aria-hidden (the map section describes the estate) and the whole line is always in the page for screen readers. `HeroCycle` steps `data-phase` on the hero every 3.2s while it is on screen and the tab is visible; CSS does the rest.
 
 ### Trace Hint
 When a figure is pinned and the map is out of view, a pill floats at the bottom centre: "**99.9%** is lit on the map", an ink "Show me ↓" pill linking to the map, and a clear button. It steps aside once the map is in view.
@@ -370,4 +388,4 @@ A Headline-voice h1, a Lede summary, then "Measured outcomes" as a figure ledger
 - **Don't** add a second accent, gradients, glow, glass or neon; the one tinted band is Surface One.
 - **Don't** use Fragment Mono for anything but the literal email.
 - **Don't** put shadows on in-flow cards or panels.
-- **Don't** animate on scroll beyond the map's one moment; content is present from the first frame and with JavaScript off.
+- **Don't** add motion beyond the hero's story and the two entrances; content is present from the first frame and with JavaScript off.
