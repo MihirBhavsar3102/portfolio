@@ -192,6 +192,98 @@ check(
   JSON.stringify(firstScreen),
 );
 
+// ---------- The hero's story and the nav's name ----------
+// The last word rolls through built, shipped, monitored while the estate preview
+// lights the same step; the nav holds its name back until the hero's has gone.
+const heroState = () =>
+  evaluate(`(() => {
+    const accent = getComputedStyle(document.querySelector('section[data-hero] a[href^=mailto]')).color;
+    const lit = (sel, prop) => [...document.querySelectorAll(sel)].filter(e => getComputedStyle(e)[prop] === accent).map(e => e.dataset.step);
+    return {
+      phase: document.querySelector('[data-hero]').dataset.phase ?? null,
+      word: [...document.querySelectorAll('.hero-roll-word')].find(w => getComputedStyle(w).opacity === '1')?.textContent ?? null,
+      litNodes: lit('.hero-node', 'color'),
+      litWires: lit('.hero-wire', 'backgroundColor'),
+    };
+  })()`);
+const navName = () => evaluate(`getComputedStyle(document.querySelector('header a[href="/"] > span:last-child')).opacity`);
+const atTop = {
+  name: await navName(),
+  monogram: await evaluate(`document.querySelector('header a[href="/"] > span').textContent`),
+  preview: await evaluate("getComputedStyle(document.querySelector('[data-hero] > div:nth-child(2)')).display"),
+};
+check(
+  "at the top of home the nav shows the monogram, not a second name, and the estate preview sits beside the hero",
+  atTop.name === "0" && atTop.monogram === "MB" && atTop.preview !== "none",
+  JSON.stringify(atTop),
+);
+const sentence = await evaluate(
+  `(() => { const s = document.querySelector('.hero-static'); return { text: s.textContent.replace(/\\s+/g, ' ').trim(), clip: getComputedStyle(s).clipPath, display: getComputedStyle(s).display }; })()`,
+);
+check(
+  "screen readers get the whole positioning line while the word rolls",
+  sentence.text.endsWith("built, shipped and monitored.") && sentence.clip !== "none" && sentence.display !== "none",
+  JSON.stringify(sentence),
+);
+const p0 = (await heroState()).phase;
+const stepped = await waitFor(`document.querySelector('[data-hero]').dataset.phase !== ${JSON.stringify(p0)}`, 5000);
+await sleep(1700); // past the 500ms transitions and the longest stagger, well inside the 3.2s step
+const story = await heroState();
+const verb = { build: "built.", ship: "shipped.", observe: "monitored." }[story.phase];
+const wantNodes = story.phase === "ship" ? 0 : await evaluate(`document.querySelectorAll('.hero-node[data-step=${story.phase}]').length`);
+check(
+  "the hero's story steps on its own, and the rolling word and the lit preview show the same step",
+  !!p0 &&
+    stepped &&
+    story.word === verb &&
+    story.litNodes.length === wantNodes &&
+    story.litNodes.every((s) => s === story.phase) &&
+    (story.phase === "build" ? story.litWires.length === 0 : story.litWires.length === 2 && story.litWires.every((s) => s === story.phase)),
+  JSON.stringify({ p0, ...story }),
+);
+await evaluate("document.getElementById('work').scrollIntoView({ block: 'start' }); true");
+await sleep(800);
+const offPhase = (await heroState()).phase;
+await sleep(4000);
+const stillPhase = (await heroState()).phase;
+await evaluate("window.scrollTo(0, 0); true");
+const resumed = await waitFor(`document.querySelector('[data-hero]').dataset.phase !== ${JSON.stringify(stillPhase)}`, 5000);
+check("the story pauses while the hero is off screen and resumes on return", offPhase === stillPhase && resumed, `${offPhase} → ${stillPhase}, resumed ${resumed}`);
+await evaluate("window.scrollTo({ top: document.querySelector('h1').getBoundingClientRect().bottom + scrollY + 40, behavior: 'instant' }); true");
+await sleep(900);
+const scrolledName = await navName();
+await evaluate("window.scrollTo({ top: 0, behavior: 'instant' }); true");
+await sleep(900);
+const backName = await navName();
+check(
+  "the nav's name joins the monogram once the hero's has scrolled away, and leaves again at the top",
+  scrolledName === "1" && backName === "0",
+  `${scrolledName} / ${backName}`,
+);
+await load("/work/avd-automation", DESKTOP);
+const workName = await navName();
+check("on a case study the nav shows the name from the start", workName === "1", workName);
+await load("/", { width: 1024, height: 768, mobile: false });
+const split = await evaluate(`(() => {
+  const h1 = document.querySelector('h1');
+  const fs = parseFloat(getComputedStyle(h1).fontSize);
+  return {
+    nameLines: Math.round(h1.getBoundingClientRect().height / (fs * 0.92)),
+    wrapped: [...document.querySelectorAll('.hero-zone li, .hero-chip')].filter(e => e.getBoundingClientRect().height > 34).map(e => e.textContent),
+    overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  };
+})()`);
+check(
+  "at 1024, the narrowest split, the name holds one line and no preview label wraps",
+  split.nameLines === 1 && split.wrapped.length === 0 && split.overflow === 0,
+  JSON.stringify(split),
+);
+await shot(`${LABEL}-hero-1024`);
+await load("/", MOBILE);
+const phonePreview = await evaluate("getComputedStyle(document.querySelector('[data-hero] > div:nth-child(2)')).display");
+check("below lg the hero is text only", phonePreview === "none", phonePreview);
+await load("/", DESKTOP);
+
 // Keyboard: focus the first figure button.
 await evaluate("document.activeElement?.blur(); window.scrollTo(0,0); true");
 let lit = 0;
@@ -672,6 +764,14 @@ const running = await evaluate("document.getAnimations().length");
 check("reduced motion runs no animations", running === 0, `${running} running`);
 const restingReduced = await evaluate("getComputedStyle(document.querySelector('#work .reveal')).opacity");
 check("reduced motion: off-screen sections are fully visible", restingReduced === "1", restingReduced);
+const heroReduced = await evaluate(
+  `({ phase: document.querySelector('[data-hero]').dataset.phase ?? null, sentence: getComputedStyle(document.querySelector('.hero-static')).clipPath, rolling: getComputedStyle(document.querySelector('.hero-rolling')).display })`,
+);
+check(
+  "reduced motion: the hero rests, its line read as one sentence",
+  heroReduced.phase === null && heroReduced.sentence === "none" && heroReduced.rolling === "none",
+  JSON.stringify(heroReduced),
+);
 await send("Emulation.setEmulatedMedia", { features: LIGHT });
 
 // ---------- JavaScript off ----------
@@ -680,6 +780,10 @@ await load("/", DESKTOP, { scripts: false });
 await send("Emulation.setScriptExecutionDisabled", { value: false });
 const noJs = await evaluate(`({ figures: document.querySelectorAll('#outcomes ul .type-figure').length, provenance: document.querySelectorAll('[id^=proof-][id$=-how]').length, name: document.querySelector('h1')?.textContent, sections: ['work', 'experience', 'stack', 'credentials', 'github', 'contact'].filter(id => document.getElementById(id)).length, revealOpacity: getComputedStyle(document.querySelector('#work .reveal')).opacity })`);
 check("content complete with JavaScript off", noJs.figures === 6 && noJs.provenance === 6 && !!noJs.name && noJs.sections === 6 && noJs.revealOpacity === "1", JSON.stringify(noJs));
+const noJsLine = await evaluate(
+  `({ sentence: getComputedStyle(document.querySelector('.hero-static')).clipPath, rolling: getComputedStyle(document.querySelector('.hero-rolling')).display })`,
+);
+check("with JavaScript off the hero's line reads as one sentence", noJsLine.sentence === "none" && noJsLine.rolling === "none", JSON.stringify(noJsLine));
 await shot(`${LABEL}-desktop-nojs`);
 
 await send("Emulation.setScriptExecutionDisabled", { value: true });
