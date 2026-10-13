@@ -45,7 +45,7 @@ The design reads like a product launch page: one idea per screen, big type, whit
 | Motion | Plain CSS, with no animation library |
 | Share images | Generated for each page with `next/og` |
 | Fonts | Schibsted Grotesk and Fragment Mono through `next/font` |
-| Testing | Vitest, plus a headless-browser verifier with no dependencies |
+| Testing | Vitest, plus a headless-browser verifier with no dependencies, both run in GitHub Actions |
 | Hosting | A standalone Node server in a Docker image |
 
 ## How it's built
@@ -54,7 +54,8 @@ The design reads like a product launch page: one idea per screen, big type, whit
 - **Accessible by default.** Every text colour pairing passes WCAG AA contrast in both themes, and a test holds it there. The whole site works from the keyboard, respects reduced-motion settings and shows all its content with JavaScript off.
 - **Light on the browser.** The map and the case-study diagrams render on the server, motion is plain CSS, and no animation or diagram library is sent to the browser.
 - **Easy to find and share.** The home page and each case study have their own canonical URL, share image and structured data, and the sitemap lists them all.
-- **Checked in a real browser.** [A script](scripts/verify-ui.mjs) drives headless Microsoft Edge to test the map's interactions, keyboard focus, both themes, widths from phone to desktop, reduced motion and JavaScript-off rendering.
+- **Checked in a real browser.** [A script](scripts/verify-ui.mjs) drives headless Chrome or Edge to test the map's interactions, keyboard focus, both themes, widths from phone to desktop, reduced motion and JavaScript-off rendering.
+- **Gated on every pull request.** [CI](.github/workflows/ci.yml) runs lint, type checks, the tests, a dependency audit and the browser checks, and `master` only accepts changes through a pull request that passes them. Dependabot proposes dependency updates weekly.
 - **Live GitHub data, with a fallback.** Repository details refresh hourly. When GitHub can't be reached, the section shows curated descriptions instead.
 
 ## Repository layout
