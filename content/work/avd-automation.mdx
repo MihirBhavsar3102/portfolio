@@ -1,0 +1,38 @@
+export const meta = { slug: "avd-automation" };
+
+## Context
+
+Five enterprise clients run their virtual desktops on Azure Virtual Desktop, and our team at Parkar Global Technologies runs those estates for them. Bringing up a client's desktops meant a long run of manual steps: build the virtual machines, join them to the domain, give them their secrets, and register them with a host pool.
+
+The work went in phases. First we learned how each client's environment was set up. Then I built the automation that provisions the virtual machines. After that, the team moved on to cost.
+
+## Constraints
+
+Requirements and sizing were set per client, and the key decisions were the clients' to make, not mine.
+
+## Architecture
+
+<Diagram />
+
+An Azure DevOps pipeline runs Terraform and PowerShell, with its secrets kept in Azure Key Vault and the Active Directory domain join automated. My PowerShell provisioning script creates virtual machines inside the client's host pool, end to end. Session hosts are built from golden images that Azure VM Image Builder produces and keep user profiles in FSLogix, and the host pool scales automatically. Azure Monitor and Log Analytics watch the estate, queried with KQL.
+
+## What I built and what the team did
+
+<Ownership
+  mine={[
+    "The end-to-end VM provisioning script in PowerShell. It creates a virtual machine inside a host pool, together with the services the machine needs, and finishes by registering it with the pool.",
+  ]}
+  teamLabel="The team of four"
+  team={[
+    "We operate and support the whole VDI estate, resolving day-to-day VM issues to improve efficiency and the experience for users.",
+    "The cost work was a team effort: right-sizing and autoscaling that lowered monthly cloud spend across Azure and AWS.",
+  ]}
+/>
+
+## What broke
+
+The provisioning script's last step installs the RDAgent and the Boot Loader on the new machine, which is what lets the machine be assigned to a host pool. That step kept failing. I dug into it, found the steps that were missing, added them, and after that the script worked.
+
+## Results
+
+Provisioning a client's session hosts now runs through a pipeline, and with the domain join and secrets automated, configuration errors are close to zero. The measured figures are at the top of this page. Monitoring with Azure Monitor and Log Analytics also shortened the time it takes to resolve support incidents. I don't have a number for that, so I don't give one.

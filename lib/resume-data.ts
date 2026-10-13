@@ -1,149 +1,432 @@
-import type { Resume } from "@/types/resume";
+import type { Figure, Resume } from "@/types/resume";
 
 /**
- * Single source of truth for all site content.
- * Edit here — every section reads from this file.
+ * Single source of truth for site content. Facts come from Mihir's October 2026
+ * resume and his questionnaire answers only; wording is paraphrased for the web.
  */
+
+// Figures are defined once and shared by the proof strip and the project cards.
+const fig = {
+  deploy: {
+    value: "40%",
+    // Non-breaking spaces keep each duration on one line.
+    label: "faster AVD deployments across clients, ~8\u00a0h\u00a0→ ~5\u00a0h",
+    provenance: "PowerShell provisioning and Azure VM Image Builder golden images replaced the manual build.",
+    measuredHow: "Timed the deployment task before and after automation.",
+  },
+  manual: {
+    value: "70%+",
+    label: "less manual effort across 5 clients, with configuration errors near zero",
+    provenance: "Azure DevOps pipelines run Terraform and PowerShell, with domain join and Key Vault secrets automated.",
+    measuredHow: "Timed the task before and after automation.",
+  },
+  spend: {
+    value: "25%",
+    label: "lower monthly cloud spend across Azure and AWS",
+    provenance: "Right-sizing and autoscaling across both clouds.",
+  },
+  users: {
+    value: "450+",
+    label: "concurrent VDI users supported",
+    provenance: "FSLogix user profiles and AVD autoscaling on the clients' host pools.",
+  },
+  uptime: {
+    value: "99.9%",
+    label: "uptime on a multi-AZ WordPress platform",
+    provenance: "Auto Scaling across availability zones behind a load balancer, with RDS for the database.",
+  },
+  setup: {
+    value: "<30 min",
+    label: "to stand up a new environment",
+    provenance: "The platform's infrastructure is defined in Terraform; plan and apply builds it, and one step replicates it.",
+  },
+  delivery: {
+    value: "50%+",
+    label: "faster feature delivery",
+    provenance: "An end-to-end pipeline: Terraform provisions, Ansible configures, GitHub Actions runs it.",
+  },
+  answers: {
+    value: "~60%",
+    label: "faster answers to HR policy questions",
+    provenance: "FAISS retrieval feeds Llama inference, replacing manual lookups in policy documents.",
+  },
+} satisfies Record<string, Figure>;
+
 export const resume: Resume = {
   name: "Mihir Bhavsar",
   role: "Cloud & DevOps Engineer",
-  headline: "Cloud & DevOps Engineer | AI Automation | Infrastructure as Code",
-  location: "Ahmedabad, Gujarat, India",
-  tagline:
-    "I engineer Azure Virtual Desktop environments for enterprise clients, automate everything repeatable with Terraform and PowerShell, and build AI tooling — RAG pipelines, LLM inference — that runs in production.",
-  stats: [
-    { target: 25, suffix: "%", label: "Cloud spend reduced" },
-    { target: 70, suffix: "%+", label: "Manual ops eliminated" },
-    { target: 200, suffix: "+", label: "VDI users supported" },
-    { target: 99.9, decimals: 1, suffix: "%", label: "Uptime delivered" },
-  ],
-  about: [
-    "I'm a cloud engineer at Parkar Digital in Ahmedabad, where I design and run Azure Virtual Desktop environments for enterprise clients — host pool design, VM lifecycle, FSLogix — and automate the repetitive parts with PowerShell and Terraform. That automation now eliminates over 70% of the manual effort those environments used to need, across a five-client estate.",
-    "Alongside infrastructure, I build AI-native tooling: a retrieval-augmented HR policy chatbot running in production, Llama inference behind FastAPI, FAISS vector search. I like working where infrastructure and AI meet — and I measure everything, because a 25% cloud-spend cut only counts when it shows up on the dashboard.",
-  ],
-  quickFacts: [
-    { label: "Location", value: "Ahmedabad, India" },
-    { label: "Current role", value: "Cloud Operations Engineer, Parkar Digital" },
-    { label: "Experience", value: "1.5+ years" },
-    { label: "Certifications", value: "AWS SAA · AZ-900 · AI-900 · GCP Digital Leader" },
-  ],
+  location: "Ahmedabad, India",
+  positioning: {
+    lead: "I automate how Azure and AWS infrastructure is",
+    verbs: ["built", "shipped", "monitored"],
+  },
+  summary:
+    "Cloud and DevOps engineer working across AWS, Azure and GCP since December 2024. Most of my work is infrastructure as code and delivery pipelines — Terraform, GitHub Actions and Azure DevOps — plus Linux administration and monitoring with Prometheus, Grafana and CloudWatch. I've used Docker, Kubernetes, Helm and ArgoCD in project work.",
   email: "mihirbhavsar2001@gmail.com",
-  phone: "+91-7096259248", // not rendered publicly; kept here for completeness
   resumeFile: "/MihirBhavsar_Resume.pdf",
   socials: [
     { label: "GitHub", href: "https://github.com/MihirBhavsar3102" },
     { label: "LinkedIn", href: "https://www.linkedin.com/in/mihirbhavsar3102/" },
   ],
+
+  estate: {
+    zones: [
+      {
+        id: "azure",
+        label: "Azure · Virtual Desktop",
+        note: "5 clients · 450+ concurrent users",
+        tech: "azure",
+        nodes: [
+          { id: "host-pools", label: "Host pools", meta: "autoscaling", tech: "azure-virtual-desktop" },
+          { id: "session-hosts", label: "Session hosts", meta: "FSLogix profiles", tech: "fslogix" },
+          { id: "golden-images", label: "Golden images", meta: "VM Image Builder", tech: "azure-image-builder" },
+          { id: "key-vault", label: "Key Vault", tech: "key-vault" },
+          { id: "domain-join", label: "AD domain join", tech: "azure" },
+        ],
+      },
+      {
+        id: "aws",
+        label: "AWS · Web platform",
+        note: "Multi-AZ WordPress in Terraform",
+        tech: "aws",
+        nodes: [
+          { id: "cdn", label: "CloudFront + S3", tech: "cloudfront" },
+          { id: "alb", label: "Load balancer", tech: "alb" },
+          { id: "asg", label: "EC2 Auto Scaling", meta: "multi-AZ", tech: "auto-scaling" },
+          { id: "rds", label: "RDS", tech: "rds" },
+          { id: "lambda", label: "Lambda", tech: "lambda" },
+        ],
+      },
+      {
+        id: "ai",
+        label: "AI · HR policy assistant",
+        note: "RAG over HR policy documents",
+        nodes: [
+          { id: "api", label: "FastAPI", tech: "fastapi" },
+          { id: "orchestration", label: "LangChain", tech: "langchain" },
+          { id: "retrieval", label: "FAISS retrieval", tech: "faiss" },
+          { id: "inference", label: "Llama inference", tech: "llama" },
+        ],
+      },
+    ],
+    controlPlane: [
+      {
+        id: "build",
+        label: "Build and ship",
+        nodes: [
+          // Ordered so Terraform, which feeds both clouds, sits between the
+          // Azure-only and AWS-only tools and no control edge crosses another.
+          { id: "powershell", label: "PowerShell", tech: "powershell" },
+          { id: "azure-devops", label: "Azure DevOps", tech: "azure-devops" },
+          { id: "terraform", label: "Terraform", tech: "terraform" },
+          { id: "github-actions", label: "GitHub Actions", tech: "github-actions" },
+          { id: "ansible", label: "Ansible", tech: "ansible" },
+        ],
+      },
+      {
+        id: "observe",
+        label: "Observe",
+        nodes: [
+          { id: "azure-monitor", label: "Azure Monitor", meta: "Log Analytics · KQL", tech: "azure-monitor" },
+          { id: "cloudwatch", label: "CloudWatch", tech: "cloudwatch" },
+          { id: "grafana", label: "Prometheus + Grafana", tech: "grafana" },
+        ],
+      },
+    ],
+    edges: [
+      { from: "host-pools", to: "session-hosts", source: "resume: AVD — FSLogix profiles and host-pool autoscaling" },
+      { from: "golden-images", to: "session-hosts", source: "resume: AVD — Image Builder golden-image pipelines" },
+      { from: "cdn", to: "alb", source: "resume: AWS — multi-AZ WordPress architecture" },
+      { from: "alb", to: "asg", source: "resume: AWS — multi-AZ WordPress architecture" },
+      { from: "asg", to: "rds", source: "resume: AWS — multi-AZ WordPress architecture" },
+      { from: "api", to: "orchestration", source: "resume: HR chatbot — FastAPI, LangChain" },
+      { from: "orchestration", to: "retrieval", source: "resume: HR chatbot — FAISS semantic retrieval" },
+      { from: "orchestration", to: "inference", source: "resume: HR chatbot — Llama inference" },
+      { from: "terraform", to: "azure", source: "resume: AVD — Azure DevOps pipelines running Terraform" },
+      { from: "powershell", to: "azure", source: "resume: AVD — PowerShell provisioning" },
+      { from: "azure-devops", to: "azure", source: "resume: AVD — Azure DevOps pipelines" },
+      { from: "terraform", to: "aws", source: "resume: AWS environment — Terraform plan and apply" },
+      { from: "ansible", to: "aws", source: "resume: AWS environment — CI/CD with Ansible" },
+      { from: "github-actions", to: "aws", source: "resume: AWS environment — CI/CD with GitHub Actions" },
+      { from: "azure-monitor", to: "azure", source: "resume: AVD — Azure Monitor and Log Analytics" },
+      { from: "cloudwatch", to: "aws", source: "resume: AWS environment — CloudWatch alarms and dashboards" },
+      { from: "grafana", to: "aws", source: "resume: AWS environment section — Grafana on Prometheus" },
+    ],
+    proof: [
+      { id: "deploy", figure: fig.deploy, highlight: ["golden-images", "session-hosts", "host-pools", "powershell"] },
+      { id: "manual", figure: fig.manual, highlight: ["key-vault", "domain-join", "session-hosts", "azure-devops", "terraform", "powershell"] },
+      { id: "spend", figure: fig.spend, highlight: ["host-pools", "asg"] },
+      { id: "users", figure: fig.users, highlight: ["host-pools", "session-hosts"] },
+      { id: "uptime", figure: fig.uptime, highlight: ["cdn", "alb", "asg", "rds"] },
+      { id: "answers", figure: fig.answers, highlight: ["api", "orchestration", "retrieval", "inference"] },
+    ],
+  },
+
   experience: [
     {
-      role: "Cloud Operations Engineer",
-      company: "Parkar Digital",
+      title: "Cloud Operations Engineer",
+      company: "Parkar Global Technologies",
+      legalName: "Parkar Global Technologies Pvt Ltd",
       location: "Ahmedabad, India",
-      stamp: "Apr 2025 – Present",
-      range: "April 2025 to present",
-      current: true,
-      bullets: [
-        "Engineered Azure Virtual Desktop environments — host pool design, VM lifecycle, FSLogix configuration — cutting provisioning time by 40% (~8 hrs to ~5 hrs) across 3+ client deployments.",
-        "Built PowerShell automation for VM provisioning, domain join, and Key Vault management, eliminating over 70% of manual effort and reducing configuration errors to near zero across a 5-client environment.",
-        "Optimized monthly AWS cloud spend by 25% via right-sizing, auto-scaling, and usage-metric-driven resource optimization, supporting 200+ concurrent VDI users.",
-        "Delivered continuous VDI incident support and troubleshooting, ensuring high availability for enterprise end-users.",
-      ],
-    },
-    {
-      role: "Cloud Infrastructure Intern",
-      company: "Parkar Digital",
-      location: "Ahmedabad, India",
-      stamp: "Dec 2024 – Apr 2025",
-      range: "December 2024 to April 2025",
-      current: false,
-      bullets: [
-        "Deployed and configured AWS and Azure infrastructure — EC2/VM provisioning, IAM/RBAC, VPC networking, and storage — supporting enterprise-scale environments with zero critical incidents.",
+      start: "2024-12",
+      workstreams: [
+        {
+          name: "Azure Virtual Desktop",
+          summary: "Building and running virtual desktop estates for five enterprise clients.",
+          caseStudy: "avd-automation",
+          points: [
+            "Automated AVD builds with PowerShell and Azure VM Image Builder golden images, taking multi-client deployments from about 8 hours to about 5 — 40% faster.",
+            "Moved provisioning into Azure DevOps pipelines that run Terraform and PowerShell, with domain join and Key Vault secrets handled automatically: over 70% less manual effort and configuration errors close to zero across five clients.",
+            "Set up FSLogix profiles and autoscaling on client host pools serving 450+ concurrent users, and cut monthly cloud spend by 25% through right-sizing and autoscaling.",
+            "Added Azure Monitor and Log Analytics (KQL) monitoring to the VDI estate, shortening the time to resolve support incidents.",
+          ],
+        },
+        {
+          name: "AWS environments",
+          summary: "Designing, provisioning and monitoring AWS environments from code.",
+          caseStudy: "aws-web-platform",
+          points: [
+            "Designed and deployed a fault-tolerant, multi-AZ WordPress platform on EC2 Auto Scaling, an Application Load Balancer, RDS, Lambda, S3 and CloudFront, running at 99.9% uptime.",
+            "Defined it in Terraform, so a new environment takes under 30 minutes and can be replicated in one step.",
+            "Built an end-to-end CI/CD pipeline with Terraform, Ansible and GitHub Actions that made feature delivery over 50% faster.",
+            "Built Grafana dashboards and alert rules on an existing Prometheus stack, plus CloudWatch alarms and dashboards.",
+          ],
+        },
+        {
+          name: "Linux administration",
+          summary: "Administering Linux servers.",
+          points: ["User and SSH access, permissions, OS patching, web and app server setup, and service troubleshooting."],
+        },
       ],
     },
   ],
+
   projects: [
     {
-      name: "AI-Powered HR Policy Chatbot",
-      description:
-        "RAG chatbot answering HR policy questions at Parkar Digital — semantic FAISS retrieval over policy documents with Llama inference behind FastAPI.",
-      outcome:
-        "~60% faster query resolution; vector retrieval significantly outperforms keyword search on org-specific queries.",
-      stack: ["Python", "FastAPI", "Llama", "LangChain", "FAISS"],
-      link: { label: "GitHub", href: "https://github.com/MihirBhavsar3102" },
-      inProduction: true,
+      slug: "avd-automation",
+      title: "Azure Virtual Desktop automation",
+      headline: "Automating Azure Virtual Desktop for five enterprise clients",
+      summary:
+        "Provisioning, imaging and scaling Azure Virtual Desktop for five enterprise clients, automated with PowerShell, Image Builder and Azure DevOps pipelines.",
+      kind: "work",
+      zone: "azure",
+      role: "Built the end-to-end VM provisioning in PowerShell; one of a four-person team running the estate.",
+      stack: ["azure-virtual-desktop", "powershell", "azure-image-builder", "azure-devops", "terraform", "key-vault", "fslogix", "azure-monitor"],
+      figures: [fig.manual, fig.deploy, fig.spend, fig.users],
     },
     {
-      name: "AWS High-Availability WordPress",
-      description:
-        "Fault-tolerant, multi-AZ WordPress on EC2, ASG, ALB, and RDS with S3 and CloudFront — the whole stack described in Terraform with one-click replication.",
-      outcome: "99.9% uptime; environment setup went from days to under 30 minutes.",
-      stack: ["Terraform", "EC2", "ASG", "ALB", "RDS", "CloudFront"],
-      link: { label: "GitHub", href: "https://github.com/MihirBhavsar3102" },
+      slug: "aws-web-platform",
+      title: "Multi-AZ AWS web platform",
+      headline: "A multi-AZ AWS platform, built and shipped from code",
+      summary:
+        "A fault-tolerant WordPress platform on AWS, defined in Terraform and shipped through a Terraform, Ansible and GitHub Actions pipeline.",
+      kind: "work",
+      zone: "aws",
+      role: "Designed and deployed the platform; built its Terraform and its CI/CD pipeline.",
+      repo: { owner: "MihirBhavsar3102", name: "Automatic-Deployment" },
+      stack: ["ec2", "auto-scaling", "alb", "rds", "lambda", "s3", "cloudfront", "terraform", "ansible", "github-actions", "cloudwatch", "prometheus", "grafana"],
+      figures: [fig.uptime, fig.setup, fig.delivery],
     },
     {
-      name: "Automated CI/CD Pipeline",
-      description:
-        "End-to-end delivery pipeline with automated testing gates and daily deployments — infrastructure provisioned by Terraform, configuration managed with Ansible.",
-      outcome: "Feature delivery timelines cut by over 50%, with fewer rollback incidents.",
-      stack: ["Terraform", "Ansible", "GitHub Actions"],
-      link: { label: "GitHub", href: "https://github.com/MihirBhavsar3102" },
+      slug: "hr-policy-assistant",
+      title: "HR policy assistant",
+      headline: "An HR policy assistant on retrieval-augmented generation",
+      summary: "A retrieval-augmented chatbot that answers HR policy questions from the policy documents themselves.",
+      kind: "work",
+      zone: "ai",
+      role: "Built it: FAISS retrieval, Llama inference and the FastAPI service around them.",
+      repo: { owner: "MihirBhavsar3102", name: "Rag-Assistant-Chatbot" },
+      stack: ["python", "fastapi", "langchain", "faiss", "llama"],
+      figures: [fig.answers],
+    },
+    {
+      slug: "devsecops-pipeline",
+      title: "DevSecOps CI/CD pipeline",
+      headline: "Security gates in a Jenkins-to-Kubernetes pipeline",
+      summary:
+        "A Jenkins pipeline with security gates at build and deploy, shipping a three-tier Java app to self-managed Kubernetes on every push.",
+      kind: "personal",
+      role: "Designed and built it.",
+      stack: ["jenkins", "sonarqube", "owasp-dependency-check", "trivy", "docker", "kubernetes", "maven", "github"],
+      figures: [],
+      stages: ["GitHub webhook", "Maven build", "SonarQube", "OWASP Dependency-Check", "Docker image", "Trivy scan", "Kubernetes deploy"],
     },
   ],
+
   skillGroups: [
     {
-      key: "Cloud",
-      skills: ["AWS (EC2, IAM, VPC, S3, RDS, CloudFront, ASG, ALB)", "Azure (AVD, Key Vault, RBAC, EntraID, Files)", "GCP"],
+      name: "CI/CD",
+      skills: [
+        { name: "GitHub Actions", tech: "github-actions" },
+        { name: "GitLab CI/CD" },
+        { name: "Jenkins", tech: "jenkins" },
+        { name: "Azure DevOps", tech: "azure-devops" },
+        { name: "AWS CodePipeline, CodeBuild, CodeDeploy" },
+        { name: "Git" },
+      ],
     },
     {
-      key: "IaC & Automation",
-      skills: ["Terraform", "Ansible", "CloudFormation", "PowerShell", "Bash", "Linux"],
+      name: "Infrastructure as code",
+      skills: [
+        { name: "Terraform", detail: "reusable modules", tech: "terraform" },
+        { name: "CloudFormation" },
+        { name: "AWS CDK" },
+        { name: "Ansible", detail: "configuration management", tech: "ansible" },
+      ],
     },
     {
-      key: "CI/CD & Containers",
-      skills: ["GitHub Actions", "Jenkins", "Docker", "Kubernetes", "Helm", "GitOps (ArgoCD)"],
+      name: "Containers and orchestration",
+      skills: [
+        { name: "Docker", tech: "docker" },
+        { name: "Kubernetes", tech: "kubernetes" },
+        { name: "Helm" },
+        { name: "ArgoCD", detail: "GitOps" },
+        { name: "Amazon EKS" },
+        { name: "Amazon ECS" },
+        { name: "GKE" },
+      ],
     },
     {
-      key: "AI / ML",
-      skills: ["LangChain", "LLM Inference (Llama)", "RAG Pipelines", "FAISS Vector DB", "FastAPI", "CrewAI"],
+      name: "Cloud platforms",
+      skills: [
+        { name: "AWS", detail: "EC2, IAM, VPC, S3, ALB, ASG, RDS, Route 53, Lambda, CloudFront, Secrets Manager", tech: "aws" },
+        { name: "Azure", detail: "AVD, Virtual Machines, Entra ID, Key Vault, RBAC", tech: "azure" },
+        { name: "Google Cloud", detail: "Compute Engine, Cloud Monitoring", tech: "gcp" },
+      ],
     },
     {
-      key: "Observability",
-      skills: ["Prometheus", "Grafana", "CloudWatch", "Azure Monitor", "Monitoring & Alerting"],
+      name: "Observability",
+      skills: [
+        { name: "Prometheus", tech: "prometheus" },
+        { name: "Grafana", tech: "grafana" },
+        { name: "CloudWatch", tech: "cloudwatch" },
+        { name: "Azure Monitor", detail: "KQL, Log Analytics", tech: "azure-monitor" },
+        { name: "Logging and alerting" },
+      ],
     },
     {
-      key: "Practices",
-      skills: ["Agile/Scrum", "Cloud Cost Optimization", "Incident Management"],
+      name: "Linux and networking",
+      skills: [
+        { name: "Linux administration" },
+        { name: "SSH" },
+        { name: "DNS" },
+        { name: "TLS/SSL" },
+        { name: "VPC and VNet networking" },
+        { name: "Load balancing" },
+        { name: "Firewall rules", detail: "NSG" },
+      ],
     },
     {
-      key: "Languages",
-      skills: ["Python", "Java", "C++", "SQL", "HTML/CSS/JS", "MongoDB"],
+      name: "Scripting and databases",
+      skills: [
+        { name: "Python", detail: "boto3", tech: "python" },
+        { name: "Bash" },
+        { name: "PowerShell", tech: "powershell" },
+        { name: "Java" },
+        { name: "SQL" },
+        { name: "PostgreSQL" },
+        { name: "MongoDB" },
+        { name: "DynamoDB" },
+      ],
+    },
+    {
+      name: "Practices",
+      skills: [
+        { name: "Agile / Scrum" },
+        { name: "Incident response" },
+        { name: "Root cause analysis" },
+        { name: "Backup and restore" },
+        { name: "Cost optimization" },
+      ],
+    },
+    {
+      name: "AI tools and frameworks",
+      skills: [
+        { name: "GitHub Copilot" },
+        { name: "Claude Code" },
+        { name: "LangChain", tech: "langchain" },
+        { name: "CrewAI" },
+        { name: "RAG pipelines" },
+      ],
     },
   ],
+
+  certifications: [
+    {
+      name: "AWS Certified Solutions Architect – Associate",
+      code: "SAA-C03",
+      issuerId: "aws",
+      earned: "2025-06",
+      verifyUrl: "https://www.credly.com/badges/5d3cb6a6-0610-4914-8a2f-52511656e738/public_url",
+    },
+    {
+      name: "AWS Certified Cloud Practitioner",
+      code: "CLF-C02",
+      issuerId: "aws",
+      earned: "2025-03",
+      verifyUrl: "https://www.credly.com/badges/776fad7d-c50e-439c-b05a-7a62f83928d6",
+    },
+    {
+      name: "Microsoft Certified: Azure Fundamentals",
+      code: "AZ-900",
+      issuerId: "microsoft",
+      earned: "2025-06",
+      verifyUrl: "https://learn.microsoft.com/en-in/users/mihirbhavsar-6601/credentials/77676d8ea945c96",
+    },
+    {
+      name: "Microsoft Certified: Azure AI Fundamentals",
+      code: "AI-900",
+      issuerId: "microsoft",
+      earned: "2026-04",
+      verifyUrl: "https://learn.microsoft.com/en-in/users/mihirbhavsar-6601/credentials/b49e1012070f7cc0",
+    },
+    { name: "Google Cloud Digital Leader", issuerId: "google" },
+  ],
+
   education: [
     {
-      degree: "B.E. Computer Science & Engineering",
+      degree: "B.E., Computer Science and Engineering",
       institution: "The Maharaja Sayajirao University of Baroda",
       years: "2022 – 2025",
       score: "73.31%",
     },
     {
-      degree: "Diploma in Computer Engineering",
+      degree: "Diploma, Computer Engineering",
       institution: "Gujarat Technological University",
       years: "2019 – 2022",
       score: "CGPA 8.89",
     },
   ],
-  certifications: [
-    { name: "AWS Certified Solutions Architect – Associate (SAA-C03)", issuer: "Amazon Web Services" },
-    { name: "AWS Certified Cloud Practitioner – Foundational (CLF-C02)", issuer: "Amazon Web Services" },
-    { name: "Microsoft Certified: Azure Fundamentals (AZ-900)", issuer: "Microsoft" },
-    { name: "Microsoft Certified: Azure AI Fundamentals (AI-900)", issuer: "Microsoft" },
-    { name: "Google Cloud Digital Leader", issuer: "Google Cloud" },
-  ],
+
   achievements: [
     {
-      title: "National Cadet Corps (2019 – 2022)",
-      detail: "Letter of Appreciation — Admiral Karambir Singh, former Chief of the Indian Naval Staff.",
+      title: "National Cadet Corps, 2019 – 2022",
+      detail: "Letter of Appreciation from Admiral Karambir Singh, former Chief of the Naval Staff.",
+    },
+  ],
+
+  featuredRepos: [
+    {
+      owner: "MihirBhavsar3102",
+      name: "Rag-Assistant-Chatbot",
+      blurb: "The HR policy assistant: FAISS retrieval and Llama inference behind a FastAPI service.",
+      demonstrates: "Applied AI",
+      project: "hr-policy-assistant",
+    },
+    {
+      owner: "MihirBhavsar3102",
+      name: "Automatic-Deployment",
+      blurb: "The Terraform, Ansible and GitHub Actions pipeline behind the AWS web platform.",
+      demonstrates: "CI/CD and IaC",
+      project: "aws-web-platform",
+    },
+    {
+      owner: "MihirBhavsar3102",
+      name: "Natural-Language-to-Robot-Framework",
+      blurb: "Turns plain English into Robot Framework test files with AI.",
+      demonstrates: "AI tooling",
+      // Fork: hidden until Mihir supplies his contribution line (questionnaire A3b).
+      upstream: "monkscode/Natural-Language-to-Robot-Framework",
     },
   ],
 };

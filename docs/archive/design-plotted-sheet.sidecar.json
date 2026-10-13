@@ -1,0 +1,671 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-17T19:29:25.917Z",
+  "title": "Design System: Mihir Bhavsar — Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "signal": {
+        "role": "primary",
+        "displayName": "Live Signal Blue",
+        "canonical": "#1b5e9e",
+        "darkValue": "#63a6e8",
+        "tonalRamp": [
+          "#061524",
+          "#0b2740",
+          "#113a5f",
+          "#164c7f",
+          "#1b5e9e",
+          "#3d84c6",
+          "#78aede",
+          "#c2daf2"
+        ]
+      },
+      "signal-field": {
+        "role": "primary",
+        "displayName": "On-Field Signal Blue",
+        "canonical": "#63a6e8",
+        "darkValue": "#63a6e8",
+        "tonalRamp": [
+          "#0a1f34",
+          "#123452",
+          "#1a4a76",
+          "#2a6ba8",
+          "#3f88ca",
+          "#63a6e8",
+          "#96c5f1",
+          "#cde3fa"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Cool Plotter Paper",
+        "canonical": "#edf0f4",
+        "darkValue": "#071320",
+        "tonalRamp": [
+          "#12171d",
+          "#232b34",
+          "#3a444f",
+          "#55616d",
+          "#7c8894",
+          "#a9b3bd",
+          "#d3d9e0",
+          "#edf0f4"
+        ]
+      },
+      "plate": {
+        "role": "neutral",
+        "displayName": "Plate White",
+        "canonical": "#ffffff",
+        "darkValue": "#0e2032",
+        "tonalRamp": [
+          "#141719",
+          "#272b2f",
+          "#41474d",
+          "#5f666e",
+          "#858c94",
+          "#adb4bb",
+          "#d8dce0",
+          "#ffffff"
+        ]
+      },
+      "field": {
+        "role": "neutral",
+        "displayName": "Navy Field",
+        "canonical": "#0b1f33",
+        "darkValue": "#04101b",
+        "tonalRamp": [
+          "#040b13",
+          "#0b1f33",
+          "#123049",
+          "#1a4263",
+          "#24557e",
+          "#3d7bab",
+          "#79a8ce",
+          "#c4d8ea"
+        ]
+      },
+      "field-2": {
+        "role": "neutral",
+        "displayName": "Field Step Two",
+        "canonical": "#123049",
+        "darkValue": "#0e2032",
+        "tonalRamp": [
+          "#050f18",
+          "#0a1e2d",
+          "#123049",
+          "#1a4364",
+          "#25587f",
+          "#417ea8",
+          "#7aa9c9",
+          "#c3d8e8"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Navy Ink",
+        "canonical": "#0b1f33",
+        "darkValue": "#e6edf5",
+        "tonalRamp": [
+          "#040b13",
+          "#0b1f33",
+          "#123049",
+          "#25567a",
+          "#4a7ea6",
+          "#83aac9",
+          "#bcd3e4",
+          "#e6edf5"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Secondary Ink",
+        "canonical": "#46586b",
+        "darkValue": "#9fb2c6",
+        "tonalRamp": [
+          "#101519",
+          "#1e262e",
+          "#2f3b47",
+          "#46586b",
+          "#647a90",
+          "#8b9db1",
+          "#b6c3d0",
+          "#e0e6ed"
+        ]
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Drafting Ink",
+        "canonical": "#55697d",
+        "darkValue": "#8296ab",
+        "tonalRamp": [
+          "#131a20",
+          "#222d37",
+          "#374652",
+          "#55697d",
+          "#74879b",
+          "#9aaabb",
+          "#c1ccd7",
+          "#e4eaf0"
+        ]
+      },
+      "on-field": {
+        "role": "neutral",
+        "displayName": "On-Field Ink",
+        "canonical": "#e9eff6",
+        "darkValue": "#e6edf5",
+        "tonalRamp": [
+          "#141b22",
+          "#25313d",
+          "#3c4c5c",
+          "#586c80",
+          "#7e91a5",
+          "#a8b8c9",
+          "#cdd9e6",
+          "#e9eff6"
+        ]
+      },
+      "on-field-2": {
+        "role": "neutral",
+        "displayName": "On-Field Secondary",
+        "canonical": "#9cb3c8",
+        "darkValue": "#9fb2c6",
+        "tonalRamp": [
+          "#151d25",
+          "#243039",
+          "#3a4a58",
+          "#55697d",
+          "#7791a6",
+          "#9cb3c8",
+          "#c2d2e0",
+          "#e5edf4"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#cbd4de",
+        "darkValue": "#1c3145",
+        "tonalRamp": [
+          "#131920",
+          "#222d38",
+          "#374654",
+          "#516375",
+          "#748698",
+          "#9dabb9",
+          "#cbd4de",
+          "#eef1f5"
+        ]
+      },
+      "rule-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "#93a3b4",
+        "darkValue": "#33506b",
+        "tonalRamp": [
+          "#141a20",
+          "#222c35",
+          "#37444f",
+          "#51616f",
+          "#728394",
+          "#93a3b4",
+          "#bcc7d1",
+          "#e3e8ee"
+        ]
+      },
+      "rule-field": {
+        "role": "neutral",
+        "displayName": "Field Hairline",
+        "canonical": "#24405a",
+        "darkValue": "#1c3145",
+        "tonalRamp": [
+          "#070d13",
+          "#0e1c28",
+          "#172c3e",
+          "#24405a",
+          "#345a7c",
+          "#4f7ea6",
+          "#87accb",
+          "#cadcec"
+        ]
+      },
+      "ghost": {
+        "role": "tertiary",
+        "displayName": "Ghost Remainder",
+        "canonical": "#bcc8d6",
+        "darkValue": "#24405a",
+        "tonalRamp": [
+          "#121820",
+          "#202a35",
+          "#34414f",
+          "#4d5d6e",
+          "#71818f",
+          "#98a6b5",
+          "#bcc8d6",
+          "#e6ebf1"
+        ]
+      },
+      "ghost-line": {
+        "role": "tertiary",
+        "displayName": "Ghost Hatch Line",
+        "canonical": "#93a3b4",
+        "darkValue": "#33506b",
+        "tonalRamp": [
+          "#141a20",
+          "#222c35",
+          "#37444f",
+          "#51616f",
+          "#728394",
+          "#93a3b4",
+          "#bcc7d1",
+          "#e3e8ee"
+        ]
+      },
+      "plane-face": {
+        "role": "neutral",
+        "displayName": "Zone Plane Face",
+        "canonical": "#123049",
+        "darkValue": "#0e2032",
+        "tonalRamp": [
+          "#050f18",
+          "#0a1e2d",
+          "#123049",
+          "#1a4364",
+          "#25587f",
+          "#417ea8",
+          "#7aa9c9",
+          "#c3d8e8"
+        ]
+      },
+      "plate-top": {
+        "role": "neutral",
+        "displayName": "Service Plate Top",
+        "canonical": "#e9eff6",
+        "darkValue": "#dbe6f2",
+        "tonalRamp": [
+          "#141b22",
+          "#25313d",
+          "#3c4c5c",
+          "#586c80",
+          "#7e91a5",
+          "#a8b8c9",
+          "#cdd9e6",
+          "#e9eff6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The name in the title block. One instance per page."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Every sheet heading, capped at 20ch and text-balanced."
+      },
+      "metric": {
+        "displayName": "Metric",
+        "purpose": "The measured figure in each operations record row, set in Signal."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Job titles, secondary project names, dialog titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default prose and every record value at 15px, capped 44-62ch by column width."
+      },
+      "body-lg": {
+        "displayName": "Body Large",
+        "purpose": "Sheet intros and section leads at 17px, capped 58-68ch."
+      },
+      "annotation": {
+        "displayName": "Annotation",
+        "purpose": "Azeret Mono drafting hand at 10-12px: legends, plane labels, operation names, title-block fields. 12px is the band top, for quantities set beside their labels."
+      },
+      "annotation-field": {
+        "displayName": "Annotation Small",
+        "purpose": "10px mono field labels inside ruled record cells and stack chips."
+      },
+      "chrome-label": {
+        "displayName": "Chrome Label",
+        "purpose": "Archivo uppercase at 12px for nav links, every button and action bar, and the footer colophon. One size for all chrome. Never mono."
+      }
+    },
+    "shadows": [
+      {
+        "name": "detached-layer-lg",
+        "value": "0 28px 70px -24px rgb(11 31 51 / 0.5)",
+        "purpose": "The centred modal dialog only. Permitted because the node is portalled out of flow; never on an in-page surface."
+      },
+      {
+        "name": "detached-layer-sm",
+        "value": "0 18px 44px -18px rgb(11 31 51 / 0.45)",
+        "purpose": "The theme dropdown and the toast. Same exception, smaller diffusion."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-settle",
+        "value": "cubic-bezier(0.16, 0.84, 0.3, 1)",
+        "purpose": "The only entrance easing in the system. Every energize and pop animation uses it."
+      },
+      {
+        "name": "plane-settle",
+        "value": "760ms ease-settle backwards, translateY(18px) + opacity 0",
+        "purpose": "Each isometric zone plane settling into place as the sheet lands."
+      },
+      {
+        "name": "rail-draw",
+        "value": "900ms ease-settle backwards, stroke-dashoffset 520 to 0",
+        "purpose": "The automation rail drawing itself down the left edge of the estate."
+      },
+      {
+        "name": "disc-land",
+        "value": "420ms ease-settle backwards, scale(0.7) + opacity 0",
+        "purpose": "Numbered callout discs landing on the rail."
+      },
+      {
+        "name": "stagger-plane",
+        "value": "110ms per index",
+        "purpose": "Delay between successive planes and their plates."
+      },
+      {
+        "name": "stagger-disc",
+        "value": "480ms + 110ms per callout number",
+        "purpose": "Discs land after the planes have settled."
+      },
+      {
+        "name": "pop-in",
+        "value": "140ms ease-settle",
+        "purpose": "Dropdown menu open. Exit is 110ms ease-in."
+      },
+      {
+        "name": "toast-in",
+        "value": "220ms ease-settle",
+        "purpose": "Toast open. Exit is 160ms ease-in."
+      },
+      {
+        "name": "state-fade",
+        "value": "500ms ease-out",
+        "purpose": "Dimming non-active planes and plates when a legend cell is hovered or focused."
+      },
+      {
+        "name": "state-color",
+        "value": "300ms",
+        "purpose": "Fill and colour swaps: active callout discs, theme icon crossfade."
+      },
+      {
+        "name": "nav-rule-spring",
+        "value": "spring, stiffness 380, damping 30",
+        "purpose": "The active nav rule travelling between links. Duration 0 under reduced motion."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none",
+        "purpose": "All keyframe animations are cancelled outright, not shortened. Resting state is the default style."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "container",
+        "value": "1408px"
+      }
+    ],
+    "materials": [
+      {
+        "name": "sheet-grid",
+        "css": ".ds-sheet-grid { background-image: linear-gradient(to right, var(--rule-field) 1px, transparent 1px), linear-gradient(to bottom, var(--rule-field) 1px, transparent 1px); background-size: 56px 56px; background-position: center; opacity: 0.5; }",
+        "purpose": "Hairline plotter guides on the navy field beneath the isometric drawing. A blueprint measurement surface, not decoration."
+      },
+      {
+        "name": "ghost-hatch",
+        "css": ".ds-ghost-hatch { background-color: var(--ghost); background-image: repeating-linear-gradient(135deg, var(--ghost-line) 0 1px, transparent 1px 5px); }",
+        "purpose": "The unlit remainder of a measured field. Real hatch, never a flat tint, and only where a denominator is stated."
+      }
+    ],
+    "lineweights": [
+      {
+        "name": "object-rule",
+        "value": "1.9",
+        "purpose": "Zone plane faces — the heaviest line, reserved for objects."
+      },
+      {
+        "name": "plate-edge",
+        "value": "1.4",
+        "purpose": "Service plate top edges."
+      },
+      {
+        "name": "rail",
+        "value": "1.5",
+        "purpose": "The automation rail, its terminators, and callout disc strokes."
+      },
+      {
+        "name": "leader",
+        "value": "0.75",
+        "purpose": "Annotation leader lines and callout tie lines."
+      },
+      {
+        "name": "dimension",
+        "value": "0.6",
+        "purpose": "Dashed depth and dimension lines. The lightest weight."
+      },
+      {
+        "name": "icon",
+        "value": "1.75",
+        "purpose": "The authored 24x24 icon family, non-scaling under isometric projection."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one action that matters on a sheet: book a call, download the resume. Signal ground, square corners, colour-only hover.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Book a call <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--signal); color: var(--signal-ink); padding: 16px 20px; font-family: var(--font-archivo), sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; text-decoration: none; border: none; border-radius: 0; transition: background-color 150ms ease; } .ds-btn-primary svg { width: 14px; height: 14px; } .ds-btn-primary:hover { background: var(--ink); } .ds-btn-primary:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 1px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Sits flush beside the primary, separated only by a 1px hairline gap. Plate ground, ink text.",
+      "html": "<a class=\"ds-btn-secondary\" href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3v12m0 0 5-5m-5 5-5-5M4 21h16\"/></svg> Resume</a>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--plate); color: var(--ink); padding: 16px 20px; font-family: var(--font-archivo), sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; text-decoration: none; border: none; border-radius: 0; transition: background-color 150ms ease; } .ds-btn-secondary svg { width: 14px; height: 14px; } .ds-btn-secondary:hover { background: var(--paper); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 1px; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Opens a detail sheet. 1px ink border inverting to a filled ink ground; its arrow nudges 2px right on hover and holds still under reduced motion.",
+      "html": "<button class=\"ds-btn-outline\" type=\"button\">Read case study <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; gap: 8px; background: var(--plate); color: var(--ink); border: 1px solid var(--ink); border-radius: 0; padding: 12px 20px; font-family: var(--font-archivo), sans-serif; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: background-color 150ms ease, color 150ms ease; } .ds-btn-outline svg { width: 14px; height: 14px; transition: transform 300ms ease; } .ds-btn-outline:hover { background: var(--ink); color: var(--plate); } .ds-btn-outline:hover svg { transform: translateX(2px); } .ds-btn-outline:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 1px; } @media (prefers-reduced-motion: reduce) { .ds-btn-outline svg { transition: none; } .ds-btn-outline:hover svg { transform: none; } }"
+    },
+    {
+      "name": "Icon Button",
+      "kind": "button",
+      "refersTo": "icon-button",
+      "description": "Square bordered control for theme switching and copy-to-clipboard. Border and glyph both darken on hover.",
+      "html": "<button class=\"ds-icon-btn\" type=\"button\" aria-label=\"Change theme\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4\"/></svg></button>",
+      "css": ".ds-icon-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: transparent; color: var(--ink-3); border: 1px solid var(--rule); border-radius: 0; cursor: pointer; transition: border-color 150ms ease, color 150ms ease; } .ds-icon-btn svg { width: 16px; height: 16px; } .ds-icon-btn:hover { border-color: var(--ink); color: var(--ink); } .ds-icon-btn:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 1px; }"
+    },
+    {
+      "name": "Navigation Link",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Header link in Archivo uppercase, drafting ink at rest. The active link carries a 2px Signal rule at its foot.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-link\" href=\"#\">Projects</a><a class=\"ds-nav-link ds-nav-link-active\" href=\"#\" aria-current=\"location\">Experience</a><a class=\"ds-nav-link\" href=\"#\">Skills</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; background: var(--paper); border-bottom: 1px solid var(--rule); padding: 0 8px; } .ds-nav-link { position: relative; padding: 16px 12px; font-family: var(--font-archivo), sans-serif; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-3); text-decoration: none; transition: color 150ms ease; } .ds-nav-link:hover { color: var(--ink); } .ds-nav-link-active { color: var(--ink); } .ds-nav-link-active::after { content: \"\"; position: absolute; left: 8px; right: 8px; bottom: 0; height: 2px; background: var(--signal); } .ds-nav-link:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 1px; }"
+    },
+    {
+      "name": "Stack Chip",
+      "kind": "chip",
+      "refersTo": "stack-chip",
+      "description": "A technology named in the drafting hand inside a hairline rectangle. Square, unfilled, non-interactive: a caption, not a button.",
+      "html": "<ul class=\"ds-chip-row\"><li class=\"ds-chip\">Terraform</li><li class=\"ds-chip\">PowerShell</li><li class=\"ds-chip\">FastAPI</li></ul>",
+      "css": ".ds-chip-row { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; } .ds-chip { border: 1px solid var(--rule); border-radius: 0; padding: 4px 10px; font-family: var(--font-azeret), monospace; font-size: 10px; letter-spacing: 0.02em; color: var(--ink-3); }"
+    },
+    {
+      "name": "Ruled Record Grid",
+      "kind": "card",
+      "refersTo": "record-cell",
+      "description": "The system's stand-in for cards. A rule-coloured ground with 1px gaps; each cell paints its own plate ground so the divider is the ground showing through.",
+      "html": "<dl class=\"ds-record\"><div class=\"ds-record-cell\"><dt>Location</dt><dd>Ahmedabad, India</dd></div><div class=\"ds-record-cell\"><dt>Current role</dt><dd>Cloud Operations Engineer</dd></div><div class=\"ds-record-cell\"><dt>Experience</dt><dd>1.5+ years</dd></div><div class=\"ds-record-cell\"><dt>Certifications</dt><dd>AWS SAA &middot; AZ-900 &middot; AI-900</dd></div></dl>",
+      "css": ".ds-record { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin: 0; } .ds-record-cell { background: var(--plate); padding: 14px 20px; } .ds-record-cell dt { font-family: var(--font-azeret), monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); } .ds-record-cell dd { margin: 4px 0 0; font-family: var(--font-archivo), sans-serif; font-size: 13px; font-weight: 500; line-height: 1.375; color: var(--ink); font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Proportion Bar",
+      "kind": "custom",
+      "refersTo": "proportion-bar",
+      "description": "Signature. Draws the whole measured field: the REMOVED share is the solid Signal span so it matches the headline figure, the remainder is the ghost hatch, and the denominator is always stated inline. The bar is aria-hidden because every value is written out beside it.",
+      "html": "<div class=\"ds-bar\" aria-hidden=\"true\"><div class=\"ds-bar-removed\" style=\"width:40%\"></div><div class=\"ds-bar-ghost\" style=\"width:calc(60% - 0.25rem)\"></div></div><dl class=\"ds-bar-legend\"><div><span class=\"ds-key-solid\"></span><dt>Removed</dt><dd>~3h per environment</dd></div><div><span class=\"ds-key-ghost\"></span><dt>Still costs</dt><dd>~5h per environment</dd></div><div><dt>Measured against</dt><dd>~8h baseline</dd></div></dl>",
+      "css": ".ds-bar { display: flex; align-items: stretch; gap: 2px; width: 100%; height: 40px; border: 1px solid var(--rule); background: var(--plate); padding: 2px; } .ds-bar-removed { background: var(--signal); border-radius: 3px 1px 1px 3px; } .ds-bar-ghost { background-color: var(--ghost); background-image: repeating-linear-gradient(135deg, var(--ghost-line) 0 1px, transparent 1px 5px); border-radius: 1px 3px 3px 1px; } .ds-bar-legend { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 12px 0 0; } .ds-bar-legend > div { display: flex; align-items: baseline; gap: 8px; } .ds-bar-legend dt { font-family: var(--font-azeret), monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); } .ds-bar-legend dd { margin: 0; font-family: var(--font-azeret), monospace; font-size: 12px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; } .ds-key-solid { width: 10px; height: 10px; flex-shrink: 0; transform: translateY(1px); background: var(--signal); } .ds-key-ghost { width: 10px; height: 10px; flex-shrink: 0; transform: translateY(1px); background-color: var(--ghost); background-image: repeating-linear-gradient(135deg, var(--ghost-line) 0 1px, transparent 1px 5px); }"
+    },
+    {
+      "name": "Evidence Marker List",
+      "kind": "custom",
+      "refersTo": "evidence-marker",
+      "description": "Signature. A filled rotated square means the item appears in the work documented on this page — never a proficiency rating. Shipped sorts above unshipped, the header carries an n-of-m tally, and both marker states are keyed.",
+      "html": "<section class=\"ds-key\"><h3><span>Infrastructure as code</span><span class=\"ds-key-tally\">3 of 5 shipped</span></h3><ul><li class=\"ds-key-shipped\"><span class=\"ds-mark ds-mark-filled\"></span>Terraform</li><li class=\"ds-key-shipped\"><span class=\"ds-mark ds-mark-filled\"></span>PowerShell</li><li><span class=\"ds-mark ds-mark-hollow\"></span>Bicep</li></ul></section>",
+      "css": ".ds-key { display: flex; flex-direction: column; background: var(--plate); border: 1px solid var(--rule); padding: 24px; } .ds-key h3 { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin: 0; font-family: var(--font-azeret), monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.16em; color: var(--signal); } .ds-key-tally { font-weight: 400; color: var(--ink-3); font-variant-numeric: tabular-nums; } .ds-key ul { list-style: none; margin: 16px 0 0; padding: 0; } .ds-key li { display: flex; align-items: baseline; gap: 12px; border-top: 1px solid var(--rule); padding: 10px 0; font-family: var(--font-archivo), sans-serif; font-size: 14px; line-height: 1.375; color: var(--ink-2); } .ds-key li:first-child { border-top: 0; padding-top: 0; } .ds-key-shipped { font-weight: 500; color: var(--ink); } .ds-mark { width: 6px; height: 6px; flex-shrink: 0; transform: rotate(45deg) translateY(1px); } .ds-mark-filled { background: var(--signal); border: 1px solid var(--signal); } .ds-mark-hollow { border: 1px solid var(--rule-strong); }"
+    },
+    {
+      "name": "Numbered Operation Legend Cell",
+      "kind": "custom",
+      "refersTo": "callout-disc",
+      "description": "Signature. A keyed callout disc plus its operation name and measured headline, ruled into the foot of the estate sheet. Hovering or focusing a cell dims every plane in the drawing except the one it belongs to.",
+      "html": "<ul class=\"ds-legend\"><li><a href=\"#\"><span class=\"ds-legend-head\"><span class=\"ds-disc\">1</span><span class=\"ds-legend-label\">Provision</span></span><span class=\"ds-legend-figure\">40% faster</span></a></li><li><a href=\"#\"><span class=\"ds-legend-head\"><span class=\"ds-disc\">2</span><span class=\"ds-legend-label\">Automate</span></span><span class=\"ds-legend-figure\">70%+ eliminated</span></a></li></ul>",
+      "css": ".ds-legend { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--rule-field); border: 1px solid var(--rule-field); list-style: none; margin: 0; padding: 0; } .ds-legend li { background: var(--field); } .ds-legend a { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 16px 20px; text-decoration: none; color: var(--on-field); transition: background-color 150ms ease; } .ds-legend a:hover { background: var(--field-2); } .ds-legend a:focus-visible { outline: 2px solid var(--on-field); outline-offset: 3px; border-radius: 1px; } .ds-legend-head { display: flex; align-items: center; gap: 10px; } .ds-disc { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex-shrink: 0; border: 1px solid var(--signal-field); border-radius: 9999px; font-family: var(--font-azeret), monospace; font-size: 11px; font-weight: 600; color: var(--signal-field); transition: background-color 300ms ease, color 300ms ease; } .ds-legend a:hover .ds-disc { background: var(--signal-field); color: var(--signal-field-ink); } .ds-legend-label { font-family: var(--font-azeret), monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; } .ds-legend-figure { font-family: var(--font-archivo), sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Pipeline",
+      "kind": "custom",
+      "refersTo": "pipeline",
+      "description": "A system drawn left to right, one hairline plate per real stage. Stacks vertically below 640px with the connector rotated, so reading order is never guessed.",
+      "html": "<ol class=\"ds-pipeline\" aria-label=\"Pipeline\"><li><span class=\"ds-stage\">Ingest</span></li><li><svg class=\"ds-arrow\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12h15M13 6l6 6-6 6\"/></svg><span class=\"ds-stage\">Embed</span></li><li><svg class=\"ds-arrow\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12h15M13 6l6 6-6 6\"/></svg><span class=\"ds-stage\">Retrieve</span></li></ol>",
+      "css": ".ds-pipeline { display: flex; flex-wrap: wrap; align-items: center; list-style: none; margin: 0; padding: 0; } .ds-pipeline li { display: flex; align-items: center; } .ds-stage { display: inline-block; border: 1px solid var(--rule); background: var(--plate); color: var(--ink); border-radius: 0; padding: 8px 12px; font-family: var(--font-azeret), monospace; font-size: 11px; line-height: 1; letter-spacing: 0.01em; } .ds-arrow { width: 16px; height: 16px; flex-shrink: 0; margin: 0 8px; color: var(--ink-3); } @media (max-width: 639px) { .ds-pipeline { flex-direction: column; align-items: flex-start; } .ds-pipeline li { flex-direction: column; align-items: flex-start; } .ds-arrow { margin: 4px 0 4px 16px; transform: rotate(90deg); } }"
+    },
+    {
+      "name": "Modal Dialog",
+      "kind": "custom",
+      "refersTo": "dialog",
+      "description": "The detail sheet for one system. Plate ground, hairline border, square corners, over a 70% navy overlay. Deliberately un-animated; the only surface in the build that carries a shadow, because it is portalled out of flow.",
+      "html": "<div class=\"ds-dialog\"><h2 class=\"ds-dialog-title\">AI-Powered HR Policy Chatbot</h2><p class=\"ds-dialog-status\">Running in production</p><p class=\"ds-dialog-desc\">A retrieval-augmented service answering policy questions against the company handbook.</p><button class=\"ds-dialog-close\" type=\"button\" aria-label=\"Close\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\"><path d=\"M6 6l12 12M18 6 6 18\"/></svg></button></div>",
+      "css": ".ds-dialog { position: relative; max-width: 42rem; background: var(--plate); border: 1px solid var(--rule); border-radius: 0; padding: 24px; box-shadow: 0 28px 70px -24px rgb(11 31 51 / 0.5); } .ds-dialog-title { margin: 0; padding-right: 40px; font-family: var(--font-archivo), sans-serif; font-size: 24px; font-weight: 800; line-height: 1.08; letter-spacing: -0.03em; color: var(--ink); } .ds-dialog-status { margin: 8px 0 0; font-family: var(--font-azeret), monospace; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.16em; color: var(--signal); } .ds-dialog-desc { margin: 16px 0 0; font-family: var(--font-archivo), sans-serif; font-size: 15px; line-height: 1.625; color: var(--ink-2); } .ds-dialog-close { position: absolute; top: 16px; right: 16px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: transparent; border: 1px solid var(--rule); border-radius: 0; color: var(--ink-3); cursor: pointer; transition: border-color 150ms ease, color 150ms ease; } .ds-dialog-close svg { width: 14px; height: 14px; } .ds-dialog-close:hover { border-color: var(--ink); color: var(--ink); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Plotted Architecture Sheet",
+    "overview": "This is not a page that describes infrastructure work; it is a drawing of it, published the way an engineering office publishes a reference architecture. Deep navy ink sits on cool plotter stock. Navy zone fields own whole regions of the page rather than tinting a card. White service plates stand on those fields with visible extruded edges. Rules are hairlines, and they do the separating work that a card, a tinted band, or a shadow would do elsewhere. Every region that carries drawing rather than prose is annotated in a mono drafting hand, and every quantity is set in tabular figures because drafted figures line up in columns.\n\nThe density is high and deliberately unpadded. Cells sit shoulder to shoulder separated by a single hairline, produced by laying a one-pixel gap over a rule-coloured ground rather than by bordering each cell — so the grid reads as one ruled sheet, not as a set of tiles that happen to be adjacent. Headings carry their own weight at the top of each sheet; there is no label, kicker, or eyebrow above any heading anywhere in the build, and production status appears as a field inside an evidence block instead. Dark mode is the same poster plotted on a navy ground: a chosen second printing, not an inverted first.\n\nThe restraint is a professional posture, not a default. Colour is scarce enough that one blue reads as \"energised / live / measured\" on sight; the accent appears on discs, rules, figures, and one primary action, and nowhere else. Corners are square by system: the only curves in the whole build are the callout discs, the status dots, and a 3px nub on one measurement bar.",
+    "keyCharacteristics": [
+      "Navy field regions and cool paper regions alternate as full-bleed grounds; nothing floats between them.",
+      "Hairline rules and one-pixel grid gaps instead of cards, tints, or dividers with weight.",
+      "Depth is drawn as isometric extrusion, never simulated with a shadow on the page surface.",
+      "Two hands: Archivo for everything spoken, Azeret Mono for everything annotated.",
+      "Square corners everywhere except discs, dots, and a single measurement nub.",
+      "Both themes complete and independently declared; neither is a filter over the other."
+    ],
+    "rules": [
+      {
+        "name": "The Two Signals Rule",
+        "body": "The accent has two declarations, not one: --signal for signal painted on paper, --signal-field for the same role painted on the navy field. They stay separate declarations even in dark mode, where their values coincide, precisely so that darkening one can never silently drag the other below the contrast floor. Never collapse them into a single token, and never paint --signal on a navy ground.",
+        "section": "colors"
+      },
+      {
+        "name": "The Field Owns The Region Rule",
+        "body": "A navy field is a full-bleed region that owns everything inside it and sets .on-field so the focus ring inverts. Navy is never a card, never a badge, never a tint behind a paragraph.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ghost Is Measured Rule",
+        "body": "The ghost hatch means \"the part of the measured whole that is not being claimed\". It is a real repeating-gradient hatch on --ghost, and it appears only where a denominator is stated. Never use it as texture.",
+        "section": "colors"
+      },
+      {
+        "name": "The Drafting Hand Rule",
+        "body": "Azeret Mono is annotation only — legends, plane and plate labels, dates, quantities, stack chips, and title-block field labels. Interface chrome (nav links, buttons, CTAs, footer) is Archivo. The role line under the name is mono because it is a title-block discipline field, not chrome. Prose is never mono, and code is never rendered at all.",
+        "section": "typography"
+      },
+      {
+        "name": "The Five Steps Rule",
+        "detail": "Below the Title step the ramp has five sizes: 10, 11, 12, 15, 17. A new literal font-size is a design decision, not a nudge - if a thing looks wrong at 15px the answer is weight, colour, or spacing, not 14px."
+      },
+      {
+        "name": "The Tabular Figure Rule",
+        "body": "font-variant-numeric: tabular-nums is set on the body, globally and permanently. Drafted figures line up in columns; proportional numerals are the tell that nobody set them.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Kicker Rule",
+        "body": "Nothing sits above a heading. No eyebrow, no kicker, no label line. Status that would have been an eyebrow (\"Running in production\") is demoted into an evidence block where it is a stated field rather than a decoration.",
+        "section": "typography"
+      },
+      {
+        "name": "The Drawn Depth Rule",
+        "body": "If a surface is part of the sheet, its depth is drawn — extrusion, hairline, or hatch. A shadow on an in-page surface is a bug.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Detached Layer Exception",
+        "body": "A shadow is permitted only on a node portalled out of flow, only as a soft straight-down diffusion in navy, and only from the two recorded values. A new shadow value is a new layer type; there are two, and there should not be a third.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Leader Hangs Down-Left Rule",
+        "body": "Diagram annotation hangs down and to the LEFT off a shouldered leader — an isometric run that flattens to a horizontal shoulder before meeting the text, which is how a drafted leader meets its note. The quantity rides inline on the label's own line, in On-Field Signal at weight 600. Never centre a label under a plate; never break the quantity onto a detached second line. Labels carry a knocked-out navy halo (3.5 stroke, paint-order stroke) so the word never fights an edge beneath it.",
+        "section": "components"
+      },
+      {
+        "name": "The Removed Share Rule",
+        "body": "A proportion bar draws the whole measured field. The removed share is the solid Signal span so it matches the headline figure beside it; the remainder is the ghost hatch. The denominator is always stated inline, and all three legend cells — removed, still costs, measured against — must name the same category of quantity. The bar itself is aria-hidden because every value it encodes is written out in the list beside it.",
+        "section": "components"
+      },
+      {
+        "name": "The Evidence Marker Rule",
+        "body": "A filled marker means \"appears in the work documented on this page\" — never a self-assessed proficiency rating, never a skill bar, never a star. Shipped items sort above unshipped within their group with original order preserved inside each half, the group header carries a plain n of m shipped tally, and both marker states are named in a key. A marker state that isn't keyed is a state the reader has to guess.",
+        "section": "components"
+      },
+      {
+        "name": "The Resting State Is Default Rule",
+        "body": "Every animated element's resting state IS its default style; animations run backwards from a from keyframe. Content is fully present with JavaScript off, with motion reduced, and before any animation runs. Under prefers-reduced-motion: reduce every keyframe animation is cancelled outright, not shortened.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do separate surfaces with a hairline rule or a 1px gap over a rule-coloured ground. That is the system's only divider.",
+      "Do keep --signal and --signal-field as two separate declarations, and paint each only on its own ground.",
+      "Do set annotation, legends, dates, quantities, and title-block field labels in Azeret Mono, and everything spoken — prose and interface chrome — in Archivo.",
+      "Do draw depth as isometric extrusion, real gradients, and real hatches.",
+      "Do state the denominator whenever a proportion is drawn, and keep all three legend cells naming the same category of quantity.",
+      "Do hang diagram annotation down-left off a shouldered leader with the quantity inline on the label's line.",
+      "Do keep the lineweight hierarchy: objects heavy (1.9 / 1.4), measurements light (0.75 / 0.6).",
+      "Do sort shipped items above unshipped and key both marker states.",
+      "Do make every animated element's resting state its default, and cancel animation entirely under reduced motion.",
+      "Do replace the isometric drawing with the ruled zone stack below md rather than scaling it down."
+    ],
+    "donts": [
+      "Don't put a shadow on any in-page surface. Shadows are permitted only on portalled layers, only from the two recorded values.",
+      "Don't use a hard offset shadow, a gradient fill on text, or any simulated physicality anywhere.",
+      "Don't put a kicker, eyebrow, or label line above a heading. If the status matters, make it a field in an evidence block.",
+      "Don't round a corner. The only curves are callout discs, 6px status dots, and the 3px measurement nub.",
+      "Don't draw the remaining share as the solid span — it inverts the claim the headline makes.",
+      "Don't treat the evidence marker as a proficiency rating, and never ship a skill bar, percentage, or star scale.",
+      "Don't use Azeret Mono for prose, buttons, nav, or the footer, and don't render code or terminal motifs at all.",
+      "Don't add a glyph-font icon or a borrowed icon set; the 24x24 / 1.75-stroke family is the only hand.",
+      "Don't lay the capability key out in two columns — the ruled ground shows through as an empty half-cell.",
+      "Don't set scrollbar-gutter: stable; Radix's scroll lock already pads the body and the two together shift centred content ~7px."
+    ]
+  }
+}

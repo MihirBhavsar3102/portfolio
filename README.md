@@ -1,43 +1,64 @@
 # Mihir Bhavsar — Portfolio
 
-Personal portfolio for a Cloud & DevOps engineer. Next.js App Router, TypeScript, Tailwind CSS v4, Framer Motion. Fully static — every route is prerendered at build time.
+The personal site of a Cloud & DevOps engineer. It's written like a product launch page: one idea per screen, big type, and every number attached to how it was achieved. There are light and dark themes, a service map that lights up whatever produced each figure, and four case studies with server-rendered architecture diagrams.
+
+**Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, Radix UI primitives, lucide-react, and MDX for the case studies. Motion is plain CSS. Tests run on Vitest, plus a headless-browser verifier.
 
 ## Run locally
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
-npm run build    # production build (all routes static)
+npm run dev        # development server
+npm run build      # production build
+npm start          # serve the production build
 ```
+
+## Check it
+
+```bash
+npm test           # Vitest: content integrity, claims, contrast, SEO, components
+npm run typecheck  # tsc --noEmit
+npx eslint .
+node scripts/verify-ui.mjs http://localhost:3000 ./out prod   # browser checks against a running server
+```
+
+`scripts/verify-ui.mjs` drives Microsoft Edge headless over the Chrome DevTools Protocol, with no dependencies. It expects Edge at its default Windows install path. It checks the Trace, keyboard reach and focus, themes, responsive widths, reduced motion, JavaScript-off content, metadata, and more, and saves screenshots to the output folder.
 
 ## Where things live
 
-| Path | Purpose |
+| Path | What it holds |
 | --- | --- |
-| `lib/resume-data.ts` | **All site content.** Roles, bullets, projects, skills, links — edit here, nothing else. |
-| `lib/site-config.ts` | Site title, description, canonical URL |
-| `types/resume.ts` | Types for the content model |
-| `app/layout.tsx` | Fonts (Schibsted Grotesk / Inter), metadata, theme provider |
-| `app/globals.css` | Design tokens — the light/dark palette lives here as CSS variables |
-| `components/` | One component per section |
+| [lib/resume-data.ts](lib/resume-data.ts) | **The site's data:** roles, figures with their provenance, projects, skills, credentials, links. The case-study narrative is in `content/work/`. |
+| [types/resume.ts](types/resume.ts) | The content model |
+| [content/work/](content/work/) | Case-study narrative in MDX (no figures; those come from `resume-data`), and each diagram's data |
+| [app/](app/) | Routes: the home page, `/work/[slug]`, share images, the sitemap, robots and the 404 |
+| [app/globals.css](app/globals.css) | Design tokens for both themes, the map's draw-in, the Trace dimming |
+| [components/](components/) | `site/` chrome, `hero/` (figures, map, Trace), `sections/`, `work/`, `diagram/`, `og/` share cards, `ui/` |
+| [lib/](lib/) | Logic: the Trace, stack evidence, GitHub fetch with fallbacks, SEO and JSON-LD, the theme script |
+| [tests/](tests/) | Unit and render tests, including the guards that keep retired or unsourced claims out of the copy |
+| [DESIGN.md](DESIGN.md) | The visual system: tokens, type, components and rules |
+| [PRODUCT.md](PRODUCT.md) | Who the site is for and what it must prove |
 
-## Before deploying — one manual step
+## Content rules
 
-1. **Site URL** — set `NEXT_PUBLIC_SITE_URL` (see `.env.example`) in Vercel project settings to your real domain so Open Graph tags, sitemap, and robots.txt emit correct absolute URLs.
+- Facts come from the resume only, paraphrased for the web.
+- Every figure carries a provenance sentence, shown wherever the figure is.
+- `npm test` fails if a retired claim reappears, or if the phone number appears anywhere in the source.
 
-`public/MihirBhavsar_Resume.pdf` is a generated copy of the resume content — replace it with your own export whenever you update your resume; the download buttons point at that exact path.
+## Deploy
 
-## Deploy on Vercel
+The site builds to a standalone Node server (`output: "standalone"`) with the [Dockerfile](Dockerfile). The container listens on port 3001.
 
-Push this repo to GitHub, import it in Vercel — no configuration needed. Every route builds as static content, and the Open Graph image (`/opengraph-image`) is generated at build time.
+```bash
+docker build --build-arg NEXT_PUBLIC_SITE_URL=https://your-domain.example -t portfolio .
+docker run -p 3001:3001 -e GITHUB_TOKEN=... portfolio
+```
 
-## Updating project links
+- **`NEXT_PUBLIC_SITE_URL` is required for a real deploy.** It's inlined at build time and used for canonical URLs, Open Graph tags, JSON-LD, the sitemap and robots.txt. Without it they point at `http://localhost:3001`. See [.env.example](.env.example).
+- **`GITHUB_TOKEN` is optional.** It's read when the home page is built and on each hourly refresh, and it raises the rate limit for the GitHub section's live repo details. Without it, or whenever GitHub is unavailable, the section shows its curated descriptions.
 
-The three project cards currently link to the GitHub profile. When repos go public, replace each `link.href` in `lib/resume-data.ts` — the card supports any label/URL pair (live demo, case study, repo).
+`public/MihirBhavsar_Resume.pdf` is the resume the download links serve. Replace it at that path to update it.
 
-## Design notes
+## Fonts
 
-- Palette: white / soft grey-blue section backgrounds with slate text and a single deep navy accent (`#0F4C81` light, muted steel blue `#7FB0E0` dark); all emphasis goes through the accent, everything else stays neutral.
-- Type: Schibsted Grotesk for headings, Inter for body text.
-- Motion system: a typewriter cycles the hero's role titles ([components/typewriter.tsx](components/typewriter.tsx)), hero stats count up on scroll ([components/stat-counter.tsx](components/stat-counter.tsx)), a scroll-progress bar tracks reading position ([components/scroll-progress.tsx](components/scroll-progress.tsx)), the nav has a sliding active-section indicator, and the experience timeline's connecting line draws in on scroll ([components/timeline-connector.tsx](components/timeline-connector.tsx)). All of it is orchestrated, not scattered — one hero load sequence, one motion idiom per section.
-- Reduced motion is respected everywhere: reveals, the typewriter, counters, and the timeline line all render at their final state statically instead of animating.
+Schibsted Grotesk and Fragment Mono load through `next/font`. The share cards use static Schibsted Grotesk files in [assets/fonts/](assets/fonts/), under the SIL Open Font License ([OFL.txt](assets/fonts/OFL.txt)).
