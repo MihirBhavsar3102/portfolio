@@ -19,6 +19,15 @@ updates:
       # (engines.node and the Dockerfile), so a major moves with those by hand.
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+      # On hold until Next.js's ESLint config supports them (checked 2026-10-14).
+      # Remove each rule once eslint-config-next's plugins accept the new major.
+      # TypeScript 7: typescript-eslint refuses it, so `npm run lint` fails (#7).
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      # ESLint 10: CI passes, but eslint-plugin-react, -jsx-a11y and -import
+      # (bundled by eslint-config-next) only declare support up to ESLint 9 (#8).
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "chore(deps)"
       prefix-development: "chore(dev-deps)"
