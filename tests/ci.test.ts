@@ -82,11 +82,18 @@ describe("master's ruleset", () => {
 });
 
 describe("Node version", () => {
-  it("is one major everywhere: package.json engines (read by CI and Vercel) and the Docker image", () => {
+  it("is one major everywhere: package.json engines (read by CI and Vercel), the Docker image and Node's type definitions", () => {
     const engines = String(pkg.engines?.node).match(/^(\d+)\.x$/)?.[1];
     const docker = dockerfile.match(/^ARG NODE_IMAGE=node:(\d+)-/m)?.[1];
+    const types = String(pkg.devDependencies?.["@types/node"]).match(/^\^(\d+)/)?.[1];
     expect(engines).toBeDefined();
     expect(docker).toBe(engines);
+    expect(types).toBe(engines);
     expect(ci.split("node-version-file: package.json").length - 1).toBe(jobs.length);
+  });
+
+  it("keeps Dependabot from proposing a Node types major ahead of the runtime", () => {
+    const dependabot = read(".github/dependabot.yml");
+    expect(dependabot).toMatch(/- dependency-name: "@types\/node"\n\s+update-types: \["version-update:semver-major"\]/);
   });
 });
