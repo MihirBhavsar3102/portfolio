@@ -18,6 +18,8 @@ function textPairs(t: Tokens): [string, string, string][] {
     ["ink-2 on surface-3", t["ink-2"], t["surface-3"]],
     ...grounds.map((bg): [string, string, string] => [`accent on ${bg}`, t.accent, t[bg]]),
     ["accent on an active chip (accent-soft over the map band)", t.accent, over(t["accent-soft"], t["surface-1"])],
+    // A lit tool keeps its canvas chip under the wash: accent-soft straight over a lane's Surface Two is 4.47:1.
+    ["accent on a lit hero tool or part (accent-soft over canvas)", t.accent, over(t["accent-soft"], t.canvas)],
     ["accent-ink on accent", t["accent-ink"], t.accent],
     ["canvas on ink (pill buttons)", t.canvas, t.ink],
     ...["cloud-azure", "cloud-aws", "cloud-ai"].flatMap((z): [string, string, string][] => [

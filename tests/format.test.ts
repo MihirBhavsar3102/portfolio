@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { monthYear, period, shortClaim, slugify } from "@/lib/format";
+import { listOf, monthYear, period, shortClaim, slugify } from "@/lib/format";
 
 describe("monthYear", () => {
   it("formats an ISO month", () => expect(monthYear("2024-12")).toBe("Dec 2024"));
@@ -22,4 +22,11 @@ describe("shortClaim", () => {
     expect(shortClaim("less manual effort across 5 clients, with configuration errors near zero")).toBe("less manual effort across 5 clients");
     expect(shortClaim("uptime on a multi-AZ WordPress platform")).toBe("uptime on a multi-AZ WordPress platform");
   });
+});
+
+describe("listOf", () => {
+  it("joins two with and", () => expect(listOf(["built", "shipped"])).toBe("built and shipped"));
+  it("joins three with a comma and and, no serial comma", () =>
+    expect(listOf(["built", "shipped", "monitored"])).toBe("built, shipped and monitored"));
+  it("leaves one alone", () => expect(listOf(["built"])).toBe("built"));
 });

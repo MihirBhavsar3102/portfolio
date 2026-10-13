@@ -242,6 +242,142 @@
 }
 
 /*
+ * The hero's story (components/hero). HeroCycle sets data-phase on the hero
+ * to build, ship or observe, one every 3.2s while it is on screen. The
+ * positioning line's last word rolls to the matching verb (built, shipped,
+ * monitored) and the estate preview lights that step: build lights the tools
+ * and the workloads' parts, ship sends packets down to the workloads, observe
+ * lights the monitoring. Nothing is lit at rest; elements set --d to stagger.
+ *
+ * The rolling word needs JavaScript and motion. data-theme on <html> is set
+ * by the pre-paint script, so whether JavaScript runs is known from the first
+ * frame and nothing shifts at hydration. Without it, under reduced motion and
+ * in print, the line reads as one sentence instead.
+ */
+.hero-rolling {
+  display: none;
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  :root[data-theme] .hero-static {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  :root[data-theme] .hero-rolling {
+    display: inline;
+  }
+}
+
+/* The verbs share one cell, as wide as the longest, so the line never reflows. */
+.hero-roll {
+  display: inline-grid;
+  vertical-align: bottom;
+  overflow: hidden;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+.hero-roll-word {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translateY(105%);
+}
+
+/* The current verb (the first, before the story starts) … */
+[data-hero]:not([data-phase]) .hero-roll-word:nth-child(1),
+[data-phase="build"] .hero-roll-word:nth-child(1),
+[data-phase="ship"] .hero-roll-word:nth-child(2),
+[data-phase="observe"] .hero-roll-word:nth-child(3) {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 750ms var(--ease-out-expo),
+    transform 750ms var(--ease-out-expo);
+}
+
+/* … and the one it replaced, rolling up and out. The next waits below, unseen. */
+[data-phase="build"] .hero-roll-word:nth-child(3),
+[data-phase="ship"] .hero-roll-word:nth-child(1),
+[data-phase="observe"] .hero-roll-word:nth-child(2) {
+  opacity: 0;
+  transform: translateY(-105%);
+  transition:
+    opacity 750ms var(--ease-out-expo),
+    transform 750ms var(--ease-out-expo);
+}
+
+.hero-node,
+.hero-zone,
+.hero-wire {
+  transition:
+    color 500ms var(--ease-out-expo),
+    background-color 500ms var(--ease-out-expo),
+    border-color 500ms var(--ease-out-expo),
+    box-shadow 500ms var(--ease-out-expo);
+}
+
+.hero-wire {
+  background-color: color-mix(in oklab, var(--color-line-graphic) 60%, transparent);
+}
+
+.hero-packet {
+  opacity: 0;
+  background-color: var(--color-accent);
+}
+
+/* A lit element: its step is the hero's phase. */
+:is([data-phase="build"] [data-step="build"], [data-phase="ship"] [data-step="ship"], [data-phase="observe"] [data-step="observe"]) {
+  transition-delay: var(--d, 0ms);
+}
+
+/* Lit tools and parts take the wash over a canvas ground: straight over a lane's Surface Two it would miss AA. */
+:is([data-phase="build"] [data-step="build"], [data-phase="observe"] [data-step="observe"]).hero-node {
+  border-color: color-mix(in oklab, var(--color-accent) 40%, transparent);
+  background-color: var(--color-canvas);
+  box-shadow: inset 0 0 0 99px var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+:is([data-phase="build"] [data-step="build"], [data-phase="observe"] [data-step="observe"]).hero-chip {
+  border-color: var(--color-accent);
+}
+
+[data-phase="ship"] [data-step="ship"].hero-zone {
+  border-color: color-mix(in oklab, var(--color-accent) 50%, transparent);
+}
+
+:is([data-phase="ship"] [data-step="ship"], [data-phase="observe"] [data-step="observe"]).hero-wire {
+  background-color: var(--color-accent);
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  :is([data-phase="ship"] [data-step="ship"], [data-phase="observe"] [data-step="observe"]) .hero-packet {
+    animation: hero-packet 1200ms cubic-bezier(0.45, 0, 0.55, 1) infinite backwards;
+    animation-delay: var(--d, 0ms);
+  }
+}
+
+@keyframes hero-packet {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -4px);
+  }
+  15%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 50px);
+  }
+}
+
+/*
  * The section reveal, the page's one entrance besides the map's: Selected
  * work, if it starts off screen, fades up 8px, once, as it first scrolls into
  * view (components/site/in-view.tsx). Screen only, so a printout never

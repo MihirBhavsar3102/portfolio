@@ -152,8 +152,12 @@ export interface Resume {
   name: string;
   role: string;
   location: string;
-  /** Hero line, at most 30 words. */
-  positioning: string;
+  /**
+   * Hero line, one crisp sentence: the lead, then three verbs the hero rolls
+   * through in order (built, shipped, monitored), one per step of the estate
+   * preview's story (build, ship, observe). Read whole with positioningLine().
+   */
+  positioning: { lead: string; verbs: [string, string, string] };
   summary: string;
   email: string;
   resumeFile: string;

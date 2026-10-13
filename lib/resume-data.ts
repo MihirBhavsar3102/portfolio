@@ -56,8 +56,10 @@ export const resume: Resume = {
   name: "Mihir Bhavsar",
   role: "Cloud & DevOps Engineer",
   location: "Ahmedabad, India",
-  positioning:
-    "I automate how Azure and AWS infrastructure is built, shipped and monitored, with Terraform, CI/CD and alerting, and I build applied AI: a RAG assistant for HR policy questions.",
+  positioning: {
+    lead: "I automate how Azure and AWS infrastructure is",
+    verbs: ["built", "shipped", "monitored"],
+  },
   summary:
     "Cloud and DevOps engineer working across AWS, Azure and GCP since December 2024. Most of my work is infrastructure as code and delivery pipelines — Terraform, GitHub Actions and Azure DevOps — plus Linux administration and monitoring with Prometheus, Grafana and CloudWatch. I've used Docker, Kubernetes, Helm and ArgoCD in project work.",
   email: "mihirbhavsar2001@gmail.com",

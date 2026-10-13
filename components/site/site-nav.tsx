@@ -62,9 +62,36 @@ function useActiveSection(pathname: string) {
   return active;
 }
 
+/**
+ * Whether the hero's name has scrolled up under the nav. Only the home page
+ * has one; until it has gone, the nav doesn't repeat it.
+ */
+function usePastHeroName(onHome: boolean) {
+  const [past, setPast] = useState(false);
+
+  useEffect(() => {
+    const name = onHome ? document.getElementById("hero-name") : null;
+    if (!name) return;
+    const observer = new IntersectionObserver(([entry]) => setPast(!entry.isIntersecting && entry.boundingClientRect.top < 0), {
+      rootMargin: "-56px 0px 0px 0px",
+    });
+    observer.observe(name);
+    return () => observer.disconnect();
+  }, [onHome]);
+
+  return past;
+}
+
+const initials = resume.name
+  .split(" ")
+  .map((word) => word[0])
+  .join("");
+
 export function SiteNav() {
   const pathname = usePathname();
   const active = useActiveSection(pathname);
+  const onHome = pathname === "/";
+  const nameShown = usePastHeroName(onHome) || !onHome;
   // On a case study the Work link stays marked: that's where the reader is.
   const current = pathname.startsWith("/work/") ? "work" : active;
   const base = pathname === "/" ? "" : "/";
@@ -89,8 +116,21 @@ export function SiteNav() {
   return (
     <header className="sticky top-0 z-50 bg-canvas/85 backdrop-blur-md">
       <div className={`${frame} flex h-14 items-center justify-between gap-4`}>
-        <Link href="/" className="py-1 text-[15px] font-semibold tracking-tight whitespace-nowrap text-ink">
-          {resume.name}
+        {/* The monogram holds the corner; the name joins it once the hero's own has scrolled away (or on focus). */}
+        <Link href="/" aria-label={resume.name} className="group flex items-center gap-2.5 py-1">
+          <span
+            aria-hidden="true"
+            className="grid size-7 shrink-0 place-items-center rounded-lg bg-ink text-[11px] font-bold tracking-[-0.02em] text-canvas"
+          >
+            {initials}
+          </span>
+          <span
+            aria-hidden="true"
+            data-shown={nameShown || undefined}
+            className="-translate-x-1.5 text-[15px] font-semibold tracking-tight whitespace-nowrap text-ink opacity-0 transition-[opacity,translate] duration-500 ease-out-expo group-focus-visible:translate-x-0 group-focus-visible:opacity-100 data-shown:translate-x-0 data-shown:opacity-100"
+          >
+            {resume.name}
+          </span>
         </Link>
 
         <nav ref={navRef} aria-label="Sections" className="relative hidden items-center md:flex">

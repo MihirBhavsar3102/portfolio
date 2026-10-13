@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { resume } from "@/lib/resume-data";
+import { positioningLine } from "@/lib/format";
 
 const { estate } = resume;
 const zoneIds = new Set(estate.zones.map((z) => z.id));
@@ -87,8 +88,10 @@ describe("projects", () => {
 });
 
 describe("profile", () => {
-  it("keeps the positioning line to 30 words", () => {
-    expect(resume.positioning.split(/\s+/).length).toBeLessThanOrEqual(30);
+  it("keeps the positioning line crisp: one sentence of at most 15 words", () => {
+    const line = positioningLine(resume.positioning);
+    expect(line.split(/\s+/).length).toBeLessThanOrEqual(15);
+    expect(line).toMatch(/^[^.]+\.$/);
   });
 
   it("strips tracking parameters from verification links", () => {
