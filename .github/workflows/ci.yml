@@ -1,0 +1,139 @@
+# Quality gates for every pull request into master, and for master itself.
+# The three job names are the required status checks on master's ruleset;
+# renaming a job means updating the ruleset too, or merges block.
+#
+# Hardening: read-only token, no checkout credentials left on disk, every
+# action pinned to a full commit SHA (Dependabot keeps them current), a
+# timeout on every job. Pull requests from forks run on `pull_request`, never
+# `pull_request_target`, so they get no write access and no secrets.
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A new push to a pull request cancels its run in progress; runs on master
+# queue instead, so every merged commit gets a full result.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  checks:
+    name: Lint, types and unit tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: package.json
+          cache: npm
+      - name: Install
+        id: install
+        run: npm ci
+      # Each check runs even when an earlier one fails, so one run reports every problem.
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm run typecheck
+      - name: Unit, content and contrast tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm test
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: package.json
+          cache: npm
+      # Production dependencies only: what ships to visitors. Dev tooling has an
+      # advisory with no fixed release (braces, via eslint-config-next), which
+      # would otherwise block every pull request with nothing to merge.
+      - name: No high or critical advisories in production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Install without running package scripts
+        run: npm ci --ignore-scripts
+      - name: Every package carries a valid registry signature
+        run: npm audit signatures
+
+  browser:
+    name: Build and browser checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: package.json
+          cache: npm
+      # Next.js's own build cache (its CI guide), restored before install so the
+      # source hash never walks node_modules.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('app/**', 'components/**', 'content/**', 'lib/**', 'types/**', 'assets/**', 'public/**', 'next.config.ts', 'mdx-components.tsx', 'postcss.config.mjs') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+      - name: Install
+        run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          # Raises the GitHub section's API limit at build time; without it the
+          # section falls back to its curated copy, which the checks also accept.
+          GITHUB_TOKEN: ${{ github.token }}
+      # The build is `output: "standalone"`, which `next start` doesn't support,
+      # so serve it the way the Dockerfile does.
+      - name: Start the production server
+        run: |
+          mkdir -p verify-out
+          cp -r public .next/standalone/public
+          cp -r .next/static .next/standalone/.next/static
+          PORT=3100 HOSTNAME=127.0.0.1 node .next/standalone/server.js > verify-out/server.log 2>&1 &
+          for _ in $(seq 1 30); do
+            if curl -fsS -o /dev/null http://127.0.0.1:3100/robots.txt; then exit 0; fi
+            sleep 1
+          done
+          echo "::error::The production server did not answer within 30s"
+          cat verify-out/server.log
+          exit 1
+      # Google Chrome ships on the runner image; verify-ui finds it on the PATH.
+      - name: Browser checks
+        run: node scripts/verify-ui.mjs http://127.0.0.1:3100 verify-out ci
+      - name: Keep the screenshots, results and server log
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          # Per attempt: a re-run would otherwise collide with the first upload.
+          name: browser-checks-attempt-${{ github.run_attempt }}
+          path: |
+            verify-out/*.png
+            verify-out/*.json
+            verify-out/server.log
+          retention-days: 7
+          if-no-files-found: ignore
