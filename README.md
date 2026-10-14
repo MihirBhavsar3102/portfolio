@@ -2,6 +2,8 @@
 
 The source of my personal site. I'm a Cloud & DevOps engineer in Ahmedabad, India. I automate how Azure and AWS infrastructure is built, shipped and monitored, and I build applied AI.
 
+**Live site: [mihirbhavsar.vercel.app](https://mihirbhavsar.vercel.app)**
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/home-dark.png">
   <img src="docs/images/home-light.png" alt="The site's first screen: my name, role and one-line positioning statement, beside a small diagram of my Azure, AWS and AI workloads and the tools that build and monitor them.">
@@ -46,7 +48,7 @@ The design reads like a product launch page: one idea per screen, big type, whit
 | Share images | Generated for each page with `next/og` |
 | Fonts | Schibsted Grotesk and Fragment Mono through `next/font` |
 | Testing | Vitest, plus a headless-browser verifier with no dependencies, both run in GitHub Actions |
-| Hosting | A standalone Node server in a Docker image |
+| Hosting | Vercel, deployed on every merge to `master`; a Dockerfile also builds a standalone Node server for container hosts |
 
 ## How it's built
 
