@@ -837,6 +837,22 @@ for (const href of cardHrefs) {
     JSON.stringify(h),
   );
 }
+// On a deployment, EXPECT_ORIGIN (e.g. https://portfolio.vercel.app) checks the
+// built-in origin is the real one: links, share cards and the sitemap pointing
+// at localhost would pass every path check above.
+if (process.env.EXPECT_ORIGIN) {
+  const want = new URL(process.env.EXPECT_ORIGIN).origin;
+  const origins = await evaluate(`(async () => {
+    const sitemap = await (await fetch('/sitemap.xml')).text();
+    const robots = await (await fetch('/robots.txt')).text();
+    return {
+      locs: [...sitemap.matchAll(/<loc>([^<]+)<\\/loc>/g)].map(m => new URL(m[1]).origin),
+      robots: (robots.match(/Sitemap:\\s*(\\S+)/) ?? [])[1] ?? null,
+    };
+  })()`);
+  const seen = [homeHead.canonical, homeHead.ogUrl, homeHead.ogImage, origins.robots, ...origins.locs].map((u) => (u ? new URL(u).origin : null));
+  check(`canonical, share URLs, robots and the sitemap all use ${want}`, seen.length > 4 && seen.every((o) => o === want), JSON.stringify([...new Set(seen)]));
+}
 const nfHead = await head("/no-such-page");
 check("the 404 says noindex exactly once", nfHead.robots.length === 1 && nfHead.robots[0].includes("noindex"), JSON.stringify(nfHead.robots));
 const siteMap = await evaluate(`fetch('/sitemap.xml').then(r => r.text())`);
