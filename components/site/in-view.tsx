@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { fragmentId } from "@/lib/format";
 
 /** Whether the element is, or holds, the #fragment the page was opened at. */
 function holdsFragment(el: HTMLElement) {
-  const id = decodeURIComponent(window.location.hash.slice(1));
+  const id = fragmentId(window.location.hash);
   const target = id ? document.getElementById(id) : null;
   return !!target && (target.contains(el) || el.contains(target));
 }

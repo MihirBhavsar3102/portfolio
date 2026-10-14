@@ -1,5 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { listOf, monthYear, period, shortClaim, slugify } from "@/lib/format";
+import { fragmentId, listOf, monthYear, period, shortClaim, slugify } from "@/lib/format";
+
+describe("fragmentId", () => {
+  it("strips the hash and decodes", () => expect(fragmentId("#what%20broke")).toBe("what broke"));
+  it("is empty without a fragment", () => {
+    expect(fragmentId("")).toBe("");
+    expect(fragmentId("#")).toBe("");
+  });
+  it("is empty, not a throw, for a malformed escape", () => {
+    expect(fragmentId("#%")).toBe("");
+    expect(fragmentId("#%E0%A4%A")).toBe("");
+  });
+});
 
 describe("monthYear", () => {
   it("formats an ISO month", () => expect(monthYear("2024-12")).toBe("Dec 2024"));
