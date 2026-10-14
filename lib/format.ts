@@ -24,6 +24,19 @@ export const positioningLine = ({ lead, verbs }: Resume["positioning"]) => `${le
 /** A figure's claim up to its first comma: short enough for a chip or a share card. */
 export const shortClaim = (label: string) => label.split(",")[0];
 
+/**
+ * A location.hash as the element id it names: "#what-broke" → "what-broke".
+ * "" when there is none, or when its escapes are malformed ("#%"), on which
+ * decodeURIComponent throws.
+ */
+export function fragmentId(hash: string): string {
+  try {
+    return decodeURIComponent(hash.replace(/^#/, ""));
+  } catch {
+    return "";
+  }
+}
+
 /** Heading text → URL fragment: "What broke?" → "what-broke". */
 export function slugify(text: string): string {
   return text

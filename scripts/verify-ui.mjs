@@ -228,6 +228,11 @@ listeners.push((m) => {
   if (m.method === "Runtime.consoleAPICalled" && m.params.type === "error")
     consoleErrors.push(m.params.args.map((a) => a.value ?? a.description).join(" "));
 });
+// A resource the Content Security Policy blocks is a console error too, so a
+// policy too tight for the site fails the run instead of silently breaking it.
+await send("Page.addScriptToEvaluateOnNewDocument", {
+  source: `document.addEventListener("securitypolicyviolation", (e) => console.error("CSP violation: " + e.effectiveDirective + " blocked " + (e.blockedURI || "inline")));`,
+});
 
 async function load(path, { width, height, mobile }, { scripts = true } = {}) {
   current = { width, height, deviceScaleFactor: 1, mobile };
@@ -770,6 +775,14 @@ const nf = await evaluate(
 );
 check("an unknown page is a styled 404 linking home and to the work", unknownStatus === 404 && nf.h1 === "Page not found" && nf.home && nf.work, `${unknownStatus} ${JSON.stringify(nf)}`);
 await shot(`${LABEL}-404-desktop`);
+
+// ---------- Security headers (lib/security-headers.ts) ----------
+// no-store: a response Chrome serves from its HTTP cache drops some headers (HSTS among them).
+const SECURITY_HEADERS = ["content-security-policy", "strict-transport-security", "x-content-type-options", "x-frame-options", "referrer-policy", "permissions-policy", "cross-origin-opener-policy"];
+const headerGaps = await evaluate(`Promise.all(${JSON.stringify(["/", cardHrefs[0], "/no-such-page", "/robots.txt", "/opengraph-image", "/MihirBhavsar_Resume.pdf"])}.map((p) =>
+  fetch(p, { cache: "no-store" }).then((r) => ({ p, missing: ${JSON.stringify(SECURITY_HEADERS)}.filter((h) => !r.headers.has(h)), poweredBy: r.headers.get("x-powered-by"), framing: /frame-ancestors 'none'/.test(r.headers.get("content-security-policy") ?? "") }))
+)).then((all) => all.filter((r) => r.missing.length || r.poweredBy || !r.framing))`);
+check("pages, files and the 404 send the security headers, and no X-Powered-By", headerGaps.length === 0, JSON.stringify(headerGaps));
 
 // ---------- Section reveal ----------
 await load("/", DESKTOP);
