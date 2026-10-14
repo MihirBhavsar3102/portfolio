@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fragment_Mono, Schibsted_Grotesk } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SiteNav } from "@/components/site/site-nav";
 import { SiteFooter } from "@/components/site/site-footer";
 import { siteConfig } from "@/lib/site-config";
@@ -70,6 +71,14 @@ export const viewport: Viewport = {
   colorScheme: "light dark",
 };
 
+/*
+ * Vercel Web Analytics (cookieless page views) runs only in a production build
+ * on Vercel, which serves its script and intake from this origin, so the CSP
+ * stands. Elsewhere it would misfire: dev loads a debug script from another
+ * origin, which the CSP blocks, and the Docker image has no route to serve it.
+ */
+const analytics = process.env.VERCEL === "1" && process.env.NODE_ENV === "production";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -89,6 +98,7 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
+        {analytics && <Analytics />}
       </body>
     </html>
   );
