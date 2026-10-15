@@ -7,6 +7,7 @@ import { Download } from "lucide-react";
 import { MobileNav } from "@/components/site/mobile-nav";
 import { ThemeToggle } from "@/components/site/theme-toggle";
 import { frame } from "@/components/site/frame";
+import { sitePath } from "@/lib/format";
 import { resume } from "@/lib/resume-data";
 import { sections } from "@/lib/sections";
 
@@ -88,7 +89,7 @@ const initials = resume.name
   .join("");
 
 export function SiteNav() {
-  const pathname = usePathname();
+  const pathname = sitePath(usePathname());
   const active = useActiveSection(pathname);
   const onHome = pathname === "/";
   const nameShown = usePastHeroName(onHome) || !onHome;

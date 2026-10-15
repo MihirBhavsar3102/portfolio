@@ -5,13 +5,13 @@ import { usePathname } from "next/navigation";
 import { ArrowUpRight, Download, Menu } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CopyEmailButton } from "@/components/ui/copy-email-button";
+import { sitePath } from "@/lib/format";
 import { resume } from "@/lib/resume-data";
 import { sections } from "@/lib/sections";
 
 export function MobileNav() {
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const pathname = usePathname();
-  const base = pathname === "/" ? "" : "/";
+  const base = sitePath(usePathname()) === "/" ? "" : "/";
 
   return (
     <Dialog>

@@ -37,6 +37,14 @@ export function fragmentId(hash: string): string {
   }
 }
 
+/**
+ * usePathname() with the home page always "/". On Vercel, once the root page's
+ * ISR copy regenerates, its server render reads "/index" (vercel/next.js#95648),
+ * and React keeps that render's attributes through hydration, so a check for
+ * "/" would fail for every visitor. Drop it once Next ships the fix (#95973).
+ */
+export const sitePath = (pathname: string) => (pathname === "/index" ? "/" : pathname);
+
 /** Heading text → URL fragment: "What broke?" → "what-broke". */
 export function slugify(text: string): string {
   return text
