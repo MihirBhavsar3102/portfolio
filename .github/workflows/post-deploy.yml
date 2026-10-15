@@ -1,0 +1,79 @@
+# After every merge to master, waits for Vercel to put that commit into
+# production, then runs the browser checks against the live site.
+#
+# It runs on `push`, not Vercel's `deployment_status`, so the run belongs to
+# whoever merged and GitHub emails them when it fails; a run started by
+# Vercel's bot would notify no one. A deployment's own URL sits behind Vercel's
+# login, so the checks go to the public domain once it answers with this
+# commit in X-Commit (next.config.ts). A manual run checks whatever production
+# serves now.
+#
+# Same hardening as ci.yml: read-only token, no checkout credentials left on
+# disk, every action pinned to a full commit SHA, a timeout on the job.
+name: Post-deploy checks
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer merge replaces the older one's release before the older run could
+# see it live, so it cancels that run (a cancelled run sends no failure email).
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  SITE: https://mihirbhavsar.vercel.app
+
+jobs:
+  production:
+    name: Production browser checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # verify-ui has no dependencies, so there is nothing to install.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: package.json
+      # A Vercel build takes about two minutes; fifteen leaves room for a queue.
+      # A deployment that fails or never goes live stops here, naming the
+      # commit production still serves.
+      - name: Wait for production to serve this commit
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          served=""
+          for _ in $(seq 1 60); do
+            served=$(curl -fsS -o /dev/null -D - "$SITE/robots.txt" | tr -d '\r' | awk 'tolower($1) == "x-commit:" { print $2 }') || true
+            if [ "$served" = "$GITHUB_SHA" ]; then exit 0; fi
+            sleep 15
+          done
+          echo "::error::After 15 minutes production serves ${served:-no X-Commit header}, not $GITHUB_SHA. Check the deployment on Vercel."
+          exit 1
+      # Google Chrome ships on the runner image; verify-ui finds it on the PATH.
+      # Vercel's analytics script ignores headless browsers, so these visits
+      # never count as page views.
+      - name: Browser checks against production
+        env:
+          EXPECT_ORIGIN: ${{ env.SITE }}
+        run: node scripts/verify-ui.mjs "$SITE" verify-out deploy
+      - name: Keep the screenshots and results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: post-deploy-checks-attempt-${{ github.run_attempt }}
+          path: |
+            verify-out/*.png
+            verify-out/*.json
+          retention-days: 7
+          if-no-files-found: ignore

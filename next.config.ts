@@ -9,7 +9,13 @@ const nextConfig: NextConfig = {
   // X-Powered-By only advertises the framework and its version family.
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders(process.env.NODE_ENV === "development") }];
+    // On Vercel, also the commit this build came from (VERCEL_GIT_COMMIT_SHA), so
+    // the post-deploy workflow can tell when production serves the commit it checks.
+    const commit = process.env.VERCEL_GIT_COMMIT_SHA;
+    return [
+      { source: "/:path*", headers: securityHeaders(process.env.NODE_ENV === "development") },
+      ...(commit ? [{ source: "/:path*", headers: [{ key: "X-Commit", value: commit }] }] : []),
+    ];
   },
 };
 

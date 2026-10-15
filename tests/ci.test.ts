@@ -22,11 +22,13 @@ const ruleset = JSON.parse(read(".github/rulesets/master.json"));
 const pkg = JSON.parse(read("package.json"));
 const dockerfile = read("Dockerfile");
 
-/** Each job's block: from its `  id:` line to the next job or the end. */
-const jobs = [...ci.slice(ci.indexOf("\njobs:")).matchAll(/\n {2}([a-z][\w-]*):\n([\s\S]*?)(?=\n {2}[a-z][\w-]*:\n|$)/g)].map((m) => ({
-  id: m[1],
-  body: m[2],
-}));
+/** Each job's block in a workflow: from its `  id:` line to the next job or the end. */
+const jobsOf = (yaml: string) =>
+  [...yaml.slice(yaml.indexOf("\njobs:")).matchAll(/\n {2}([a-z][\w-]*):\n([\s\S]*?)(?=\n {2}[a-z][\w-]*:\n|$)/g)].map((m) => ({
+    id: m[1],
+    body: m[2],
+  }));
+const jobs = jobsOf(ci);
 
 describe("CI workflows", () => {
   it("pin every action to a full commit SHA, with the version it was in a comment", () => {
@@ -55,8 +57,11 @@ describe("CI workflows", () => {
   });
 
   it("give every job a timeout", () => {
-    expect(jobs.length).toBeGreaterThan(0);
-    for (const job of jobs) expect(job.body, job.id).toMatch(/\n {4}timeout-minutes: \d+/);
+    for (const { file, raw } of workflows) {
+      const own = jobsOf(raw);
+      expect(own.length, file).toBeGreaterThan(0);
+      for (const job of own) expect(job.body, `${file}: ${job.id}`).toMatch(/\n {4}timeout-minutes: \d+/);
+    }
   });
 });
 
@@ -89,7 +94,7 @@ describe("Node version", () => {
     expect(engines).toBeDefined();
     expect(docker).toBe(engines);
     expect(types).toBe(engines);
-    expect(ci.split("node-version-file: package.json").length - 1).toBe(jobs.length);
+    for (const { file, raw } of workflows) expect(raw.split("node-version-file: package.json").length - 1, file).toBe(jobsOf(raw).length);
   });
 
   it("keeps Dependabot from proposing a Node types major ahead of the runtime", () => {
