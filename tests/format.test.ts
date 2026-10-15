@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { fragmentId, listOf, monthYear, period, shortClaim, slugify } from "@/lib/format";
+import { fragmentId, listOf, monthYear, period, shortClaim, sitePath, slugify } from "@/lib/format";
+
+describe("sitePath", () => {
+  it("reads Vercel's regenerated root, /index, as home", () => expect(sitePath("/index")).toBe("/"));
+  it("leaves every other path alone", () => {
+    expect(sitePath("/")).toBe("/");
+    expect(sitePath("/work/avd-automation")).toBe("/work/avd-automation");
+    expect(sitePath("/work/index")).toBe("/work/index");
+  });
+});
 
 describe("fragmentId", () => {
   it("strips the hash and decodes", () => expect(fragmentId("#what%20broke")).toBe("what broke"));
