@@ -6,7 +6,7 @@ The source of my personal site. I'm a Cloud & DevOps engineer in Ahmedabad, Indi
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/home-dark.png">
-  <img src="docs/images/home-light.png" alt="The site's first screen: my name, role and one-line positioning statement, beside a small diagram of my Azure, AWS and AI workloads and the tools that build and monitor them.">
+  <img src="docs/images/home-light.png" alt="The site's first screen: my name, role and one-line positioning statement, with my AWS certification and current role under it, beside a small diagram of my Azure, AWS and AI workloads and the tools that build and monitor them.">
 </picture>
 
 ## About me
@@ -27,10 +27,10 @@ Some results from that work. The site explains how each one was achieved:
 
 ## What's on the site
 
-- **What I do, on the first screen.** One line whose last word rolls through *built*, *shipped* and *monitored*, beside a small live diagram of my workloads that lights up the matching step.
+- **What I do, on the first screen.** One line whose last word rolls through *built*, *shipped* and *monitored*, beside a small live diagram of my workloads that lights up the matching step. Under it, my AWS certification (with a link to verify it) and my current role.
 - **Measured outcomes.** Six figures set large, each with the sentence that says how it was achieved and, where known, how it was measured.
 - **How it fits together.** A service map of three workloads under one way of building and monitoring them. Pick a figure and the map lights up whatever produced it.
-- **Selected work.** Four case studies, each with its own page and architecture diagram: [Azure Virtual Desktop automation](content/work/avd-automation.mdx), a [multi-AZ AWS web platform](content/work/aws-web-platform.mdx), an [HR policy assistant](content/work/hr-policy-assistant.mdx) and a [DevSecOps CI/CD pipeline](content/work/devsecops-pipeline.mdx).
+- **Selected work.** Four case studies, each with its own page and an architecture diagram that is drawn again for phones and lights up the parts behind each result: [Azure Virtual Desktop automation](content/work/avd-automation.mdx), a [multi-AZ AWS web platform](content/work/aws-web-platform.mdx), an [HR policy assistant](content/work/hr-policy-assistant.mdx) and a [DevSecOps CI/CD pipeline](content/work/devsecops-pipeline.mdx).
 - **Experience, stack, credentials, GitHub and contact.** Skills I've used at work or in a project are marked that way. The GitHub section shows hand-picked repositories with live details.
 
 The design reads like a product launch page: one idea per screen, big type, white or black backgrounds and one accent colour, in light and dark themes. The full visual system is in [DESIGN.md](DESIGN.md).

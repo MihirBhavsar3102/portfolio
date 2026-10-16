@@ -225,7 +225,7 @@ components:
 
 **Creative North Star: "The Statement"**
 
-The site reads like a product launch page for an engineer: one idea per screen, set in big, confident, tightly tracked type, with nothing on the page that is not content. Screen one is who and what: the name, the role, and one crisp positioning line whose last word rolls through built, shipped and monitored, while the estate in miniature beside it plays the same three steps. Screen two proves it, with six measured figures at display size, each attached to the sentence that says how it was achieved. Screen three shows how the estate fits together, and any figure lights the infrastructure that produced it. The rest of the page keeps the same grammar: a statement heading, a short intro, then the evidence.
+The site reads like a product launch page for an engineer: one idea per screen, set in big, confident, tightly tracked type, with nothing on the page that is not content. Screen one is who and what: the name, the role, and one crisp positioning line whose last word rolls through built, shipped and monitored, while the estate in miniature beside it plays the same three steps; under the buttons, two proof lines name the AWS certification and the current role, the facts a recruiter screens for. Screen two proves it, with six measured figures at display size, each attached to the sentence that says how it was achieved. Screen three shows how the estate fits together, and any figure lights the infrastructure that produced it. The rest of the page keeps the same grammar: a statement heading, a short intro, then the evidence.
 
 The palette is pure white or pure black with near-black or near-white ink, in two first-class themes. A single persimmon accent marks what you can act on and what is lit, and colour beyond that appears only where it names something: the cloud a case study ran on, or a technology's brand dot. Depth is quiet: one tinted band behind the map, tinted cards for the work, and hairlines. Motion is one story and two entrances. The story is the hero's: every 3.2s the positioning line's last word rolls up to the next verb and the estate preview lights that step (tools and parts, then packets down to the workloads, then monitoring); it runs only while the hero is on screen and the tab is visible. The entrances each play once: the map settling and its edges drawing when it first scrolls into view, and one section reveal, where Selected work (the case-study cards, the page's product shots) fades up 8px over 700ms (ease-out-expo) as it arrives, if it started off screen. Neither entrance plays on case studies, in print, under reduced motion, or for anything already on screen when the page loads; under reduced motion, in print and without JavaScript the hero rests, its line read as one sentence. Everything else is a colour change or a 2px lift on hover.
 
@@ -249,7 +249,7 @@ Achromatic grounds and ink in two themes, one warm persimmon accent, and three c
 - **Persimmon Wash** (8% light, 14% dark): the fill of a selected figure chip and of a lit map node. A state colour only.
 
 ### Secondary
-- **Azure Signal** (light `#0b6bcb`, dark `#4ea1f0`), **AWS Amber** (light `#8a5c00`, dark `#f2b33d`), **Applied-AI Green** (light `#12703a`, dark `#4cc38a`): the cloud a case study ran on. Each tints its work card (6% into Surface One for the fill, 22% into Hairline for the border, 45% on hover) and colours the card's "where" label and dot. The light values clear 4.5:1 on their tinted card.
+- **Azure Signal** (light `#0b6bcb`, dark `#4ea1f0`), **AWS Amber** (light `#8a5c00`, dark `#f2b33d`), **Applied-AI Green** (light `#12703a`, dark `#4cc38a`): the cloud a case study ran on. Each tints its work card (6% into Surface One for the fill, 22% into Hairline for the border, 45% on hover) and colours the card's "where" label and dot. An Experience workstream takes the same colour as the 8px dot beside its name. The light values clear 4.5:1 on their tinted card.
 
 ### Neutral
 - **Canvas** (light `#ffffff`, dark `#0a0a0a`): the page, the nav at 85%, the trace hint, map nodes "cut into" their zones, stage chips.
@@ -266,7 +266,7 @@ Achromatic grounds and ink in two themes, one warm persimmon accent, and three c
 ### Named Rules
 **The One Persimmon Rule.** Persimmon is the only interface colour. It marks a text action, focus, a selection or a lit path, and nothing decorative. Buttons are ink, not persimmon.
 
-**The Cloud Means Something Rule.** Azure blue, AWS amber and AI green appear only where they name where work ran (the work cards). They are never used for emphasis, charts or decoration.
+**The Cloud Means Something Rule.** Azure blue, AWS amber and AI green appear only where they name where work ran (the work cards, and the dot beside an Experience workstream's name). They are never used for emphasis, charts or decoration.
 
 **The Marks Only Rule.** Technology brand colours (lib/tech.ts) render only as a 6–7px dot beside that technology's name; a brand with no usable colour gets an Ink Three dot.
 
@@ -362,6 +362,12 @@ The estate drawn as a server SVG on the Surface One band: a Build band over thre
 ### Hero Story (signature)
 The first screen's one moving idea. The positioning line is a lead ("I automate how Azure and AWS infrastructure is") and three verbs sharing one inline cell as wide as the longest, so nothing reflows: the current verb sits in place and the one it replaces rolls up and out over 750ms (ease-out-expo). Beside it, from lg, the estate in miniature, built from the same data as the map: the Build and ship lane (Surface Two, tool chips on Canvas with brand dots), the three workloads as Canvas cards with their first three parts on Surface One, and the Observe lane, joined by straight connectors only where the estate has an edge, so nothing runs into the AI workload. Each verb is a step. **Built** lights the tools and the parts (Persimmon text, a 40% persimmon border and the wash over Canvas, staggered 90ms). **Shipped** turns the build connectors persimmon, sends packets down them and edges the Azure and AWS cards. **Monitored** does the same for the Observe lane. A lit tool keeps its Canvas chip under the wash, because the wash straight over Surface Two misses AA. The preview is aria-hidden (the map section describes the estate) and the whole line is always in the page for screen readers. `HeroCycle` steps `data-phase` on the hero every 3.2s while it is on screen and the tab is visible; CSS does the rest.
 
+### Hero Proof
+Two lines under the hero's buttons, above a hairline, in 15px Ink Two: the AWS Solutions Architect – Associate certification in semibold Ink with an AWS dot and a persimmon "Verify ↗" text action to its Credly badge, then "Cloud Operations Engineer at **Parkar Global Technologies**, since Dec 2024" with an Ink Three dot. They are what a recruiter screens for, so they sit on the first screen at 375×812 and 1440×900; the full credentials and experience follow further down. The trading name is used here; the legal name keeps its one appearance in Experience.
+
+### Experience
+One role, then its workstreams (three columns from lg). The role reads as a title, the legal employer name in Ink Two, and the period with the time in the role ("Dec 2024 – present · 1 yr 10 mos", counted in whole months when the page renders), the location on its own line below sm. Each workstream has an 8px dot in its cloud's colour (Ink Three when it ran on none), a 1.25rem name, a 14px Ink Three line saying where it ran, then one line per fact of at most 20 words: the result first in semibold Ink, then how, in 15px Ink Two, on a 5px Graphic Line bullet. The case studies hold the longer story.
+
 ### Trace Hint
 When a figure is pinned and the map is out of view, a pill floats at the bottom centre: "**99.9%** is lit on the map", an ink "Show me ↓" pill linking to the map, and a clear button. It steps aside once the map is in view.
 
@@ -370,6 +376,9 @@ The close: "Let's talk." as a Headline, a Lede intro, then the address in persim
 
 ### Case Study
 A Headline-voice h1, a Lede summary, then "Measured outcomes" as a figure ledger on fine rules (3.25rem figures, two columns). The facts panel (Where, My part, Built with, Code) is sticky beside it from xl. MDX prose runs at 17px with 2rem headings; diagrams sit in an 18px Surface One frame with a caption row; ownership is a two-column ruled panel; the pager closes on two 18px cells with 20px semibold titles.
+
+### Architecture Diagram (case study)
+The figure tells its story through Trace, the same grammar as the home page's map. Under the caption row, a chip per step: each of the case study's figures first ("**99.9%** uptime"), then any step that has none ("What watches it"), styled exactly as the map's chips (12px side padding below sm so they pair up on a phone). Hover or focus previews a step, a tap pins it and mirrors it to `?trace=`, Escape or a second tap clears. Lit nodes take Persimmon Wash and a persimmon stroke, lit group outlines and their labels turn persimmon, lit edges and their arrowheads turn persimmon, and the rest dims to 30% over 220ms. Under the chips, one Ink Two line says why: a figure's claim and provenance, or a sentence the case study already says; at rest it is an Ink Three hint. From md the figure shows the drawing as it is laid out for desktop; below md it shows the same diagram laid out again for a tall screen (340 units wide, capped at 26rem so it stays near 1:1), never a shrunken copy or a list, so its text is 11px or more on a 360px phone. A text version of every group, node and connection stays in the page for screen readers at every size.
 
 ## Do's and Don'ts
 
