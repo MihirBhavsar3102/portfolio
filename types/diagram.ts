@@ -46,6 +46,37 @@ export interface DiagramEdge {
   source: string;
 }
 
+/**
+ * One chip above the drawing, lighting a step of the story. A figure step
+ * names one of the case study's figures by value and takes its caption from
+ * that figure's claim and provenance; any other step brings its own caption,
+ * a sentence the case study already says.
+ */
+export interface DiagramTrace {
+  id: string;
+  /** The chip's words, after the figure's value when there is one. */
+  label: string;
+  /** The value of one of the case study's figures, e.g. "99.9%". */
+  figure?: string;
+  /** A step without a figure: what the lit parts do. */
+  caption?: string;
+  /** The node and group ids it lights; an edge lights when both its ends do. */
+  lights: string[];
+}
+
+/**
+ * The same diagram laid out again for a phone: a tall, narrow drawing whose
+ * text stays readable at 360px. Positions only; labels, edges and their
+ * sources stay in the Diagram. Edges are keyed "from->to".
+ */
+export interface DiagramPhoneLayout {
+  width: number;
+  height: number;
+  groups: Record<string, Pick<DiagramGroup, "x" | "y" | "w" | "h">>;
+  nodes: Record<string, Pick<DiagramNode, "x" | "y" | "w">>;
+  edges: Record<string, Pick<DiagramEdge, "path" | "labelAt">>;
+}
+
 export interface Diagram {
   /** One sentence; the figure caption. */
   title: string;
@@ -54,4 +85,8 @@ export interface Diagram {
   groups: DiagramGroup[];
   nodes: DiagramNode[];
   edges: DiagramEdge[];
+  /** The chips above the drawing, in order. */
+  traces: DiagramTrace[];
+  /** The drawing below md. */
+  phone: DiagramPhoneLayout;
 }

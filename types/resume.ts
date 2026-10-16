@@ -57,10 +57,21 @@ export interface Estate {
   proof: ProofItem[];
 }
 
+/** One line of a workstream, read in a glance: the result first, then how. */
+export interface WorkPoint {
+  /** The whole line, at most 20 words. */
+  text: string;
+  /** The line's opening words, its result, set in bold. */
+  lead?: string;
+}
+
 export interface Workstream {
   name: string;
-  summary: string;
-  points: string[];
+  /** One short line under the name: where it ran and for whom. */
+  summary?: string;
+  /** The cloud it ran on, which colours the dot beside its name. */
+  zone?: EstateZone["id"];
+  points: WorkPoint[];
   /** Slug of the case study that tells this workstream's story. */
   caseStudy?: string;
 }

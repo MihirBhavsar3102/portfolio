@@ -8,9 +8,21 @@ export function monthYear(iso: string): string {
   return `${MONTHS[month - 1]} ${year}`;
 }
 
-/** "Dec 2024 – present"; a duration is never printed, because it goes stale. */
+/** "Dec 2024 – present". The time in a role is tenure(), worked out when the page renders. */
 export function period(start: string, end?: string): string {
   return `${monthYear(start)} – ${end ? monthYear(end) : "present"}`;
+}
+
+/**
+ * Whole months from an ISO start month to `now`, as the resume counts them:
+ * "1 yr 10 mos" from Dec 2024 in Oct 2026. Empty within the start month.
+ */
+export function tenure(start: string, now: Date): string {
+  const [year, month] = start.split("-").map(Number);
+  const months = (now.getFullYear() - year) * 12 + now.getMonth() + 1 - month;
+  const y = Math.floor(months / 12);
+  const m = months % 12;
+  return [y && `${y} ${y === 1 ? "yr" : "yrs"}`, m && `${m} ${m === 1 ? "mo" : "mos"}`].filter(Boolean).join(" ");
 }
 
 /** ["built", "shipped", "monitored"] → "built, shipped and monitored" (no serial comma). */

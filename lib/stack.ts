@@ -28,7 +28,7 @@ export function skillEvidence(
   const id = skill.tech;
   const inStack = (kind: Project["kind"]) => id !== undefined && projects.some((p) => p.kind === kind && p.stack.includes(id));
   const named = roles.some((r) =>
-    r.workstreams.some((w) => [w.name, w.summary, ...w.points].some((t) => mentions(t, skill.name))),
+    r.workstreams.some((w) => [w.name, w.summary ?? "", ...w.points.map((p) => p.text)].some((t) => mentions(t, skill.name))),
   );
   if (inStack("work") || named) return "work";
   if (inStack("personal")) return "project";

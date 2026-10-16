@@ -310,10 +310,13 @@ const fontsLoaded = await evaluate("[...new Set([...document.fonts].filter(f => 
 const monoFamily = await evaluate("getComputedStyle(document.querySelector('a[href^=mailto]')).fontFamily");
 check("both web fonts load", /Schibsted/.test(fontsLoaded) && /Fragment/.test(fontsLoaded), fontsLoaded + " | mono: " + monoFamily);
 // The statement owns the first screen; the figures are the second (the Statement direction).
-const firstScreen = await evaluate(`(() => { const inView = (el) => el && el.getBoundingClientRect().bottom <= innerHeight; const p = [...document.querySelectorAll('section[aria-labelledby=hero-name] p')]; return { name: inView(document.querySelector('h1')), role: inView(p[0]), positioning: inView(p[1]), outcomes: Math.round(document.getElementById('outcomes').getBoundingClientRect().top) }; })()`);
+// The hero's proof lines (the AWS certification and the current role) are what a recruiter screens for: first screen too.
+const firstScreenOf = () =>
+  evaluate(`(() => { const inView = (el) => !!el && el.getBoundingClientRect().bottom <= innerHeight; const p = [...document.querySelectorAll('section[aria-labelledby=hero-name] p')]; return { name: inView(document.querySelector('h1')), role: inView(p[0]), positioning: inView(p[1]), proof: inView(document.querySelector('[data-hero] ul')), outcomes: Math.round(document.getElementById('outcomes').getBoundingClientRect().top) }; })()`);
+const firstScreen = await firstScreenOf();
 check(
-  "name, role and positioning fill the first 1440x900 screen; the figures start the next",
-  firstScreen.name && firstScreen.role && firstScreen.positioning && firstScreen.outcomes <= 900 * 1.1,
+  "name, role, positioning and the proof lines fill the first 1440x900 screen; the figures start the next",
+  firstScreen.name && firstScreen.role && firstScreen.positioning && firstScreen.proof && firstScreen.outcomes <= 900 * 1.1,
   JSON.stringify(firstScreen),
 );
 
@@ -622,6 +625,8 @@ await shot(`${LABEL}-mobile-viewport`);
 await shot(`${LABEL}-mobile-full`, { fullPage: true });
 const overflow = await evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth");
 check("no horizontal scroll at 375px", overflow === 0, `overflow ${overflow}px`);
+const phoneFirstScreen = await firstScreenOf();
+check("on a 375x812 phone the hero's proof lines are on the first screen", phoneFirstScreen.proof, JSON.stringify(phoneFirstScreen));
 const svgShown = await evaluate("getComputedStyle(document.querySelector('figure')?.parentElement ?? document.body).display");
 check("drawing replaced by the stack below md", svgShown === "none", svgShown);
 await mouseAt("button[aria-label='Open menu']");
@@ -726,42 +731,68 @@ for (const v of [MOBILE, DESKTOP]) {
 }
 
 // ---------- Case studies ----------
+// In the drawing a width shows (desktop from md, the phone layout below it): every node's text inside its box, and
+// edge labels clear of nodes. A hidden drawing has no boxes to measure, so each check names the one on screen.
+const drawingFits = (which) =>
+  evaluate(`(() => {
+    const root = '[data-drawing=${which}]';
+    const clipped = [...document.querySelectorAll(root + ' [data-node]')].filter(g => { const r = g.querySelector('rect').getBBox(); return [...g.querySelectorAll('text')].some(t => { const b = t.getBBox(); return b.x < r.x || b.x + b.width > r.x + r.width - 4 || b.y < r.y || b.y + b.height > r.y + r.height; }); }).map(g => g.dataset.node);
+    const rects = [...document.querySelectorAll(root + ' [data-node] rect')].map(r => r.getBBox());
+    const labelHits = [...document.querySelectorAll(root + ' [data-edge-label]')].filter(t => { const b = t.getBBox(); return rects.some(r => b.x < r.x + r.width && r.x < b.x + b.width && b.y < r.y + r.height && r.y < b.y + b.height); }).map(t => t.textContent);
+    return { clipped, labelHits };
+  })()`);
 for (const href of cardHrefs) {
   const slug = href.split("/").pop();
   await load(href, DESKTOP);
   const page = await evaluate(
-    `({ h1: document.querySelector('h1')?.textContent ?? '', sections: [...document.querySelectorAll('article h2')].map(h => h.textContent), drawn: getComputedStyle(document.querySelector('[data-diagram] svg').parentElement).display !== 'none' })`,
+    `({ h1: document.querySelector('h1')?.textContent ?? '', sections: [...document.querySelectorAll('article h2')].map(h => h.textContent), drawn: getComputedStyle(document.querySelector('[data-drawing=desktop]')).display !== 'none' })`,
   );
   check(
     `${slug}: headline, required sections and drawing render`,
     !!page.h1 && ["Context", "Architecture", "Results"].every((s) => page.sections.includes(s)) && page.drawn,
     page.sections.join(" | "),
   );
-  const clipped = await evaluate(
-    `[...document.querySelectorAll('[data-diagram] [data-node]')].filter(g => { const r = g.querySelector('rect').getBBox(); return [...g.querySelectorAll('text')].some(t => { const b = t.getBBox(); return b.x < r.x || b.x + b.width > r.x + r.width - 4 || b.y < r.y || b.y + b.height > r.y + r.height; }); }).map(g => g.dataset.node)`,
-  );
-  check(`${slug}: every node's text fits its box`, clipped.length === 0, clipped.join(", "));
-  const labelHits = await evaluate(
-    `(() => { const rects = [...document.querySelectorAll('[data-diagram] [data-node] rect')].map(r => r.getBBox()); return [...document.querySelectorAll('[data-diagram] [data-edge-label]')].filter(t => { const b = t.getBBox(); return rects.some(r => b.x < r.x + r.width && r.x < b.x + b.width && b.y < r.y + r.height && r.y < b.y + b.height); }).map(t => t.textContent); })()`,
-  );
-  check(`${slug}: edge labels clear of nodes`, labelHits.length === 0, labelHits.join(", "));
+  const desk = await drawingFits("desktop");
+  check(`${slug}: every node's text fits its box`, desk.clipped.length === 0, desk.clipped.join(", "));
+  check(`${slug}: edge labels clear of nodes`, desk.labelHits.length === 0, desk.labelHits.join(", "));
   await shot(`${LABEL}-work-${slug}-desktop-full`, { fullPage: true });
 
   for (const width of [768, 1024, 1440]) {
     await load(href, { width, height: 900, mobile: false });
-    const px = Number(await minSvgFont("[data-diagram] svg"));
+    const px = Number(await minSvgFont("[data-drawing=desktop] svg"));
     check(`${slug}: diagram text >= 11px at ${width}`, px >= 11, `${px}px`);
   }
 
+  // Phones get the drawing laid out for a tall screen, never a list, with its text at 11px or more.
+  for (const width of [360, 375, 414]) {
+    await load(href, { width, height: 800, mobile: true });
+    const phone = await evaluate(
+      `({ overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, desktopHidden: getComputedStyle(document.querySelector('[data-drawing=desktop]')).display === 'none', phoneShown: document.querySelector('[data-drawing=phone] svg').getBoundingClientRect().height > 0, listHidden: (() => { const r = document.querySelector('[data-diagram] [data-connections]').closest('.sr-only').getBoundingClientRect(); return r.width <= 1 && r.height <= 1; })() })`,
+    );
+    const px = Number(await minSvgFont("[data-drawing=phone] svg"));
+    check(
+      `${slug} at ${width}: the phone drawing replaces the desktop one, text >= 11px, no horizontal scroll`,
+      phone.overflow === 0 && phone.desktopHidden && phone.phoneShown && phone.listHidden && px >= 11,
+      JSON.stringify({ ...phone, px }),
+    );
+  }
+
   await load(href, MOBILE);
-  const phone = await evaluate(
-    `({ overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, drawingHidden: getComputedStyle(document.querySelector('[data-diagram] svg').parentElement).display === 'none', listShown: document.querySelector('[data-diagram] [data-connections]').getBoundingClientRect().height > 0 })`,
+  const fits = await drawingFits("phone");
+  check(`${slug}: on a phone every node's text fits its box and edge labels clear nodes`, fits.clipped.length === 0 && fits.labelHits.length === 0, JSON.stringify(fits));
+  // A chip lights its step in the drawing (persimmon arrows included), says why, and pins it to the URL; a second tap clears.
+  await mouseAt("[data-diagram] [role=group] button:nth-child(1)");
+  const traced = await evaluate(
+    `(() => { const edges = [...document.querySelectorAll('[data-drawing=phone] path[data-lit]')]; return { nodes: document.querySelectorAll('[data-drawing=phone] [data-node][data-lit]').length, edges: edges.length, arrows: edges.every(p => getComputedStyle(p).markerEnd.includes('-arrow-lit')), caption: document.querySelector('[data-diagram] [aria-live]').textContent, url: location.search }; })()`,
   );
   check(
-    `${slug}: at 375 no horizontal scroll and the diagram is a list`,
-    phone.overflow === 0 && phone.drawingHidden && phone.listShown,
-    JSON.stringify(phone),
+    `${slug}: tapping a chip lights its step in the phone drawing, explains it and pins it`,
+    traced.nodes > 0 && traced.edges > 0 && traced.arrows && !traced.caption.startsWith("Pick") && traced.url.includes("trace="),
+    JSON.stringify(traced),
   );
+  await shot(`${LABEL}-work-${slug}-mobile-trace`);
+  await mouseAt("[data-diagram] [role=group] button:nth-child(1)");
+  check(`${slug}: tapping the chip again clears it`, (await litCount()) === 0 && !(await evaluate("location.search")).includes("trace"));
   await shot(`${LABEL}-work-${slug}-mobile-full`, { fullPage: true });
 }
 

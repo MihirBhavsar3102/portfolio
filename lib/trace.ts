@@ -1,3 +1,4 @@
+import type { Diagram } from "@/types/diagram";
 import type { Estate, EstateEdge } from "@/types/resume";
 
 export const edgeKey = (e: Pick<EstateEdge, "from" | "to">) => `${e.from}->${e.to}`;
@@ -35,6 +36,21 @@ export function litBy(estate: Estate): Map<string, string[]> {
     for (const key of [...ids, ...edges]) {
       map.set(key, [...(map.get(key) ?? []), proof.id]);
     }
+  }
+  return map;
+}
+
+/**
+ * For every box and edge of an architecture diagram, the steps that light it:
+ * the ids a step names, and each edge whose two ends it names.
+ */
+export function diagramLitBy({ edges, traces }: Pick<Diagram, "edges" | "traces">): Map<string, string[]> {
+  const map = new Map<string, string[]>();
+  const add = (key: string, id: string) => map.set(key, [...(map.get(key) ?? []), id]);
+  for (const t of traces) {
+    const lit = new Set(t.lights);
+    for (const id of t.lights) add(id, t.id);
+    for (const e of edges) if (lit.has(e.from) && lit.has(e.to)) add(edgeKey(e), t.id);
   }
   return map;
 }

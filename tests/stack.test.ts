@@ -19,7 +19,7 @@ const role = (points: string[]): Role => ({
   legalName: "x",
   location: "x",
   start: "2024-12",
-  workstreams: [{ name: "Stream", summary: "x", points }],
+  workstreams: [{ name: "Stream", summary: "x", points: points.map((text) => ({ text })) }],
 });
 
 describe("mentions", () => {

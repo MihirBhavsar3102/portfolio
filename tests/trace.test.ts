@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Estate } from "@/types/resume";
-import { edgeKey, litBy, nextTraceState, readTraceParam, traceHref, tracedLabels, traceSelection } from "@/lib/trace";
+import { diagramLitBy, edgeKey, litBy, nextTraceState, readTraceParam, traceHref, tracedLabels, traceSelection } from "@/lib/trace";
 
 const figure = { value: "1", label: "x", provenance: "y" };
 const estate: Estate = {
@@ -121,5 +121,24 @@ describe("tracedLabels", () => {
 
   it("is empty for an unknown figure", () => {
     expect(tracedLabels(estate, "nope")).toEqual([]);
+  });
+});
+
+describe("diagramLitBy", () => {
+  const edge = (from: string, to: string) => ({ from, to, path: [] as [number, number][], source: "s" });
+  const step = (id: string, lights: string[]) => ({ id, label: id, caption: "c", lights });
+
+  it("lists, for every box and edge, the steps that light it; an edge lights only when both its ends do", () => {
+    const lit = diagramLitBy({
+      edges: [edge("a", "b"), edge("b", "group"), edge("c", "group")],
+      traces: [step("one", ["a", "b"]), step("two", ["b", "group"])],
+    });
+    expect(Object.fromEntries(lit)).toEqual({
+      a: ["one"],
+      b: ["one", "two"],
+      group: ["two"],
+      "a->b": ["one"],
+      "b->group": ["two"],
+    });
   });
 });

@@ -1,12 +1,59 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { resume } from "@/lib/resume-data";
-import { listOf } from "@/lib/format";
+import { listOf, monthYear } from "@/lib/format";
+import { tech } from "@/lib/tech";
 import { frame } from "@/components/site/frame";
 import { EstatePreview } from "@/components/hero/estate-preview";
 import { HeroCycle } from "@/components/hero/hero-cycle";
 
 /** The preview's three steps, one per verb of the positioning line. */
 const steps = ["build", "ship", "observe"] as const;
+
+/**
+ * What a recruiter screens for, on the first screen: the AWS certification,
+ * one tap from its proof, and the current role and employer. Both are shown
+ * in full further down the page.
+ */
+function Proof() {
+  const cert = resume.certifications.find((c) => c.code === "SAA-C03");
+  const role = resume.experience[0];
+  const dot = "mt-[0.5em] size-1.75 shrink-0 rounded-full";
+  return (
+    <ul className="mt-10 max-w-xl space-y-2.5 border-t border-line pt-6 text-[15px] leading-normal text-ink-2">
+      {cert && (
+        <li className="flex gap-2.5">
+          <span aria-hidden="true" className={dot} style={{ backgroundColor: tech.aws.color }} />
+          <span>
+            <span className="font-semibold text-ink">{cert.name}</span>
+            {cert.verifyUrl && (
+              <>
+                {" · "}
+                <a
+                  href={cert.verifyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium whitespace-nowrap text-accent"
+                >
+                  Verify
+                  <ArrowUpRight aria-hidden="true" className="ml-0.5 inline size-3.5 align-[-0.15em]" strokeWidth={2} />
+                  <span className="sr-only">the certification on Credly (opens in new tab)</span>
+                </a>
+              </>
+            )}
+          </span>
+        </li>
+      )}
+      {role && (
+        <li className="flex gap-2.5">
+          <span aria-hidden="true" className={`${dot} bg-ink-3`} />
+          <span>
+            {role.title} at <span className="font-semibold text-ink">{role.company}</span>, since {monthYear(role.start)}
+          </span>
+        </li>
+      )}
+    </ul>
+  );
+}
 
 /**
  * Screen one: who and what. The name, the role and where, then one crisp line
@@ -63,6 +110,7 @@ export function Hero() {
             <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2} />
           </a>
         </div>
+        <Proof />
       </div>
       <div className="hidden lg:block">
         <EstatePreview />
