@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import type { Role } from "@/types/resume";
+import type { EstateZone, Role, WorkPoint } from "@/types/resume";
 import { resume } from "@/lib/resume-data";
-import { period } from "@/lib/format";
+import { period, tenure } from "@/lib/format";
 import { getProject, unlinkedWorkProjects } from "@/lib/work";
 import { Section } from "@/components/site/section";
 
@@ -15,7 +15,7 @@ function CaseStudyLink({ slug }: { slug: string }) {
   const words = project.title.split(" ");
   const last = words.pop();
   return (
-    <p className="mt-6 text-[15px]">
+    <p className="mt-4 text-[15px]">
       <Link href={`/work/${slug}`} className={`group py-1 ${textLink}`}>
         Case study: {words.join(" ")}{" "}
         <span className="whitespace-nowrap">
@@ -31,29 +31,59 @@ function CaseStudyLink({ slug }: { slug: string }) {
   );
 }
 
-/** The role, with the legal employer name (its one appearance on the site), then the workstreams side by side. */
+/** The dot beside a workstream's name says which cloud it ran on. */
+const cloudDot: Record<EstateZone["id"], string> = { azure: "bg-cloud-azure", aws: "bg-cloud-aws", ai: "bg-cloud-ai" };
+
+/** The result in bold, then how, so the eye can run down the results alone. */
+function Point({ point }: { point: WorkPoint }) {
+  if (!point.lead) return point.text;
+  return (
+    <>
+      <strong className="font-semibold text-ink">{point.lead}</strong>
+      {point.text.slice(point.lead.length)}
+    </>
+  );
+}
+
+/**
+ * The role, with the legal employer name (its one appearance on the site) and
+ * the time in it, then the workstreams side by side: one short line per fact,
+ * result first. The time is worked out when the page renders (hourly).
+ */
 function RoleEntry({ role }: { role: Role }) {
   const also = unlinkedWorkProjects();
+  const when = [period(role.start), tenure(role.start, new Date())].filter(Boolean).join(" · ");
   return (
     <article>
-      <header className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2 border-b border-line pb-8">
-        <h3 className="text-2xl font-semibold tracking-tight text-ink">
-          {role.title}, <span className="font-normal text-ink-2">{role.legalName}</span>
-        </h3>
-        <p className="text-ink-3">
-          {period(role.start)} · {role.location}
+      <header className="border-b border-line pb-8">
+        <h3 className="text-2xl font-semibold tracking-tight text-ink">{role.title}</h3>
+        <p className="mt-1 text-lg text-ink-2">{role.legalName}</p>
+        {/* On phones the location takes its own line rather than breaking mid-name, as in the hero. */}
+        <p className="mt-2 text-ink-3">
+          {when}
+          <span aria-hidden="true" className="hidden sm:inline">
+            {" · "}
+          </span>
+          <span className="sr-only">, </span>
+          <span className="block sm:inline">{role.location}</span>
         </p>
       </header>
 
-      <div className="mt-12 grid gap-x-14 gap-y-14 lg:grid-cols-3">
+      <div className="mt-10 grid gap-x-14 gap-y-12 lg:grid-cols-3">
         {role.workstreams.map((w) => (
-          <section key={w.name} aria-label={w.name}>
-            <h4 className="text-xl font-semibold tracking-tight text-ink">{w.name}</h4>
-            <p className="mt-2 leading-relaxed text-ink-2">{w.summary}</p>
-            <ul className="mt-6 space-y-4">
+          <section key={w.name} aria-label={w.name} className="pl-4.5">
+            <h4 className="-ml-4.5 flex items-center gap-2.5 text-xl font-semibold tracking-tight text-ink">
+              <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${w.zone ? cloudDot[w.zone] : "bg-ink-3"}`} />
+              {w.name}
+            </h4>
+            {w.summary && <p className="mt-1 text-sm text-ink-3">{w.summary}</p>}
+            <ul className="mt-4 space-y-2.5">
               {w.points.map((point) => (
-                <li key={point} className="text-[15px] leading-relaxed text-ink-2">
-                  {point}
+                <li
+                  key={point.text}
+                  className="relative text-[15px] leading-normal text-ink-2 before:absolute before:top-[0.6em] before:-left-3.75 before:size-1.25 before:rounded-full before:bg-line-graphic"
+                >
+                  <Point point={point} />
                 </li>
               ))}
             </ul>

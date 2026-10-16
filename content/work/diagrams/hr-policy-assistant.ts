@@ -46,4 +46,36 @@ export const hrPolicyAssistant: Diagram = {
       source: "resume: HR chatbot — semantic retrieval over the HR policy documents",
     },
   ],
+  traces: [
+    { id: "answers", figure: "~60%", label: "faster answers", lights: ["langchain", "llama", "faiss", "documents"] },
+    {
+      id: "question",
+      label: "How a question comes in",
+      caption: "A question comes in through a FastAPI service, and LangChain coordinates the rest.",
+      lights: ["question", "fastapi", "langchain"],
+    },
+  ],
+  // The question runs down through FastAPI to LangChain, which branches to Llama and FAISS; the documents feed FAISS from below.
+  phone: {
+    width: 340,
+    height: 438,
+    groups: {
+      assistant: { x: 8, y: 78, w: 324, h: 274 },
+    },
+    nodes: {
+      question: { x: 115, y: 8, w: 150 },
+      fastapi: { x: 115, y: 130, w: 150 },
+      langchain: { x: 115, y: 200, w: 150 },
+      llama: { x: 20, y: 290, w: 110 },
+      faiss: { x: 150, y: 290, w: 170 },
+      documents: { x: 157, y: 384, w: 156 },
+    },
+    edges: {
+      "question->fastapi": { path: [[190, 54], [190, 130]] },
+      "fastapi->langchain": { path: [[190, 176], [190, 200]] },
+      "langchain->llama": { path: [[115, 223], [75, 223], [75, 290]] },
+      "langchain->faiss": { path: [[235, 246], [235, 290]] },
+      "documents->faiss": { path: [[235, 384], [235, 336]] },
+    },
+  },
 };

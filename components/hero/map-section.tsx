@@ -5,6 +5,7 @@ import { InView } from "@/components/site/in-view";
 import { Topology } from "@/components/hero/topology";
 import { TopologyStack } from "@/components/hero/topology-stack";
 import { TraceButton } from "@/components/hero/trace-button";
+import { traceChip } from "@/components/hero/trace-chip";
 
 /** One sentence a screen reader gets in place of the drawing. */
 function mapSummary() {
@@ -38,11 +39,7 @@ export function MapSection() {
 
         <div role="group" aria-label="Light up a figure" className="mt-12 flex flex-wrap gap-2">
           {resume.estate.proof.map(({ id, figure }) => (
-            <TraceButton
-              key={id}
-              id={id}
-              className="rounded-full border border-line-strong px-4 py-2 text-left text-sm text-ink-2 transition-colors hover:border-ink-3 hover:text-ink data-active:border-accent data-active:bg-accent-soft data-active:text-accent"
-            >
+            <TraceButton key={id} id={id} className={traceChip}>
               <span className="font-semibold">{figure.value}</span> {shortClaim(figure.label)}
             </TraceButton>
           ))}

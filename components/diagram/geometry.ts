@@ -1,4 +1,5 @@
 import type { Diagram, DiagramGroup, DiagramNode } from "@/types/diagram";
+import { edgeKey } from "@/lib/trace";
 
 export interface Rect {
   x: number;
@@ -27,6 +28,23 @@ export function boxOf(diagram: Diagram, id: string): Rect | undefined {
   if (node) return nodeRect(node);
   const group = diagram.groups.find((g) => g.id === id);
   return group && groupRect(group);
+}
+
+/** The diagram as drawn for phones: the same content at its phone layout's positions. */
+export function phoneView(d: Diagram): Diagram {
+  const at = <T>(table: Record<string, T>, key: string): T => {
+    if (!table[key]) throw new Error(`The phone layout has no position for "${key}"`);
+    return table[key];
+  };
+  return {
+    ...d,
+    width: d.phone.width,
+    height: d.phone.height,
+    groups: d.groups.map((g) => ({ ...g, ...at(d.phone.groups, g.id) })),
+    nodes: d.nodes.map((n) => ({ ...n, ...at(d.phone.nodes, n.id) })),
+    // A desktop label position never carries over; the phone layout sets its own.
+    edges: d.edges.map((e) => ({ ...e, labelAt: undefined, ...at(d.phone.edges, edgeKey(e)) })),
+  };
 }
 
 export function labelOf(diagram: Diagram, id: string): string {

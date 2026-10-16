@@ -10,6 +10,7 @@ import {
   labelOf,
   labelPoint,
   nodeRect,
+  phoneView,
   onBoundary,
   overlaps,
   pathD,
@@ -38,6 +39,8 @@ describe("boxOf and labelOf", () => {
     groups: [{ id: "g", label: "Group", x: 0, y: 0, w: 100, h: 100 }],
     nodes: [{ id: "n", label: "Node", x: 10, y: 50, w: 40 }],
     edges: [],
+    traces: [],
+    phone: { width: 100, height: 100, groups: {}, nodes: {}, edges: {} },
   };
 
   it("finds nodes and groups by id", () => {
@@ -141,5 +144,37 @@ describe("chainOrder", () => {
     expect(chainOrder(["a", "b", "c"], [e("a", "b")])).toBeNull();
     expect(chainOrder(["a", "b"], [e("a", "b"), e("b", "a")])).toBeNull();
     expect(chainOrder(["a"], [])).toBeNull();
+  });
+});
+
+describe("phoneView", () => {
+  const base: Diagram = {
+    title: "t",
+    width: 760,
+    height: 300,
+    groups: [{ id: "g", label: "Group", note: "note", x: 10, y: 10, w: 400, h: 200 }],
+    nodes: [{ id: "n", label: "Node", meta: "meta", tech: "terraform", group: "g", x: 30, y: 60, w: 150 }],
+    edges: [{ from: "n", to: "g", path: [[180, 80], [410, 80]], label: "runs", source: "resume" }],
+    traces: [],
+    phone: {
+      width: 340,
+      height: 500,
+      groups: { g: { x: 8, y: 8, w: 324, h: 300 } },
+      nodes: { n: { x: 20, y: 60, w: 200 } },
+      edges: { "n->g": { path: [[120, 106], [120, 308]], labelAt: [150, 200] } },
+    },
+  };
+
+  it("draws the same boxes and connections at the phone layout's positions", () => {
+    const v = phoneView(base);
+    expect([v.width, v.height]).toEqual([340, 500]);
+    expect(v.groups).toEqual([{ id: "g", label: "Group", note: "note", x: 8, y: 8, w: 324, h: 300 }]);
+    expect(v.nodes).toEqual([{ id: "n", label: "Node", meta: "meta", tech: "terraform", group: "g", x: 20, y: 60, w: 200 }]);
+    expect(v.edges).toEqual([{ from: "n", to: "g", path: [[120, 106], [120, 308]], labelAt: [150, 200], label: "runs", source: "resume" }]);
+  });
+
+  it("refuses a phone layout that leaves a box or a connection out", () => {
+    expect(() => phoneView({ ...base, phone: { ...base.phone, nodes: {} } })).toThrow('"n"');
+    expect(() => phoneView({ ...base, phone: { ...base.phone, edges: {} } })).toThrow('"n->g"');
   });
 });

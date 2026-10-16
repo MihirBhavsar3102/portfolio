@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { createElement } from "react";
 import { resume } from "@/lib/resume-data";
 import { SelectedWork } from "@/components/sections/selected-work";
@@ -50,9 +50,22 @@ describe("Experience", () => {
     for (const slug of ["avd-automation", "aws-web-platform", "hr-policy-assistant"]) expect(html).toContain(`href="/work/${slug}"`);
   });
 
-  it("shows the period, never a duration", () => {
-    expect(text).toContain("Dec 2024 – present");
-    expect(text).not.toMatch(/\d+ (years?|months?)/);
+  it("shows the period and the time in the role, worked out when the page renders", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 9, 16));
+    try {
+      const t = textOf(createElement(Experience));
+      expect(t).toContain("Dec 2024 – present · 1 yr 10 mos");
+      expect(t).toContain("Ahmedabad, India");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("opens each line with its result in bold", () => {
+    const leads = resume.experience.flatMap((r) => r.workstreams.flatMap((w) => w.points.flatMap((p) => (p.lead ? [p.lead] : []))));
+    expect(leads.length).toBeGreaterThan(0);
+    for (const lead of leads) expect(html, lead).toMatch(new RegExp(`<strong[^>]*>${lead.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}</strong>`));
   });
 });
 

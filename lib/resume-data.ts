@@ -170,32 +170,47 @@ export const resume: Resume = {
       location: "Ahmedabad, India",
       start: "2024-12",
       workstreams: [
+        // One line per fact, result first: the case studies tell the longer story.
         {
           name: "Azure Virtual Desktop",
-          summary: "Building and running virtual desktop estates for five enterprise clients.",
+          summary: "Azure · five enterprise clients",
+          zone: "azure",
           caseStudy: "avd-automation",
           points: [
-            "Automated AVD builds with PowerShell and Azure VM Image Builder golden images, taking multi-client deployments from about 8 hours to about 5 — 40% faster.",
-            "Moved provisioning into Azure DevOps pipelines that run Terraform and PowerShell, with domain join and Key Vault secrets handled automatically: over 70% less manual effort and configuration errors close to zero across five clients.",
-            "Set up FSLogix profiles and autoscaling on client host pools serving 450+ concurrent users, and cut monthly cloud spend by 25% through right-sizing and autoscaling.",
-            "Added Azure Monitor and Log Analytics (KQL) monitoring to the VDI estate, shortening the time to resolve support incidents.",
+            {
+              lead: "40% faster deployments",
+              text: "40% faster deployments, ~8\u00a0h to ~5\u00a0h, with PowerShell and Image Builder golden images",
+            },
+            {
+              lead: "70%+ less manual effort",
+              text: "70%+ less manual effort and near-zero config errors: Azure DevOps pipelines automate Terraform, PowerShell, domain join and Key Vault secrets",
+            },
+            { lead: "450+ concurrent users", text: "450+ concurrent users on autoscaling host pools with FSLogix profiles" },
+            { lead: "25% lower monthly cloud spend", text: "25% lower monthly cloud spend from right-sizing and autoscaling" },
+            { lead: "Faster incident resolution", text: "Faster incident resolution with Azure Monitor and Log Analytics (KQL)" },
           ],
         },
         {
           name: "AWS environments",
-          summary: "Designing, provisioning and monitoring AWS environments from code.",
+          summary: "AWS · built and monitored from code",
+          zone: "aws",
           caseStudy: "aws-web-platform",
           points: [
-            "Designed and deployed a fault-tolerant, multi-AZ WordPress platform on EC2 Auto Scaling, an Application Load Balancer, RDS, Lambda, S3 and CloudFront, running at 99.9% uptime.",
-            "Defined it in Terraform, so a new environment takes under 30 minutes and can be replicated in one step.",
-            "Built an end-to-end CI/CD pipeline with Terraform, Ansible and GitHub Actions that made feature delivery over 50% faster.",
-            "Built Grafana dashboards and alert rules on an existing Prometheus stack, plus CloudWatch alarms and dashboards.",
+            {
+              lead: "99.9% uptime",
+              text: "99.9% uptime on a multi-AZ WordPress platform: EC2 Auto Scaling, ALB, RDS, Lambda, S3, CloudFront",
+            },
+            { lead: "Under 30 minutes", text: "Under 30 minutes to stand up a new environment from Terraform, replicated in one step" },
+            { lead: "50%+ faster feature delivery", text: "50%+ faster feature delivery through a Terraform, Ansible and GitHub Actions pipeline" },
+            {
+              lead: "Monitoring",
+              text: "Monitoring: Grafana dashboards and alert rules on an existing Prometheus stack, plus CloudWatch alarms",
+            },
           ],
         },
         {
           name: "Linux administration",
-          summary: "Administering Linux servers.",
-          points: ["User and SSH access, permissions, OS patching, web and app server setup, and service troubleshooting."],
+          points: [{ text: "User and SSH access, permissions, OS patching, web and app server setup, troubleshooting" }],
         },
       ],
     },

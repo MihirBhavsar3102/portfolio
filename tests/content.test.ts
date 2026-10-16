@@ -85,6 +85,15 @@ describe("projects", () => {
       if (w.caseStudy) expect(slugs.has(w.caseStudy), w.caseStudy).toBe(true);
     }
   });
+
+  it("keep every experience line crisp: at most 20 words, opening with its bold result", () => {
+    const points = resume.experience.flatMap((r) => r.workstreams.flatMap((w) => w.points));
+    expect(points.length).toBeGreaterThan(0);
+    for (const p of points) {
+      expect(p.text.split(/\s+/).length, p.text).toBeLessThanOrEqual(20);
+      if (p.lead) expect(p.text.startsWith(p.lead), p.text).toBe(true);
+    }
+  });
 });
 
 describe("profile", () => {

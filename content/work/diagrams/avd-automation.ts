@@ -75,4 +75,52 @@ export const avdAutomation: Diagram = {
       source: "resume: AVD — Azure Monitor and Log Analytics (KQL) observability for the VDI infrastructure",
     },
   ],
+  traces: [
+    {
+      id: "manual",
+      figure: "70%+",
+      label: "less effort",
+      lights: ["key-vault", "pipeline", "terraform", "pipeline-powershell", "client", "active-directory"],
+    },
+    { id: "deploy", figure: "40%", label: "faster deploys", lights: ["provisioning", "image-builder", "session-hosts"] },
+    { id: "spend", figure: "25%", label: "lower spend", lights: ["host-pool", "session-hosts"] },
+    { id: "users", figure: "450+", label: "users", lights: ["users", "host-pool", "session-hosts"] },
+    {
+      id: "watch",
+      label: "What watches it",
+      caption: "Azure Monitor and Log Analytics watch the estate, queried with KQL.",
+      lights: ["azure-monitor", "client"],
+    },
+  ],
+  // Key Vault feeds the pipeline at the top, and the pipeline's arrow runs down the left edge to the client.
+  // Image Builder and the provisioning script come down into the session hosts; users and monitoring sit below.
+  phone: {
+    width: 340,
+    height: 660,
+    groups: {
+      pipeline: { x: 8, y: 88, w: 324, h: 84 },
+      client: { x: 8, y: 322, w: 324, h: 252 },
+      "host-pool": { x: 20, y: 374, w: 300, h: 114 },
+    },
+    nodes: {
+      "key-vault": { x: 200, y: 8, w: 110 },
+      terraform: { x: 39, y: 124, w: 120 },
+      "pipeline-powershell": { x: 171, y: 124, w: 130 },
+      "image-builder": { x: 150, y: 196, w: 170 },
+      provisioning: { x: 32, y: 252, w: 160 },
+      "session-hosts": { x: 130, y: 426, w: 180 },
+      "active-directory": { x: 140, y: 512, w: 170 },
+      users: { x: 8, y: 606, w: 124 },
+      "azure-monitor": { x: 156, y: 606, w: 176 },
+    },
+    edges: {
+      "key-vault->pipeline": { path: [[255, 40], [255, 88]], labelAt: [255, 64] },
+      "pipeline->client": { path: [[20, 172], [20, 322]] },
+      "provisioning->session-hosts": { path: [[180, 298], [180, 426]], labelAt: [180, 400] },
+      "image-builder->session-hosts": { path: [[280, 228], [280, 426]], labelAt: [280, 310] },
+      "session-hosts->active-directory": { path: [[225, 472], [225, 512]] },
+      "users->host-pool": { path: [[70, 606], [70, 488]] },
+      "azure-monitor->client": { path: [[300, 606], [300, 574]] },
+    },
+  },
 };

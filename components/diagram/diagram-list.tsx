@@ -63,12 +63,12 @@ function Items({ diagram, parent }: { diagram: Diagram; parent?: string }) {
 
 /**
  * The diagram as text: every group with what sits inside it, then every
- * connection. It replaces the drawing below md and is the drawing's text
- * equivalent for screen readers above it.
+ * connection: the drawings' text equivalent for screen readers, at every
+ * size (below md the phone layout is drawn instead).
  */
 export function DiagramList({ diagram }: { diagram: Diagram }) {
   return (
-    <div className="space-y-4 px-4 py-4 md:sr-only">
+    <div className="sr-only">
       <Items diagram={diagram} />
       <div>
         <h3 className="text-sm font-medium text-ink">Connections</h3>

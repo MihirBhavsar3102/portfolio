@@ -72,4 +72,59 @@ export const devsecopsPipeline: Diagram = {
       source: "resume: DevSecOps — deploys a three-tier Java application to a self-managed Kubernetes cluster",
     },
   ],
+  // No figures here, so the chips walk the pipeline in the case study's own sentences.
+  traces: [
+    {
+      id: "trigger",
+      label: "Trigger",
+      caption: "A push to GitHub fires a webhook, and Jenkins runs the pipeline.",
+      lights: ["github", "jenkins"],
+    },
+    {
+      id: "build",
+      label: "Build and scan",
+      caption: "Maven builds the application, SonarQube runs static analysis on the code, and OWASP Dependency-Check scans its dependencies.",
+      lights: ["build", "sonarqube", "dependency-check"],
+    },
+    {
+      id: "ship",
+      label: "Ship",
+      caption: "The pipeline then builds a Docker image, Trivy scans that image, and the application is deployed to the cluster.",
+      lights: ["image", "trivy", "deploy", "cluster", "app"],
+    },
+    {
+      id: "gates",
+      label: "Security gates",
+      caption: "SonarQube, Dependency-Check and Trivy are the security gates.",
+      lights: ["sonarqube", "dependency-check", "trivy"],
+    },
+  ],
+  // One column, push to cluster, in pipeline order.
+  phone: {
+    width: 340,
+    height: 668,
+    groups: {
+      jenkins: { x: 8, y: 78, w: 324, h: 450 },
+      cluster: { x: 8, y: 556, w: 324, h: 100 },
+    },
+    nodes: {
+      github: { x: 95, y: 8, w: 150 },
+      build: { x: 70, y: 130, w: 200 },
+      sonarqube: { x: 70, y: 200, w: 200 },
+      "dependency-check": { x: 70, y: 270, w: 200 },
+      image: { x: 70, y: 340, w: 200 },
+      trivy: { x: 70, y: 396, w: 200 },
+      deploy: { x: 70, y: 466, w: 200 },
+      app: { x: 70, y: 608, w: 200 },
+    },
+    edges: {
+      "github->jenkins": { path: [[170, 54], [170, 78]] },
+      "build->sonarqube": { path: [[170, 176], [170, 200]] },
+      "sonarqube->dependency-check": { path: [[170, 246], [170, 270]] },
+      "dependency-check->image": { path: [[170, 316], [170, 340]] },
+      "image->trivy": { path: [[170, 372], [170, 396]] },
+      "trivy->deploy": { path: [[170, 442], [170, 466]] },
+      "deploy->cluster": { path: [[170, 512], [170, 556]] },
+    },
+  },
 };

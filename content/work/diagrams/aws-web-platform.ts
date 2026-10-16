@@ -68,4 +68,47 @@ export const awsWebPlatform: Diagram = {
         "resume: AWS environment section — Grafana dashboards and alert rules on an existing Prometheus stack (A8 skipped; drawn by resume grouping, as on the hero map)",
     },
   ],
+  traces: [
+    { id: "uptime", figure: "99.9%", label: "uptime", lights: ["cdn", "alb", "asg", "ec2", "rds"] },
+    { id: "setup", figure: "<30 min", label: "setup", lights: ["terraform", "region"] },
+    { id: "delivery", figure: "50%+", label: "faster delivery", lights: ["pipeline", "terraform", "ansible", "region"] },
+    {
+      id: "watch",
+      label: "What watches it",
+      caption:
+        "CloudWatch alarms and dashboards watch the platform, and I built Grafana dashboards and alert rules on a Prometheus stack that was already running.",
+      lights: ["cloudwatch", "grafana", "region"],
+    },
+  ],
+  // The pipeline ships into the region from above; traffic enters at CloudFront and runs down to RDS; monitoring watches from below.
+  phone: {
+    width: 340,
+    height: 722,
+    groups: {
+      pipeline: { x: 8, y: 8, w: 324, h: 96 },
+      region: { x: 8, y: 176, w: 324, h: 392 },
+      vpc: { x: 20, y: 212, w: 300, h: 292 },
+      asg: { x: 32, y: 304, w: 276, h: 116 },
+    },
+    nodes: {
+      terraform: { x: 20, y: 44, w: 142 },
+      ansible: { x: 178, y: 44, w: 142 },
+      cdn: { x: 90, y: 124, w: 160 },
+      alb: { x: 45, y: 248, w: 250 },
+      ec2: { x: 70, y: 360, w: 200 },
+      rds: { x: 95, y: 444, w: 150 },
+      lambda: { x: 105, y: 520, w: 130 },
+      grafana: { x: 8, y: 600, w: 210 },
+      cloudwatch: { x: 162, y: 664, w: 170 },
+    },
+    edges: {
+      "cdn->alb": { path: [[170, 156], [170, 248]] },
+      "alb->asg": { path: [[170, 280], [170, 304]] },
+      "ec2->rds": { path: [[170, 406], [170, 444]] },
+      "terraform->region": { path: [[40, 90], [40, 176]] },
+      "ansible->region": { path: [[300, 90], [300, 176]] },
+      "cloudwatch->region": { path: [[300, 664], [300, 568]] },
+      "grafana->region": { path: [[40, 600], [40, 568]] },
+    },
+  },
 };

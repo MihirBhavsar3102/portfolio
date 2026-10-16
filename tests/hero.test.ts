@@ -25,6 +25,15 @@ describe("Hero", () => {
     expect(html).toContain("data-hero");
     expect(html).not.toContain("data-phase");
   });
+
+  it("puts the AWS certification, with a link to check it, and the current role on the first screen", () => {
+    const text = textOf(createElement(Hero));
+    const cert = resume.certifications.find((c) => c.code === "SAA-C03")!;
+    expect(text).toContain("AWS Certified Solutions Architect – Associate");
+    expect(html).toContain(`href="${cert.verifyUrl}" target="_blank" rel="noopener noreferrer"`);
+    expect(text.replace(/ ,/g, ",")).toContain("Cloud Operations Engineer at Parkar Global Technologies, since Dec 2024");
+    expect(text).not.toContain("Pvt Ltd");
+  });
 });
 
 describe("the estate preview", () => {
