@@ -62,6 +62,8 @@ export const metadata: Metadata = {
     title: siteConfig.title,
     description: siteConfig.description,
   },
+  // Only once a token is set (GOOGLE_SITE_VERIFICATION, .env.example).
+  ...(siteConfig.googleSiteVerification ? { verification: { google: siteConfig.googleSiteVerification } } : {}),
 };
 
 export const viewport: Viewport = {

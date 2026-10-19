@@ -1,4 +1,4 @@
-import type { Figure, Resume } from "@/types/resume";
+import type { Certification, Figure, Resume } from "@/types/resume";
 
 /**
  * Single source of truth for site content. Facts come from Mihir's October 2026
@@ -444,4 +444,11 @@ export const resume: Resume = {
       upstream: "monkscode/Natural-Language-to-Robot-Framework",
     },
   ],
+};
+
+/** Who issues each certification, as the Credentials section and the structured data name them. */
+export const certIssuers: Record<Certification["issuerId"], string> = {
+  aws: "Amazon Web Services",
+  microsoft: "Microsoft",
+  google: "Google Cloud",
 };

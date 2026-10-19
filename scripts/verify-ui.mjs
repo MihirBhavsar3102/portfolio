@@ -810,7 +810,7 @@ await shot(`${LABEL}-404-desktop`);
 // ---------- Security headers (lib/security-headers.ts) ----------
 // no-store: a response Chrome serves from its HTTP cache drops some headers (HSTS among them).
 const SECURITY_HEADERS = ["content-security-policy", "strict-transport-security", "x-content-type-options", "x-frame-options", "referrer-policy", "permissions-policy", "cross-origin-opener-policy"];
-const headerGaps = await evaluate(`Promise.all(${JSON.stringify(["/", cardHrefs[0], "/no-such-page", "/robots.txt", "/opengraph-image", "/MihirBhavsar_Resume.pdf"])}.map((p) =>
+const headerGaps = await evaluate(`Promise.all(${JSON.stringify(["/", cardHrefs[0], "/no-such-page", "/robots.txt", "/opengraph-image", "/favicon.ico", "/MihirBhavsar_Resume.pdf"])}.map((p) =>
   fetch(p, { cache: "no-store" }).then((r) => ({ p, missing: ${JSON.stringify(SECURITY_HEADERS)}.filter((h) => !r.headers.has(h)), poweredBy: r.headers.get("x-powered-by"), framing: /frame-ancestors 'none'/.test(r.headers.get("content-security-policy") ?? "") }))
 )).then((all) => all.filter((r) => r.missing.length || r.poweredBy || !r.framing))`);
 check("pages, files and the 404 send the security headers, and no X-Powered-By", headerGaps.length === 0, JSON.stringify(headerGaps));
@@ -857,21 +857,37 @@ const head = (path) =>
       canonical: d.querySelector('link[rel=canonical]')?.getAttribute('href') ?? null,
       ogTitle: meta('og:title'), ogUrl: meta('og:url'), ogImage: meta('og:image'), ogType: meta('og:type'), site: meta('og:site_name'),
       robots: [...d.querySelectorAll('meta[name=robots]')].map(m => m.content),
-      ld: [...d.querySelectorAll('script[type="application/ld+json"]')].map(s => JSON.parse(s.textContent)['@type']),
+      googlebot: meta('googlebot'),
+      // Every node's type, a @graph's and a ProfilePage's mainEntity included.
+      ld: [...d.querySelectorAll('script[type="application/ld+json"]')].flatMap(s => { const j = JSON.parse(s.textContent); return (j['@graph'] ?? [j]).flatMap(n => [n['@type'], n.mainEntity?.['@type']]).filter(Boolean); }),
+      icons: [...d.querySelectorAll('link[rel=icon], link[rel=apple-touch-icon]')].map(l => l.rel + ' ' + l.getAttribute('href').split('?')[0]),
     };
   })`);
 const homeHead = await head("/");
+const indexable = (h) => h.robots.length === 1 && h.robots[0] === "index, follow" && /max-image-preview:large/.test(h.googlebot ?? "");
 check(
-  "home: canonical, its own share block and a Person",
+  "home: indexable, canonical, its own share block, and the site, profile page and person",
   // Next prints the root canonical without its slash; http://x and http://x/ are the same URL.
-  new URL(homeHead.canonical ?? "x:").pathname === "/" && homeHead.ogType === "website" && /\/opengraph-image/.test(homeHead.ogImage ?? "") && homeHead.ld.includes("Person"),
+  new URL(homeHead.canonical ?? "x:").pathname === "/" &&
+    indexable(homeHead) &&
+    homeHead.ogType === "website" &&
+    /\/opengraph-image/.test(homeHead.ogImage ?? "") &&
+    ["WebSite", "ProfilePage", "Person"].every((t) => homeHead.ld.includes(t)),
   JSON.stringify(homeHead),
+);
+const iconFiles = await evaluate(`Promise.all(['/favicon.ico', '/apple-icon'].map((p) => fetch(p).then((r) => ({ p, status: r.status, type: r.headers.get('content-type') }))))`);
+check(
+  "a favicon.ico, the SVG icon and an Apple touch icon, each served",
+  ["icon /favicon.ico", "icon /icon.svg", "apple-touch-icon /apple-icon"].every((i) => homeHead.icons.includes(i)) &&
+    iconFiles.every((f) => f.status === 200 && /^image\//.test(f.type ?? "")),
+  JSON.stringify({ icons: homeHead.icons, iconFiles }),
 );
 for (const href of cardHrefs) {
   const h = await head(href);
   check(
-    `${href}: its own canonical, title, URL and card, and an Article`,
+    `${href}: indexable, its own canonical, title, URL and card, and an Article`,
     (h.canonical ?? "").endsWith(href) &&
+      indexable(h) &&
       (h.ogUrl ?? "").endsWith(href) &&
       h.ogType === "article" &&
       h.ogTitle?.startsWith(h.title.split(" — ")[0]) &&
@@ -917,7 +933,11 @@ check(
   darkFirst.theme === "dark" && darkFirst.bg === "rgb(10, 10, 10)" && lightFirst.theme === "light" && lightFirst.bg === "rgb(255, 255, 255)",
   JSON.stringify({ darkFirst, lightFirst }),
 );
+// Colour transitions started by the switch (the hero's own story and the hovered toggle aside).
+await evaluate(`window.__themeTransitions = 0; document.addEventListener('transitionrun', (e) => { if (!e.target.closest('[data-hero], .theme-toggle')) window.__themeTransitions++; }, true); true`);
 await mouseAt("header button.theme-toggle");
+const switchTransitions = await evaluate("window.__themeTransitions");
+check("the theme switches in one frame: nothing eases from the old colours", switchTransitions === 0, `${switchTransitions} transitions`);
 const toggled = { theme: await theme(), bg: await canvas(), label: await evaluate("document.querySelector('header button.theme-toggle').getAttribute('aria-label')") };
 await load("/", DESKTOP);
 const remembered = await theme();
