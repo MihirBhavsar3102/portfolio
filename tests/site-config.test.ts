@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { resolveSiteUrl } from "@/lib/site-config";
 
 describe("resolveSiteUrl", () => {
@@ -29,5 +29,26 @@ describe("resolveSiteUrl", () => {
     for (const [pub, host] of [["https://mihir.dev", undefined], [undefined, "x.vercel.app"], [undefined, undefined]] as const) {
       expect(() => new URL(resolveSiteUrl(pub, host))).not.toThrow();
     }
+  });
+});
+
+describe("googleSiteVerification", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+  const load = async (token: string | undefined) => {
+    vi.stubEnv("GOOGLE_SITE_VERIFICATION", token);
+    vi.resetModules();
+    return (await import("@/lib/site-config")).siteConfig.googleSiteVerification;
+  };
+
+  it("carries the Search Console token when set, trimmed", async () => {
+    expect(await load(" abc123_-XYZ ")).toBe("abc123_-XYZ");
+  });
+
+  it("is absent when unset or blank, so no empty tag is printed", async () => {
+    expect(await load(undefined)).toBeUndefined();
+    expect(await load("  ")).toBeUndefined();
   });
 });

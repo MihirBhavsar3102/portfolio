@@ -12,7 +12,7 @@ import { GitHubRepos } from "@/components/sections/github-repos";
 import { Contact } from "@/components/sections/contact";
 import { JsonLd } from "@/components/site/json-ld";
 import { resume } from "@/lib/resume-data";
-import { pageMetadata, personJsonLd } from "@/lib/seo";
+import { homeJsonLd, pageMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site-config";
 
 // The GitHub section's live fields refresh hourly. Set on the route too, so a
@@ -26,7 +26,7 @@ const proof = resume.estate.proof;
 export default function Home() {
   return (
     <>
-      <JsonLd data={personJsonLd()} />
+      <JsonLd data={homeJsonLd()} />
       <Hero />
       {/* The figures and the map they light share one Trace. */}
       <TraceProvider ids={proof.map((p) => p.id)}>

@@ -424,6 +424,14 @@
   animation: toast-out 160ms ease-in;
 }
 
+/* A theme switch lands in one frame: no colour eases from the old theme (lib/theme.ts). */
+[data-theme-switching],
+[data-theme-switching] *,
+[data-theme-switching] *::before,
+[data-theme-switching] *::after {
+  transition: none !important;
+}
+
 /* Reduced motion cancels every animation and transition outright; every
    animated element's resting state is its default style, so nothing is lost. */
 @media (prefers-reduced-motion: reduce) {

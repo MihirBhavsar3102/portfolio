@@ -17,10 +17,13 @@ export function resolveSiteUrl(publicUrl: string | undefined, vercelProductionHo
 export const siteConfig = {
   name: "Mihir Bhavsar",
   title: "Mihir Bhavsar — Cloud & DevOps Engineer",
+  // Leads with the name, which search results bold for a name search; under 160 characters so it isn't cut.
   description:
-    "Cloud & DevOps engineer automating Azure and AWS with Terraform, CI/CD pipelines and monitoring, plus applied AI. Based in Ahmedabad, India.",
+    "Mihir Bhavsar is a Cloud & DevOps engineer in Ahmedabad, India, automating Azure and AWS with Terraform, CI/CD pipelines and monitoring, plus applied AI.",
   // Each variable is named in full: Next inlines NEXT_PUBLIC_SITE_URL at build
   // time only when it is written out, so a Docker server regenerating the page
   // at runtime (without the build arg) still gets the built-in value.
   url: resolveSiteUrl(process.env.NEXT_PUBLIC_SITE_URL, process.env.VERCEL_PROJECT_PRODUCTION_URL),
+  // Google Search Console's HTML-tag token, so the property can be verified without a code change.
+  googleSiteVerification: process.env.GOOGLE_SITE_VERIFICATION?.trim() || undefined,
 };

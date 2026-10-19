@@ -1,14 +1,8 @@
 import { ArrowUpRight } from "lucide-react";
 import type { Certification } from "@/types/resume";
 import { monthYear } from "@/lib/format";
-import { resume } from "@/lib/resume-data";
+import { certIssuers as issuers, resume } from "@/lib/resume-data";
 import { Section } from "@/components/site/section";
-
-const issuers: Record<Certification["issuerId"], string> = {
-  aws: "Amazon Web Services",
-  microsoft: "Microsoft",
-  google: "Google Cloud",
-};
 
 /** A titled, hairline-ruled list panel. */
 function Panel({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {
