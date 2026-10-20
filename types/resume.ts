@@ -83,6 +83,8 @@ export interface Role {
   location: string;
   /** ISO month, e.g. "2024-12". A current role has no end. */
   start: string;
+  /** ISO month the role's opening internship ended, when it began as one. */
+  internUntil?: string;
   workstreams: Workstream[];
 }
 

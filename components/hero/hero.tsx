@@ -69,7 +69,7 @@ export function Hero() {
     <section
       data-hero
       aria-labelledby="hero-name"
-      className={`${frame} grid min-h-[min(calc(100svh-3.5rem),56rem)] content-center items-center gap-x-12 gap-y-14 py-20 lg:grid-cols-[minmax(0,1fr)_27rem] xl:grid-cols-[minmax(0,1fr)_30rem]`}
+      className={`${frame} relative grid min-h-[min(calc(100svh-3.5rem),56rem)] content-center items-center gap-x-12 gap-y-14 py-20 lg:grid-cols-[minmax(0,1fr)_27rem] xl:grid-cols-[minmax(0,1fr)_30rem]`}
     >
       <div>
         <h1 id="hero-name" className="type-display text-display text-ink lg:text-[clamp(3.5rem,6.8vw,6rem)]">

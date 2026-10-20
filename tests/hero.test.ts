@@ -21,6 +21,10 @@ describe("Hero", () => {
     expect(words).toEqual(positioning.verbs.map((v) => `${v}.`));
   });
 
+  it("offers a control that pauses the story, which plays on its own for longer than five seconds (WCAG 2.2.2)", () => {
+    expect(html).toMatch(/<button type="button" aria-label="Pause animation" class="hero-motion /);
+  });
+
   it("renders at rest: no step is lit until the story starts in the browser", () => {
     expect(html).toContain("data-hero");
     expect(html).not.toContain("data-phase");

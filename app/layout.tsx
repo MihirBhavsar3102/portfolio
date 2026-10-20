@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteNav } from "@/components/site/site-nav";
 import { SiteFooter } from "@/components/site/site-footer";
 import { siteConfig } from "@/lib/site-config";
+import { vercelInsights } from "@/lib/insights";
 import { themeScript } from "@/lib/theme";
 import "./globals.css";
 
@@ -73,16 +74,6 @@ export const viewport: Viewport = {
   ],
   colorScheme: "light dark",
 };
-
-/*
- * Vercel Web Analytics (cookieless page views) and Speed Insights (Core Web
- * Vitals from real visits) run only in a production build on Vercel, which
- * serves their scripts and intake from this origin, so the CSP stands.
- * Elsewhere they would misfire: dev loads debug scripts from another origin,
- * which the CSP blocks, and the Docker image has no route to serve them. Both
- * scripts ignore headless browsers, so the post-deploy checks never count.
- */
-const vercelInsights = process.env.VERCEL === "1" && process.env.NODE_ENV === "production";
 
 export default function RootLayout({
   children,

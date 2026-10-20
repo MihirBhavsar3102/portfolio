@@ -10,7 +10,7 @@ import { whereLabel, zoneLabel } from "@/lib/work";
  * box and every text node a single string, which is how Satori lays text out.
  */
 
-/** The home card's figures: Azure, both clouds together, AWS. */
+/** The home card's figures: the Azure effort saved, then AWS cost and uptime. */
 const HOME_FIGURES = ["manual", "spend", "uptime"];
 
 const frame = (p: OgPalette): CSSProperties => ({

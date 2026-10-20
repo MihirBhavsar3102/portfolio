@@ -5,8 +5,8 @@
 # whoever merged and GitHub emails them when it fails; a run started by
 # Vercel's bot would notify no one. A deployment's own URL sits behind Vercel's
 # login, so the checks go to the public domain once it answers with this
-# commit in X-Commit (next.config.ts). A manual run checks whatever production
-# serves now.
+# commit in X-Commit (next.config.ts). A daily or manual run checks whatever
+# production serves now.
 #
 # Same hardening as ci.yml: read-only token, no checkout credentials left on
 # disk, every action pinned to a full commit SHA, a timeout on the job.
@@ -15,6 +15,12 @@ name: Post-deploy checks
 on:
   push:
     branches: [master]
+  # Every day as well, so a fault that appears between merges (the hourly
+  # regeneration of the home page, an expired link, an outage) still fails a
+  # run. GitHub emails whoever last edited this schedule, and pauses scheduled
+  # runs after 60 days without repository activity.
+  schedule:
+    - cron: "17 3 * * *"
   workflow_dispatch:
 
 permissions:
@@ -42,10 +48,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      # verify-ui has no dependencies, so there is nothing to install.
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: package.json
+          cache: npm
+      # verify-ui imports nothing, but its accessibility pass injects the locked axe-core.
+      - name: Install
+        run: npm ci --ignore-scripts
       # A Vercel build takes about two minutes; fifteen leaves room for a queue.
       # A deployment that fails or never goes live stops here, naming the
       # commit production still serves.

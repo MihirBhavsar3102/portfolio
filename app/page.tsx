@@ -15,8 +15,9 @@ import { resume } from "@/lib/resume-data";
 import { homeJsonLd, pageMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site-config";
 
-// The GitHub section's live fields refresh hourly. Set on the route too, so a
-// build that couldn't reach GitHub (and so registered no fetch) still revalidates.
+// Re-rendered hourly, so the time in the role (Experience) and any featured
+// repo's live fields stay current. Set on the route itself: with no repo to
+// fetch, nothing else would make the page revalidate.
 export const revalidate = 3600;
 
 export const metadata: Metadata = pageMetadata({ description: siteConfig.description, path: "/" });

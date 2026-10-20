@@ -27,7 +27,7 @@ A personal portfolio for Mihir Bhavsar that converts a cold screen into a conver
 
 ## Positioning
 
-Cloud & DevOps engineer at Parkar Global Technologies (December 2024 – present) who automates how Azure and AWS infrastructure is built, shipped, and monitored — infrastructure as code, CI/CD, and observability — and who also built an applied-AI (retrieval-augmented) HR policy assistant at the same company. Infrastructure, automation, reliability, and applied AI are one competence, not four sections. Every claim on the site is attached to a measured number or a concrete mechanism from work actually performed.
+Cloud & DevOps engineer at Parkar Global Technologies (December 2024 – present; an internship until April 2025) who automates how Azure and AWS infrastructure is built, shipped, and monitored — infrastructure as code, CI/CD, and observability — and who also built an applied-AI (retrieval-augmented) HR policy assistant at the same company. Infrastructure, automation, reliability, and applied AI are one competence, not four sections. Every claim on the site is attached to a measured number or a concrete mechanism from work actually performed.
 
 ## Operating Context
 
@@ -37,11 +37,11 @@ Cloud & DevOps engineer at Parkar Global Technologies (December 2024 – present
 
 ## Capabilities and Constraints
 
-- **Stack:** Next.js 16.4.0 App Router, React 19.2.4, TypeScript, Tailwind CSS v4 (CSS-first `@theme` config), CSS-only motion (no animation library), Radix UI primitives, `lucide-react` for interface icons, MDX for case studies, Vitest for logic and content tests. Hosted on Vercel's free Hobby plan (decided 2026-10-13: no cloud spend for now); the Dockerfile (`output: "standalone"`) stays for a later move to Azure Container Apps. `NEXT_PUBLIC_SITE_URL` sets the canonical URL; on Vercel it defaults to the project's production domain.
+- **Stack:** Next.js 16.4 App Router, React 19.3, TypeScript, Tailwind CSS v4 (CSS-first `@theme` config), CSS-only motion (no animation library), Radix UI primitives, `lucide-react` for interface icons, MDX for case studies, Vitest for logic and content tests. Hosted on Vercel's free Hobby plan (decided 2026-10-13: no cloud spend for now); the Dockerfile (`output: "standalone"`) stays for a later move to Azure Container Apps. `NEXT_PUBLIC_SITE_URL` sets the canonical URL; on Vercel it defaults to the project's production domain.
 - **Light and dark themes**, both first-class, with a toggle in the nav. The visitor's system setting picks the first theme and a chosen one is remembered; with JavaScript off the system setting still applies (decided 2026-10-11, replacing "dark only").
 - **No blog** in this rebuild.
 - All facts live in `lib/resume-data.ts`, typed by `types/resume.ts`; long-form case-study narrative lives in MDX. Content tests guard both.
-- No backend, no database, no auth, no analytics.
+- No backend, no database, no auth. Cookieless Vercel Web Analytics and Speed Insights run on the production deployment only, and the footer says so there (added 2026-10-15).
 - The phone number is not stored in site data and never rendered (it appears only in the PDF, by Mihir's choice).
 
 ## Content Sources
@@ -59,18 +59,19 @@ Cloud & DevOps engineer at Parkar Global Technologies (December 2024 – present
 
 ## Evidence on Hand
 
-Real and available (October 2026 resume):
+Real and available. Since 2026-10-21 the resume PDF in `public/` is the source of truth: where the site and the PDF disagreed, the site now follows the PDF (Mihir confirmed its facts are true).
 
-- **Role:** Cloud Operations Engineer, Parkar Global Technologies Pvt Ltd, Ahmedabad, December 2024 – present (one role).
-- **Azure Virtual Desktop, five enterprise clients:** PowerShell provisioning and Azure VM Image Builder golden images made multi-client deployments 40% faster (~8 h → ~5 h); Azure DevOps pipelines running Terraform and PowerShell with automated domain join and Key Vault secrets removed over 70% of manual effort and brought configuration errors near zero; FSLogix profiles and AVD autoscaling for 450+ concurrent users; right-sizing and autoscaling cut monthly cloud spend 25% across Azure and AWS; Azure Monitor and Log Analytics (KQL) observability reduced MTTR (no figure). Mihir built the end-to-end VM provisioning PowerShell; a team of four runs the estate. AVD numbers were measured by timing tasks before and after automation.
-- **AWS web platform:** fault-tolerant multi-AZ WordPress (EC2 Auto Scaling, ALB, RDS, Lambda, S3, CloudFront) at 99.9% uptime; Terraform plan/apply with environment setup under 30 minutes and one-step replication; CI/CD with Terraform, Ansible, and GitHub Actions making feature delivery over 50% faster; Grafana dashboards and alert rules on an existing Prometheus stack, plus CloudWatch alarms and dashboards.
+- **Role:** Cloud Operations Engineer, Parkar Global Technologies Pvt Ltd, Ahmedabad, December 2024 – present (one role, begun as an internship, December 2024 – April 2025). The PDF summary's "450+ VMs and servers" is the right count; its experience bullet's "150+" is a slip Mihir fixes in the PDF. The site shows no VM count.
+- **Azure Virtual Desktop, five enterprise clients:** Terraform onboarding of new clients (host pools, session hosts, networking) with Azure VM Image Builder golden images, FSLogix profiles and autoscaling made deployments 40% faster (~8 h → ~5 h); Azure DevOps pipelines running Terraform and PowerShell with automated domain join and Key Vault secrets removed over 70% of manual effort and brought configuration errors near zero; FSLogix profiles and AVD autoscaling for 450+ concurrent users; Azure Monitor and Log Analytics (KQL) observability reduced MTTR (no figure). Mihir built the end-to-end VM provisioning PowerShell (questionnaire) and the Terraform onboarding (PDF); a team of four runs the estate. AVD numbers were measured by timing tasks before and after automation.
+- **AWS:** right-sizing and auto-scaling cut monthly AWS spend 25%.
+- **AWS web platform:** fault-tolerant multi-AZ WordPress (EC2 Auto Scaling, ALB, RDS, S3, CloudFront) at 99.9% uptime; Terraform plan/apply with environment setup under 30 minutes and one-step replication; CI/CD with Terraform, Ansible, and GitHub Actions making feature delivery over 50% faster; Grafana dashboards and alert rules on an existing Prometheus stack, plus CloudWatch alarms and dashboards.
 - **Linux administration:** access and permissions, OS patching, web/app server setup, service troubleshooting.
-- **HR policy assistant (RAG):** FAISS retrieval and Llama inference with LangChain behind FastAPI; ~60% faster HR policy query resolution, replacing manual lookups. Public repo `Rag-Assistant-Chatbot`.
+- **HR policy assistant (RAG):** FAISS retrieval and Llama inference with LangChain behind FastAPI; shipped as an internal tool that replaced manual HR lookups and keyword search, with ~60% faster HR policy query resolution. Its repo is private (it held employer documents) and is not linked.
 - **DevSecOps CI/CD pipeline (personal project):** Jenkins with SonarQube, OWASP Dependency-Check, and Trivy gates; Docker, Maven, GitHub webhooks; deploys a three-tier Java app to self-managed Kubernetes.
-- **Certifications:** AWS Solutions Architect – Associate (SAA-C03, Jun 2025), AWS Cloud Practitioner (CLF-C02, Mar 2025), Azure Fundamentals (AZ-900, Jun 2025), Azure AI Fundamentals (AI-900, Apr 2026), Google Cloud Digital Leader (date not yet supplied); verification links for the first four.
+- **Certifications:** AWS Solutions Architect – Associate (SAA-C03, Jun 2025), AWS Cloud Practitioner (CLF-C02, Mar 2025), Azure Fundamentals (AZ-900, Jun 2025), Azure AI Fundamentals (AI-900, Apr 2026), Google Cloud Digital Leader (date not yet supplied); verification links for all five (the Google certificate is a shared Drive PDF, added 2026-10-21).
 - **Education:** B.E. CSE, The Maharaja Sayajirao University of Baroda (2022–2025, 73.31%); Diploma in Computer Engineering, GTU (2019–2022, CGPA 8.89).
-- **Achievement:** NCC 2019–2022, Letter of Appreciation from Admiral Karambir Singh, former Chief of the Naval Staff.
-- **Public repos to feature:** `Rag-Assistant-Chatbot`, `Automatic-Deployment` (the AWS platform's CI/CD). `Natural-Language-to-Robot-Framework` is a fork and appears only once Mihir supplies his contribution line.
+- **Achievements:** core founder of Code Vimarsh (MSU), a coding community grown to 300+ students; NCC 2019–2022, Letter of Appreciation from Admiral Karambir Singh, former Chief of the Naval Staff.
+- **Public repos to feature:** none for now (2026-10-21). `Rag-Assistant-Chatbot` went private, and `Automatic-Deployment` came off the site because it is a single-instance demo, not the multi-AZ platform its case study describes; re-list either only once it supports the claims beside it. `Natural-Language-to-Robot-Framework` is a fork and appears only once Mihir supplies his contribution line.
 
 Explicitly absent — must never be fabricated:
 
@@ -78,8 +79,8 @@ Explicitly absent — must never be fabricated:
 - No testimonials, quotes, references, or endorsements.
 - No client names; the five-client estate is anonymous.
 - No public live URLs or demos.
-- No MTTR figure; no claim that the HR assistant is "in production"; no claim that its retrieval beat keyword search; no daily-deployment or rollback claims.
-- No press, awards (beyond the NCC letter), or third-party validation.
+- No MTTR figure; no claim that the HR assistant is "in production" (it shipped as an internal tool and replaced manual lookups and keyword search, nothing more); no daily-deployment or rollback claims.
+- No press, awards (beyond the NCC letter and Code Vimarsh), or third-party validation.
 
 ## Product Principles
 

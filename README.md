@@ -11,11 +11,11 @@ The source of my personal site. I'm a Cloud & DevOps engineer in Ahmedabad, Indi
 
 ## About me
 
-I'm a Cloud Operations Engineer at Parkar Global Technologies, where I've worked across AWS, Azure and GCP since December 2024, mostly on infrastructure as code and delivery pipelines. A few results, each explained on the site:
+I'm a Cloud Operations Engineer at Parkar Global Technologies, where I've automated multi-client Azure and AWS environments since December 2024, mostly with infrastructure as code and delivery pipelines. A few results, each explained on the site:
 
 - **40%** faster Azure Virtual Desktop deployments across clients, from about 8 hours to about 5
 - **99.9%** uptime on a multi-AZ WordPress platform on AWS
-- **~60%** faster answers to HR policy questions, from a retrieval-augmented assistant
+- **~60%** faster HR policy query resolution, from a retrieval-augmented assistant shipped as an internal tool
 
 ## What's on the site
 
@@ -23,7 +23,7 @@ I'm a Cloud Operations Engineer at Parkar Global Technologies, where I've worked
 - **Measured outcomes** with how each was achieved, tied to a service map that lights up whatever produced it.
 - **Four case studies** with architecture diagrams: [Azure Virtual Desktop automation](content/work/avd-automation.mdx), a [multi-AZ AWS web platform](content/work/aws-web-platform.mdx), an [HR policy assistant](content/work/hr-policy-assistant.mdx) and a [DevSecOps CI/CD pipeline](content/work/devsecops-pipeline.mdx).
 
-Then experience, stack, credentials, live GitHub repositories and contact. The visual system, in light and dark themes, is in [DESIGN.md](DESIGN.md).
+Then experience, stack, credentials and contact. The visual system, in light and dark themes, is in [DESIGN.md](DESIGN.md).
 
 ## Tech stack
 
@@ -34,7 +34,7 @@ Then experience, stack, credentials, live GitHub repositories and contact. The v
 | UI | Radix UI primitives, lucide-react icons |
 | Content | One typed data file for every fact; MDX for the case-study narratives |
 | Diagrams and motion | Server-rendered SVG and plain CSS, with no diagram or animation library in the browser |
-| Testing | Vitest, plus a headless-browser verifier with no dependencies |
+| Testing | Vitest, plus a headless-browser verifier that also runs axe-core on every page |
 | Hosting | Vercel; a Dockerfile also builds a standalone Node server for container hosts |
 
 ## How it's built
@@ -42,7 +42,6 @@ Then experience, stack, credentials, live GitHub repositories and contact. The v
 - **Every fact has one source.** Roles, figures, projects, skills and credentials live in [lib/resume-data.ts](lib/resume-data.ts). Each figure carries the sentence that explains it, and tests fail if a retired or unsourced claim creeps back into the copy.
 - **Accessible by default.** Every text colour pairing passes WCAG AA contrast in both themes, and a test holds it there. The whole site works from the keyboard, respects reduced-motion settings and shows all its content with JavaScript off.
 - **Easy to find and share.** The home page and each case study have their own canonical URL, share image and structured data, and the sitemap lists them all.
-- **Live GitHub data, with a fallback.** Repository details refresh hourly. When GitHub can't be reached, the section shows curated descriptions instead.
 
 ## How a change ships
 
@@ -59,7 +58,7 @@ flowchart LR
 1. **Pull request.** Every change reaches `master` through a pull request, including Dependabot's weekly updates. [CI](.github/workflows/ci.yml) runs three checks: lint, types and unit tests; a dependency audit with registry signature checks; and a production build that [the browser verifier](scripts/verify-ui.mjs) tests in headless Chrome across both themes, phone to desktop widths, keyboard focus, reduced motion and JavaScript off. Vercel also builds a preview of the branch.
 2. **Merge.** A [ruleset](.github/rulesets/master.json) blocks direct pushes and force-pushes. It allows a merge only when all three checks pass on a branch that is up to date with `master`.
 3. **Deploy.** Vercel builds the merged commit and points the live domain at it. Every response carries an `X-Commit` header naming the commit it was built from.
-4. **Verify.** [A second workflow](.github/workflows/post-deploy.yml) waits until the live site's `X-Commit` matches the merge, then runs the same browser checks against it. It also confirms that canonical URLs, the sitemap and share images point at the live domain. If it fails, GitHub emails whoever merged.
+4. **Verify.** [A second workflow](.github/workflows/post-deploy.yml) waits until the live site's `X-Commit` matches the merge, then runs the same browser checks against it. It also confirms that canonical URLs, the sitemap and share images point at the live domain. It runs again every day, so a fault that appears between merges still fails a run. If it fails, GitHub emails whoever merged.
 
 ## Repository layout
 

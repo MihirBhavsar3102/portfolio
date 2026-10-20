@@ -14,18 +14,19 @@ Requirements and sizing were set per client, and the key decisions were the clie
 
 <Diagram />
 
-An Azure DevOps pipeline runs Terraform and PowerShell, with its secrets kept in Azure Key Vault and the Active Directory domain join automated. My PowerShell provisioning script creates virtual machines inside the client's host pool, end to end. Session hosts are built from golden images that Azure VM Image Builder produces and keep user profiles in FSLogix, and the host pool scales automatically. Azure Monitor and Log Analytics watch the estate, queried with KQL.
+An Azure DevOps pipeline runs Terraform and PowerShell, with its secrets kept in Azure Key Vault and the Active Directory domain join automated. For a new client, Terraform builds the host pools, session hosts and networking. My PowerShell provisioning script creates virtual machines inside the client's host pool, end to end. Session hosts are built from golden images that Azure VM Image Builder produces and keep user profiles in FSLogix, and the host pool scales automatically. Azure Monitor and Log Analytics watch the estate, queried with KQL.
 
 ## What I built and what the team did
 
 <Ownership
   mine={[
+    "The Terraform that onboards a new client: its host pools, session hosts and networking.",
     "The end-to-end VM provisioning script in PowerShell. It creates a virtual machine inside a host pool, together with the services the machine needs, and finishes by registering it with the pool.",
   ]}
   teamLabel="The team of four"
   team={[
     "We operate and support the whole VDI estate, resolving day-to-day VM issues to improve efficiency and the experience for users.",
-    "The cost work was a team effort: right-sizing and autoscaling that lowered monthly cloud spend across Azure and AWS.",
+    "The cost-cutting phase that followed was a team effort, built on right-sizing and auto-scaling.",
   ]}
 />
 

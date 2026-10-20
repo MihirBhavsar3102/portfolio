@@ -82,8 +82,8 @@ export const avdAutomation: Diagram = {
       label: "less effort",
       lights: ["key-vault", "pipeline", "terraform", "pipeline-powershell", "client", "active-directory"],
     },
-    { id: "deploy", figure: "40%", label: "faster deploys", lights: ["provisioning", "image-builder", "session-hosts"] },
-    { id: "spend", figure: "25%", label: "lower spend", lights: ["host-pool", "session-hosts"] },
+    // Credited to Terraform onboarding and Image Builder golden images (resume PDF, 2026-10-21), not the provisioning script.
+    { id: "deploy", figure: "40%", label: "faster deploys", lights: ["pipeline", "terraform", "image-builder", "host-pool", "session-hosts"] },
     { id: "users", figure: "450+", label: "users", lights: ["users", "host-pool", "session-hosts"] },
     {
       id: "watch",

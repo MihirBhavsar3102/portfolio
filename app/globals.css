@@ -362,6 +362,22 @@
   }
 }
 
+/* Paused (HeroCycle's button): the lit step holds and the packets stop. */
+[data-hero][data-paused] .hero-packet {
+  animation: none;
+}
+
+/* The pause button, only where the story can play: JavaScript on, motion allowed. */
+.hero-motion {
+  display: none;
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  :root[data-theme] .hero-motion {
+    display: flex;
+  }
+}
+
 @keyframes hero-packet {
   0% {
     opacity: 0;

@@ -1,6 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import { resume } from "@/lib/resume-data";
 import { frame } from "@/components/site/frame";
+import { vercelInsights } from "@/lib/insights";
 
 const link = "inline-flex items-center gap-1 py-0.5 text-ink-2 transition-colors hover:text-ink";
 
@@ -36,7 +37,10 @@ export function SiteFooter() {
           </li>
         </ul>
       </div>
-      <p className={`${frame} pb-10 text-xs text-ink-3`}>Built with Next.js. Every figure on this site comes from my resume.</p>
+      <p className={`${frame} pb-10 text-xs text-ink-3`}>
+        Built with Next.js. Every figure on this site comes from my resume.
+        {vercelInsights && " Visits and page speed are measured anonymously by Vercel, without cookies."}
+      </p>
     </footer>
   );
 }

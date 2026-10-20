@@ -101,10 +101,9 @@ describe("getFeaturedRepos", () => {
 });
 
 describe("featured repos in the site data", () => {
-  it("show the two own repos and hide the uncredited fork, even offline", async () => {
+  it("show no repo for now: both own repos were unlisted (2026-10-21) and the uncredited fork stays hidden", async () => {
     const offline = fake(async () => Promise.reject(new TypeError("offline")));
-    const cards = await getFeaturedRepos(resume.featuredRepos, { fetch: offline.fetch });
-    expect(cards.map((c) => c.name)).toEqual(["Rag-Assistant-Chatbot", "Automatic-Deployment"]);
+    expect(await getFeaturedRepos(resume.featuredRepos, { fetch: offline.fetch })).toEqual([]);
   });
 
   it("revalidates the home page hourly, even when every fetch failed at build", async () => {

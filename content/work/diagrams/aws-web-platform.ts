@@ -4,10 +4,10 @@ import type { Diagram } from "@/types/diagram";
 export const awsWebPlatform: Diagram = {
   title: "The WordPress platform, the pipeline that ships it, and what watches it",
   width: 760,
-  height: 576,
+  height: 528,
   groups: [
     { id: "pipeline", label: "GitHub Actions pipeline", x: 16, y: 96, w: 196, h: 156 },
-    { id: "region", label: "AWS region", x: 244, y: 80, w: 500, h: 400 },
+    { id: "region", label: "AWS region", x: 244, y: 80, w: 500, h: 352 },
     { id: "vpc", label: "VPC", parent: "region", x: 260, y: 116, w: 468, h: 300 },
     { id: "asg", label: "Auto Scaling group", note: "EC2 across availability zones", parent: "vpc", x: 276, y: 214, w: 436, h: 110 },
   ],
@@ -16,11 +16,10 @@ export const awsWebPlatform: Diagram = {
     { id: "alb", label: "Application Load Balancer", tech: "alb", group: "vpc", x: 435, y: 152, w: 250 },
     { id: "ec2", label: "EC2 instances", meta: "WordPress", tech: "ec2", group: "asg", x: 460, y: 262, w: 200 },
     { id: "rds", label: "RDS", meta: "database", tech: "rds", group: "vpc", x: 485, y: 354, w: 150 },
-    { id: "lambda", label: "Lambda", tech: "lambda", group: "region", x: 260, y: 432, w: 150 },
     { id: "terraform", label: "Terraform", meta: "plan and apply", tech: "terraform", group: "pipeline", x: 28, y: 136, w: 172 },
     { id: "ansible", label: "Ansible", meta: "configuration", tech: "ansible", group: "pipeline", x: 28, y: 194, w: 172 },
-    { id: "cloudwatch", label: "CloudWatch", meta: "alarms, dashboards", tech: "cloudwatch", x: 260, y: 512, w: 170 },
-    { id: "grafana", label: "Prometheus + Grafana", meta: "dashboards, alert rules", tech: "grafana", x: 446, y: 512, w: 210 },
+    { id: "cloudwatch", label: "CloudWatch", meta: "alarms, dashboards", tech: "cloudwatch", x: 260, y: 464, w: 170 },
+    { id: "grafana", label: "Prometheus + Grafana", meta: "dashboards, alert rules", tech: "grafana", x: 446, y: 464, w: 210 },
   ],
   edges: [
     {
@@ -57,13 +56,13 @@ export const awsWebPlatform: Diagram = {
     {
       from: "cloudwatch",
       to: "region",
-      path: [[345, 512], [345, 480]],
+      path: [[345, 464], [345, 432]],
       source: "resume: AWS — CloudWatch alarms and dashboards on AWS",
     },
     {
       from: "grafana",
       to: "region",
-      path: [[551, 512], [551, 480]],
+      path: [[551, 464], [551, 432]],
       source:
         "resume: AWS environment section — Grafana dashboards and alert rules on an existing Prometheus stack (A8 skipped; drawn by resume grouping, as on the hero map)",
     },
@@ -83,10 +82,10 @@ export const awsWebPlatform: Diagram = {
   // The pipeline ships into the region from above; traffic enters at CloudFront and runs down to RDS; monitoring watches from below.
   phone: {
     width: 340,
-    height: 722,
+    height: 674,
     groups: {
       pipeline: { x: 8, y: 8, w: 324, h: 96 },
-      region: { x: 8, y: 176, w: 324, h: 392 },
+      region: { x: 8, y: 176, w: 324, h: 344 },
       vpc: { x: 20, y: 212, w: 300, h: 292 },
       asg: { x: 32, y: 304, w: 276, h: 116 },
     },
@@ -97,9 +96,8 @@ export const awsWebPlatform: Diagram = {
       alb: { x: 45, y: 248, w: 250 },
       ec2: { x: 70, y: 360, w: 200 },
       rds: { x: 95, y: 444, w: 150 },
-      lambda: { x: 105, y: 520, w: 130 },
-      grafana: { x: 8, y: 600, w: 210 },
-      cloudwatch: { x: 162, y: 664, w: 170 },
+      grafana: { x: 8, y: 552, w: 210 },
+      cloudwatch: { x: 162, y: 616, w: 170 },
     },
     edges: {
       "cdn->alb": { path: [[170, 156], [170, 248]] },
@@ -107,8 +105,8 @@ export const awsWebPlatform: Diagram = {
       "ec2->rds": { path: [[170, 406], [170, 444]] },
       "terraform->region": { path: [[40, 90], [40, 176]] },
       "ansible->region": { path: [[300, 90], [300, 176]] },
-      "cloudwatch->region": { path: [[300, 664], [300, 568]] },
-      "grafana->region": { path: [[40, 600], [40, 568]] },
+      "cloudwatch->region": { path: [[300, 616], [300, 520]] },
+      "grafana->region": { path: [[40, 552], [40, 520]] },
     },
   },
 };

@@ -47,7 +47,7 @@ function Point({ point }: { point: WorkPoint }) {
 
 /**
  * The role, with the legal employer name (its one appearance on the site) and
- * the time in it, then the workstreams side by side: one short line per fact,
+ * the time in it (and the internship it began as), then the workstreams side by side: one short line per fact,
  * result first. The time is worked out when the page renders (hourly).
  */
 function RoleEntry({ role }: { role: Role }) {
@@ -67,6 +67,7 @@ function RoleEntry({ role }: { role: Role }) {
           <span className="sr-only">, </span>
           <span className="block sm:inline">{role.location}</span>
         </p>
+        {role.internUntil && <p className="mt-1 text-ink-3">Joined as an intern, {period(role.start, role.internUntil)}</p>}
       </header>
 
       <div className="mt-10 grid gap-x-14 gap-y-12 lg:grid-cols-3">

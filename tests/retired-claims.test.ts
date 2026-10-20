@@ -7,13 +7,15 @@ const RETIRED = [
   "200+",
   "1.5+ years",
   "Cloud Infrastructure Intern",
-  "keyword search",
   "rollback",
   "daily deployment",
-  "monthly AWS spend",
   "3+ client",
   "in production",
+  // The work ran on Azure and AWS client environments; GCP is a skill, not where the work ran (resume PDF, 2026-10-21).
+  "AWS, Azure and GCP",
 ];
+// Re-confirmed by Mihir on 2026-10-21 (the resume PDF is the source of truth): "keyword search" (the HR
+// assistant replaced manual lookups and keyword search) and "monthly AWS spend" (the 25% saving is AWS spend).
 
 describe("retired claims", () => {
   it("do not appear in site source or the README", () => {
