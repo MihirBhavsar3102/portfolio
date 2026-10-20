@@ -78,11 +78,11 @@ describe("CaseStudyHeader", () => {
 
 describe("CaseStudyFacts", () => {
   it("names the employer, not the legal name, and links the repo when there is one", () => {
-    const aws = getProject("aws-web-platform")!;
-    const html = htmlOf(createElement(CaseStudyFacts, { project: aws }));
-    expect(textOf(createElement(CaseStudyFacts, { project: aws }))).toContain("Parkar Global Technologies");
+    const withRepo = { ...getProject("aws-web-platform")!, repo: { owner: "o", name: "Some-Repo" } };
+    const html = htmlOf(createElement(CaseStudyFacts, { project: withRepo }));
+    expect(textOf(createElement(CaseStudyFacts, { project: withRepo }))).toContain("Parkar Global Technologies");
     expect(html).not.toContain("Pvt Ltd");
-    expect(html).toContain('href="https://github.com/MihirBhavsar3102/Automatic-Deployment"');
+    expect(html).toContain('href="https://github.com/o/Some-Repo"');
     expect(html).toContain('rel="noopener noreferrer"');
   });
 

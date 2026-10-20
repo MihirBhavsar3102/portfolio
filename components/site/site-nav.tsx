@@ -117,18 +117,18 @@ export function SiteNav() {
   return (
     <header className="sticky top-0 z-50 bg-canvas/85 backdrop-blur-md">
       <div className={`${frame} flex h-14 items-center justify-between gap-4`}>
-        {/* The monogram holds the corner; the name joins it once the hero's own has scrolled away (or on focus). */}
-        <Link href="/" aria-label={resume.name} className="group flex items-center gap-2.5 py-1">
+        {/* The monogram holds the corner; the name joins it once the hero's own has scrolled away (or on focus).
+            The link is named by both, as they read (WCAG 2.5.3): the name stays in the accessibility tree
+            while it is faded out, and below 360px, where it doesn't fit, it is visually hidden rather than removed. */}
+        <Link href="/" className="group flex items-center gap-2.5 py-1">
           <span
-            aria-hidden="true"
             className="grid size-7 shrink-0 place-items-center rounded-lg bg-ink text-[11px] font-bold tracking-[-0.02em] text-canvas"
           >
             {initials}
           </span>
           <span
-            aria-hidden="true"
             data-shown={nameShown || undefined}
-            className="-translate-x-1.5 text-[15px] font-semibold tracking-tight whitespace-nowrap text-ink opacity-0 transition-[opacity,translate] duration-500 ease-out-expo group-focus-visible:translate-x-0 group-focus-visible:opacity-100 data-shown:translate-x-0 data-shown:opacity-100"
+            className="-translate-x-1.5 text-[15px] max-[359px]:sr-only font-semibold tracking-tight whitespace-nowrap text-ink opacity-0 transition-[opacity,translate] duration-500 ease-out-expo group-focus-visible:translate-x-0 group-focus-visible:opacity-100 data-shown:translate-x-0 data-shown:opacity-100"
           >
             {resume.name}
           </span>
@@ -155,12 +155,14 @@ export function SiteNav() {
 
         <div className="flex items-center gap-1">
           <ThemeToggle />
+          {/* On every width: the resume is the handoff a recruiter forwards, so it stays one tap away on a phone too. */}
           <a
             href={resume.resumeFile}
             download
-            className="hidden items-center gap-1.5 px-2 py-2 text-[13px] font-medium text-accent hover:underline md:inline-flex"
+            className="inline-flex items-center gap-1.5 px-2 py-2 text-[13px] font-medium text-accent hover:underline"
           >
-            <Download aria-hidden="true" className="size-3.5" strokeWidth={2} />
+            {/* Below sm the word alone, so the name still fits beside it on a 360px phone. */}
+            <Download aria-hidden="true" className="size-3.5 max-sm:hidden" strokeWidth={2} />
             Resume
           </a>
           <MobileNav />

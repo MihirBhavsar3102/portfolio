@@ -23,7 +23,6 @@ const registry = {
   "auto-scaling": { name: "EC2 Auto Scaling", color: "#FF9900" },
   alb: { name: "Application Load Balancer", color: "#FF9900" },
   rds: { name: "RDS", color: "#FF9900" },
-  lambda: { name: "Lambda", color: "#FF9900" },
   s3: { name: "S3", color: "#FF9900" },
   cloudfront: { name: "CloudFront", color: "#FF9900" },
   cloudwatch: { name: "CloudWatch", color: "#FF9900" },

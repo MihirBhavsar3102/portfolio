@@ -57,6 +57,7 @@ describe("Experience", () => {
       const t = textOf(createElement(Experience));
       expect(t).toContain("Dec 2024 – present · 1 yr 10 mos");
       expect(t).toContain("Ahmedabad, India");
+      expect(t).toContain("Joined as an intern, Dec 2024 – Apr 2025");
     } finally {
       vi.useRealTimers();
     }
@@ -197,6 +198,36 @@ describe("the section reveal", () => {
     expect(hasReveal(createElement(SelectedWork))).toBe(true);
     for (const [name, C] of [["Experience", Experience], ["Stack", Stack], ["Credentials", Credentials], ["Contact", Contact]] as const) {
       expect(hasReveal(createElement(C)), name).toBe(false);
+    }
+  });
+});
+
+describe("SiteFooter", () => {
+  const footerText = async () => {
+    vi.resetModules();
+    const { SiteFooter } = await import("@/components/site/site-footer");
+    return textOf(createElement(SiteFooter));
+  };
+
+  it("says how visits are measured where they are: anonymously, by Vercel, without cookies", async () => {
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("NODE_ENV", "production");
+    try {
+      const text = await footerText();
+      expect(text).toMatch(/Vercel/);
+      expect(text).toMatch(/anonymous/i);
+      expect(text).toMatch(/without cookies/);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("claims no measurement where none runs (a local or Docker build)", async () => {
+    vi.stubEnv("VERCEL", "");
+    try {
+      expect(await footerText()).not.toMatch(/Vercel/);
+    } finally {
+      vi.unstubAllEnvs();
     }
   });
 });

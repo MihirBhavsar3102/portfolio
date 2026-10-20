@@ -117,4 +117,8 @@ describe("sitemap", () => {
     const urls = sitemap().map((e) => e.url);
     expect(urls).toEqual([absoluteUrl("/"), ...resume.projects.map((p) => absoluteUrl(`/work/${p.slug}`))]);
   });
+
+  it("claims no modification dates: a build time is not when the content changed", () => {
+    for (const entry of sitemap()) expect(entry.lastModified, entry.url).toBeUndefined();
+  });
 });

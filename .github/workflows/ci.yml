@@ -107,14 +107,12 @@ jobs:
           # Raises the GitHub section's API limit at build time; without it the
           # section falls back to its curated copy, which the checks also accept.
           GITHUB_TOKEN: ${{ github.token }}
-      # The build is `output: "standalone"`, which `next start` doesn't support,
-      # so serve it the way the Dockerfile does.
+      # The build is `output: "standalone"`, which `next start` doesn't support;
+      # `npm start` serves it the way the Dockerfile does (scripts/start.mjs).
       - name: Start the production server
         run: |
           mkdir -p verify-out
-          cp -r public .next/standalone/public
-          cp -r .next/static .next/standalone/.next/static
-          PORT=3100 HOSTNAME=127.0.0.1 node .next/standalone/server.js > verify-out/server.log 2>&1 &
+          PORT=3100 HOSTNAME=127.0.0.1 npm start > verify-out/server.log 2>&1 &
           for _ in $(seq 1 30); do
             if curl -fsS -o /dev/null http://127.0.0.1:3100/robots.txt; then exit 0; fi
             sleep 1

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { resume } from "@/lib/resume-data";
 import { positioningLine } from "@/lib/format";
+import { tech } from "@/lib/tech";
+import { diagrams } from "@/content/work/diagrams";
+import { listSourceFiles, readSource } from "./source-files";
 
 const { estate } = resume;
 const zoneIds = new Set(estate.zones.map((z) => z.id));
@@ -86,6 +89,14 @@ describe("projects", () => {
     }
   });
 
+  it("link neither unlisted repo: one held employer documents, the other didn't match its case study (2026-10-21)", () => {
+    const unlisted = ["Rag-Assistant-Chatbot", "Automatic-Deployment"];
+    const hits = [...listSourceFiles(["lib", "components", "app", "content"]), "README.md"].flatMap((f) =>
+      unlisted.filter((name) => readSource(f).includes(name)).map((name) => `${f}: ${name}`),
+    );
+    expect(hits).toEqual([]);
+  });
+
   it("keep every experience line crisp: at most 20 words, opening with its bold result", () => {
     const points = resume.experience.flatMap((r) => r.workstreams.flatMap((w) => w.points));
     expect(points.length).toBeGreaterThan(0);
@@ -103,8 +114,12 @@ describe("profile", () => {
     expect(line).toMatch(/^[^.]+\.$/);
   });
 
-  it("strips tracking parameters from verification links", () => {
-    for (const c of resume.certifications) if (c.verifyUrl) expect(c.verifyUrl).not.toMatch(/[?&](ref|utm_)/);
+  it("strips tracking and share parameters from verification links", () => {
+    for (const c of resume.certifications) if (c.verifyUrl) expect(c.verifyUrl).not.toMatch(/[?&](ref|utm_|usp)/);
+  });
+
+  it("links every certification to its proof", () => {
+    for (const c of resume.certifications) expect(c.verifyUrl, c.name).toMatch(/^https:[/][/]/);
   });
 
   it("names the employer as decided", () => {
@@ -112,5 +127,57 @@ describe("profile", () => {
       expect(r.company).toBe("Parkar Global Technologies");
       expect(r.legalName).toBe("Parkar Global Technologies Pvt Ltd");
     }
+  });
+});
+
+/** The resume PDF is the source of truth (Mihir, 2026-10-21): where the site said otherwise, it now says what the PDF says. */
+describe("agrees with the resume PDF", () => {
+  const proof = (id: string) => estate.proof.find((p) => p.id === id)!;
+  const workstream = (name: string) => resume.experience[0].workstreams.find((w) => w.name === name)!;
+
+  it("credits the 25% saving to AWS alone, from right-sizing and auto-scaling", () => {
+    expect(proof("spend").figure.label).toBe("lower monthly AWS spend");
+    expect(proof("spend").highlight).toEqual(["asg"]);
+    expect(workstream("AWS environments").points.map((p) => p.lead)).toContain("25% lower monthly AWS spend");
+    expect(workstream("Azure Virtual Desktop").points.some((p) => p.text.includes("25%"))).toBe(false);
+    expect(resume.projects.find((p) => p.slug === "avd-automation")!.figures.map((f) => f.value)).not.toContain("25%");
+  });
+
+  it("credits the 40% faster AVD deployments to Terraform onboarding and Image Builder golden images", () => {
+    const { figure, highlight } = proof("deploy");
+    expect(figure.provenance).toMatch(/Terraform/);
+    expect(figure.provenance).toMatch(/Image Builder/);
+    expect(figure.provenance).not.toMatch(/PowerShell/);
+    expect(highlight).toContain("terraform");
+    expect(highlight).not.toContain("powershell");
+  });
+
+  it("notes that the role began as an internship, December 2024 to April 2025", () => {
+    expect(resume.experience[0].start).toBe("2024-12");
+    expect(resume.experience[0].internUntil).toBe("2025-04");
+  });
+
+  it("says the HR assistant shipped as an internal tool, replacing manual lookups and keyword search", () => {
+    const { figure } = proof("answers");
+    expect(figure.label).toBe("faster HR policy query resolution");
+    expect(figure.provenance).toMatch(/internal tool/);
+    expect(figure.provenance).toMatch(/keyword search/);
+  });
+
+  it("names no Lambda, which the PDF doesn't list, in the map, the stacks, the skills or the diagrams", () => {
+    expect("lambda" in tech).toBe(false);
+    const named = [
+      ...estate.zones.flatMap((z) => z.nodes.map((n) => n.label)),
+      ...resume.projects.flatMap((p) => p.stack as string[]),
+      ...resume.skillGroups.flatMap((g) => g.skills.map((k) => `${k.name} ${k.detail ?? ""}`)),
+      ...resume.experience.flatMap((r) => r.workstreams.flatMap((w) => w.points.map((p) => p.text))),
+      ...Object.values(diagrams).flatMap((d) => d.nodes.map((n) => n.label)),
+    ];
+    expect(named.filter((t) => /lambda/i.test(t))).toEqual([]);
+  });
+
+  it("lists Code Vimarsh beside the NCC letter", () => {
+    const vimarsh = resume.achievements.find((a) => a.title.includes("Code Vimarsh"));
+    expect(vimarsh?.detail).toMatch(/300\+ students/);
   });
 });

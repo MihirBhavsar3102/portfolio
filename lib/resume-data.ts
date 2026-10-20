@@ -11,7 +11,7 @@ const fig = {
     value: "40%",
     // Non-breaking spaces keep each duration on one line.
     label: "faster AVD deployments across clients, ~8\u00a0h\u00a0→ ~5\u00a0h",
-    provenance: "PowerShell provisioning and Azure VM Image Builder golden images replaced the manual build.",
+    provenance: "Terraform builds a new client's host pools, session hosts and networking from Image Builder golden images, with FSLogix profiles and autoscaling.",
     measuredHow: "Timed the deployment task before and after automation.",
   },
   manual: {
@@ -22,8 +22,8 @@ const fig = {
   },
   spend: {
     value: "25%",
-    label: "lower monthly cloud spend across Azure and AWS",
-    provenance: "Right-sizing and autoscaling across both clouds.",
+    label: "lower monthly AWS spend",
+    provenance: "Right-sizing and auto-scaling on AWS.",
   },
   users: {
     value: "450+",
@@ -47,8 +47,8 @@ const fig = {
   },
   answers: {
     value: "~60%",
-    label: "faster answers to HR policy questions",
-    provenance: "FAISS retrieval feeds Llama inference, replacing manual lookups in policy documents.",
+    label: "faster HR policy query resolution",
+    provenance: "Shipped as an internal tool: FAISS retrieval feeds Llama inference, replacing manual lookups and keyword search.",
   },
 } satisfies Record<string, Figure>;
 
@@ -61,7 +61,7 @@ export const resume: Resume = {
     verbs: ["built", "shipped", "monitored"],
   },
   summary:
-    "Cloud and DevOps engineer working across AWS, Azure and GCP since December 2024. Most of my work is infrastructure as code and delivery pipelines — Terraform, GitHub Actions and Azure DevOps — plus Linux administration and monitoring with Prometheus, Grafana and CloudWatch. I've used Docker, Kubernetes, Helm and ArgoCD in project work.",
+    "Cloud and DevOps engineer automating multi-client Azure and AWS environments since December 2024. Most of my work is infrastructure as code and delivery pipelines — Terraform, GitHub Actions and Azure DevOps — plus Linux administration and monitoring with Prometheus, Grafana and CloudWatch. I've used Docker, Kubernetes, Helm and ArgoCD in project work.",
   email: "mihirbhavsar2001@gmail.com",
   resumeFile: "/MihirBhavsar_Resume.pdf",
   socials: [
@@ -94,7 +94,6 @@ export const resume: Resume = {
           { id: "alb", label: "Load balancer", tech: "alb" },
           { id: "asg", label: "EC2 Auto Scaling", meta: "multi-AZ", tech: "auto-scaling" },
           { id: "rds", label: "RDS", tech: "rds" },
-          { id: "lambda", label: "Lambda", tech: "lambda" },
         ],
       },
       {
@@ -143,7 +142,7 @@ export const resume: Resume = {
       { from: "orchestration", to: "retrieval", source: "resume: HR chatbot — FAISS semantic retrieval" },
       { from: "orchestration", to: "inference", source: "resume: HR chatbot — Llama inference" },
       { from: "terraform", to: "azure", source: "resume: AVD — Azure DevOps pipelines running Terraform" },
-      { from: "powershell", to: "azure", source: "resume: AVD — PowerShell provisioning" },
+      { from: "powershell", to: "azure", source: "resume: AVD — Azure DevOps pipelines running Terraform and PowerShell" },
       { from: "azure-devops", to: "azure", source: "resume: AVD — Azure DevOps pipelines" },
       { from: "terraform", to: "aws", source: "resume: AWS environment — Terraform plan and apply" },
       { from: "ansible", to: "aws", source: "resume: AWS environment — CI/CD with Ansible" },
@@ -153,9 +152,9 @@ export const resume: Resume = {
       { from: "grafana", to: "aws", source: "resume: AWS environment section — Grafana on Prometheus" },
     ],
     proof: [
-      { id: "deploy", figure: fig.deploy, highlight: ["golden-images", "session-hosts", "host-pools", "powershell"] },
+      { id: "deploy", figure: fig.deploy, highlight: ["golden-images", "session-hosts", "host-pools", "terraform"] },
       { id: "manual", figure: fig.manual, highlight: ["key-vault", "domain-join", "session-hosts", "azure-devops", "terraform", "powershell"] },
-      { id: "spend", figure: fig.spend, highlight: ["host-pools", "asg"] },
+      { id: "spend", figure: fig.spend, highlight: ["asg"] },
       { id: "users", figure: fig.users, highlight: ["host-pools", "session-hosts"] },
       { id: "uptime", figure: fig.uptime, highlight: ["cdn", "alb", "asg", "rds"] },
       { id: "answers", figure: fig.answers, highlight: ["api", "orchestration", "retrieval", "inference"] },
@@ -169,6 +168,7 @@ export const resume: Resume = {
       legalName: "Parkar Global Technologies Pvt Ltd",
       location: "Ahmedabad, India",
       start: "2024-12",
+      internUntil: "2025-04",
       workstreams: [
         // One line per fact, result first: the case studies tell the longer story.
         {
@@ -179,14 +179,13 @@ export const resume: Resume = {
           points: [
             {
               lead: "40% faster deployments",
-              text: "40% faster deployments, ~8\u00a0h to ~5\u00a0h, with PowerShell and Image Builder golden images",
+              text: "40% faster deployments, ~8\u00a0h to ~5\u00a0h, with Terraform onboarding and Image Builder golden images",
             },
             {
               lead: "70%+ less manual effort",
               text: "70%+ less manual effort and near-zero config errors: Azure DevOps pipelines automate Terraform, PowerShell, domain join and Key Vault secrets",
             },
             { lead: "450+ concurrent users", text: "450+ concurrent users on autoscaling host pools with FSLogix profiles" },
-            { lead: "25% lower monthly cloud spend", text: "25% lower monthly cloud spend from right-sizing and autoscaling" },
             { lead: "Faster incident resolution", text: "Faster incident resolution with Azure Monitor and Log Analytics (KQL)" },
           ],
         },
@@ -198,10 +197,11 @@ export const resume: Resume = {
           points: [
             {
               lead: "99.9% uptime",
-              text: "99.9% uptime on a multi-AZ WordPress platform: EC2 Auto Scaling, ALB, RDS, Lambda, S3, CloudFront",
+              text: "99.9% uptime on a multi-AZ WordPress platform: EC2 Auto Scaling, ALB, RDS, S3, CloudFront",
             },
             { lead: "Under 30 minutes", text: "Under 30 minutes to stand up a new environment from Terraform, replicated in one step" },
             { lead: "50%+ faster feature delivery", text: "50%+ faster feature delivery through a Terraform, Ansible and GitHub Actions pipeline" },
+            { lead: "25% lower monthly AWS spend", text: "25% lower monthly AWS spend from right-sizing and auto-scaling" },
             {
               lead: "Monitoring",
               text: "Monitoring: Grafana dashboards and alert rules on an existing Prometheus stack, plus CloudWatch alarms",
@@ -222,12 +222,12 @@ export const resume: Resume = {
       title: "Azure Virtual Desktop automation",
       headline: "Automating Azure Virtual Desktop for five enterprise clients",
       summary:
-        "Provisioning, imaging and scaling Azure Virtual Desktop for five enterprise clients, automated with PowerShell, Image Builder and Azure DevOps pipelines.",
+        "Provisioning, imaging and scaling Azure Virtual Desktop for five enterprise clients, automated with Terraform, PowerShell, Image Builder and Azure DevOps pipelines.",
       kind: "work",
       zone: "azure",
-      role: "Built the end-to-end VM provisioning in PowerShell; one of a four-person team running the estate.",
+      role: "Automated new-client onboarding in Terraform and built the end-to-end VM provisioning in PowerShell; one of a four-person team running the estate.",
       stack: ["azure-virtual-desktop", "powershell", "azure-image-builder", "azure-devops", "terraform", "key-vault", "fslogix", "azure-monitor"],
-      figures: [fig.manual, fig.deploy, fig.spend, fig.users],
+      figures: [fig.manual, fig.deploy, fig.users],
     },
     {
       slug: "aws-web-platform",
@@ -238,8 +238,7 @@ export const resume: Resume = {
       kind: "work",
       zone: "aws",
       role: "Designed and deployed the platform; built its Terraform and its CI/CD pipeline.",
-      repo: { owner: "MihirBhavsar3102", name: "Automatic-Deployment" },
-      stack: ["ec2", "auto-scaling", "alb", "rds", "lambda", "s3", "cloudfront", "terraform", "ansible", "github-actions", "cloudwatch", "prometheus", "grafana"],
+      stack: ["ec2", "auto-scaling", "alb", "rds", "s3", "cloudfront", "terraform", "ansible", "github-actions", "cloudwatch", "prometheus", "grafana"],
       figures: [fig.uptime, fig.setup, fig.delivery],
     },
     {
@@ -250,7 +249,6 @@ export const resume: Resume = {
       kind: "work",
       zone: "ai",
       role: "Built it: FAISS retrieval, Llama inference and the FastAPI service around them.",
-      repo: { owner: "MihirBhavsar3102", name: "Rag-Assistant-Chatbot" },
       stack: ["python", "fastapi", "langchain", "faiss", "llama"],
       figures: [fig.answers],
     },
@@ -304,7 +302,7 @@ export const resume: Resume = {
     {
       name: "Cloud platforms",
       skills: [
-        { name: "AWS", detail: "EC2, IAM, VPC, S3, ALB, ASG, RDS, Route 53, Lambda, CloudFront, Secrets Manager", tech: "aws" },
+        { name: "AWS", detail: "EC2, IAM, VPC, S3, ALB, ASG, RDS, Route 53, CloudFront, Secrets Manager", tech: "aws" },
         { name: "Azure", detail: "AVD, Virtual Machines, Entra ID, Key Vault, RBAC", tech: "azure" },
         { name: "Google Cloud", detail: "Compute Engine, Cloud Monitoring", tech: "gcp" },
       ],
@@ -395,7 +393,12 @@ export const resume: Resume = {
       earned: "2026-04",
       verifyUrl: "https://learn.microsoft.com/en-in/users/mihirbhavsar-6601/credentials/b49e1012070f7cc0",
     },
-    { name: "Google Cloud Digital Leader", issuerId: "google" },
+    {
+      name: "Google Cloud Digital Leader",
+      issuerId: "google",
+      // The certificate itself, shared from Google Drive (no date supplied, so none is shown).
+      verifyUrl: "https://drive.google.com/file/d/1AU5UDE5Eig8qBOiJxJ5KKXCklrAYxEix/view",
+    },
   ],
 
   education: [
@@ -415,26 +418,19 @@ export const resume: Resume = {
 
   achievements: [
     {
+      title: "Code Vimarsh, MSU Baroda",
+      detail: "Core founder. Grew it into a coding community of 300+ students through contests, guest lectures and DSA sessions.",
+    },
+    {
       title: "National Cadet Corps, 2019 – 2022",
       detail: "Letter of Appreciation from Admiral Karambir Singh, former Chief of the Naval Staff.",
     },
   ],
 
+  // The GitHub section shows only these, and none for now: on 2026-10-21 the
+  // HR assistant's repo went private (it held employer documents) and the AWS
+  // pipeline's repo came off the site (it didn't match its case study).
   featuredRepos: [
-    {
-      owner: "MihirBhavsar3102",
-      name: "Rag-Assistant-Chatbot",
-      blurb: "The HR policy assistant: FAISS retrieval and Llama inference behind a FastAPI service.",
-      demonstrates: "Applied AI",
-      project: "hr-policy-assistant",
-    },
-    {
-      owner: "MihirBhavsar3102",
-      name: "Automatic-Deployment",
-      blurb: "The Terraform, Ansible and GitHub Actions pipeline behind the AWS web platform.",
-      demonstrates: "CI/CD and IaC",
-      project: "aws-web-platform",
-    },
     {
       owner: "MihirBhavsar3102",
       name: "Natural-Language-to-Robot-Framework",

@@ -4,8 +4,8 @@ import { absoluteUrl } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
-    { url: absoluteUrl("/"), lastModified: new Date(), changeFrequency: "monthly", priority: 1 },
-    // No lastModified: there's no honest per-case-study date to give.
+    // No lastModified anywhere: the build time isn't when the content changed, and there's no honest per-page date to give.
+    { url: absoluteUrl("/"), changeFrequency: "monthly", priority: 1 },
     ...resume.projects.map((p) => ({ url: absoluteUrl(`/work/${p.slug}`), changeFrequency: "yearly" as const, priority: 0.8 })),
   ];
 }

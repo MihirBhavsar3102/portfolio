@@ -1,16 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Portal, Toast } from "radix-ui";
-import { Check, Copy, X } from "lucide-react";
+import dynamic from "next/dynamic";
+import { Check, Copy } from "lucide-react";
 
 /**
  * The address as a mailto link, with a copy control beside it. Copying is
- * announced through a Radix toast (an aria-live region). Where the Clipboard
- * API is missing (plain-http origins, locked-down browsers) or the write is
- * refused, the control selects the address and says how to copy it, so it
- * never dead-ends.
+ * announced through a Radix toast (an aria-live region, components/ui/copy-toast.tsx),
+ * which stays out of the first load: hovering or focusing the control starts
+ * loading it, and the first copy shows it. Where the Clipboard API is missing
+ * (plain-http origins, locked-down browsers) or the write is refused, the
+ * control selects the address and says how to copy it, so it never dead-ends.
  */
+const loadToast = () => import("@/components/ui/copy-toast");
+const CopyToast = dynamic(loadToast, { ssr: false });
+const warm = () => void loadToast();
+
 /** `display` sets the address large, as the close of the page, with a round copy button beside it; on phones the type steps down so the button stays on the address's line. */
 const looks = {
   default: {
@@ -38,6 +43,7 @@ export function CopyEmailButton({
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [copied, setCopied] = useState(false);
+  const [toastWanted, setToastWanted] = useState(false);
   const timerRef = useRef(0);
   const linkRef = useRef<HTMLAnchorElement>(null);
 
@@ -52,6 +58,7 @@ export function CopyEmailButton({
 
   /** Radix re-announces a toast only on a fresh open, so close before reopening. */
   function announce(text: string) {
+    setToastWanted(true);
     setMessage(text);
     setOpen(false);
     window.clearTimeout(timerRef.current);
@@ -83,7 +90,7 @@ export function CopyEmailButton({
   }
 
   return (
-    <Toast.Provider swipeDirection="right" duration={3200}>
+    <>
       <div
         className={`${look.box} ${className ?? ""}`}
       >
@@ -97,6 +104,8 @@ export function CopyEmailButton({
         <button
           type="button"
           onClick={handleCopy}
+          onPointerEnter={warm}
+          onFocus={warm}
           aria-label="Copy email address"
           className={look.button}
         >
@@ -108,24 +117,7 @@ export function CopyEmailButton({
         </button>
       </div>
 
-      <Toast.Root
-        open={open}
-        onOpenChange={setOpen}
-        className="anim-toast flex items-center justify-between gap-3 rounded-xl border border-line-strong bg-surface-2 px-4 py-3 shadow-[0_18px_44px_-18px_rgb(0_0_0/0.45)]"
-      >
-        <Toast.Title className="text-sm text-ink">{message}</Toast.Title>
-        <Toast.Close aria-label="Dismiss" className="flex size-6 shrink-0 items-center justify-center rounded-full text-ink-3 transition-colors hover:bg-surface-3 hover:text-ink">
-          <X aria-hidden="true" className="size-3.5" strokeWidth={2} />
-        </Toast.Close>
-      </Toast.Root>
-
-      {/* At the end of <body>: a transformed ancestor (the section reveal, mid-rise) would otherwise become the fixed viewport's containing block. */}
-      <Portal.Root>
-        <Toast.Viewport
-          label="Notifications ({hotkey})"
-          className="fixed right-4 bottom-4 z-100 flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2 outline-none"
-        />
-      </Portal.Root>
-    </Toast.Provider>
+      {toastWanted && <CopyToast open={open} onOpenChange={setOpen} message={message} />}
+    </>
   );
 }

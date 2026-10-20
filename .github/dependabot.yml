@@ -40,6 +40,22 @@ updates:
       minor-and-patch:
         update-types: [minor, patch]
 
+  # Keeps the Dockerfile's digest-pinned base image current. The Node major
+  # follows package.json engines and the CI's Node by hand (tests/ci.test.ts).
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Asia/Kolkata
+    cooldown:
+      default-days: 7
+    ignore:
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
+    commit-message:
+      prefix: "chore(docker)"
+
   # Keeps the SHA-pinned actions in the workflows current.
   - package-ecosystem: github-actions
     directory: /

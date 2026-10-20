@@ -8,6 +8,12 @@ const nextConfig: NextConfig = {
   output: "standalone",
   // X-Powered-By only advertises the framework and its version family.
   poweredByHeader: false,
+  // /work has no page of its own (every case study lives under it); a trimmed
+  // URL lands on the work section rather than the 404. Temporary, so a future
+  // index page can take the path back.
+  async redirects() {
+    return [{ source: "/work", destination: "/#work", permanent: false }];
+  },
   async headers() {
     // On Vercel, also the commit this build came from (VERCEL_GIT_COMMIT_SHA), so
     // the post-deploy workflow can tell when production serves the commit it checks.

@@ -1,7 +1,8 @@
 // Browser verification for the portfolio: drives a Chromium-family browser
 // (Edge, Chrome or Chromium) headless over the Chrome DevTools Protocol (Node
-// 24 global WebSocket, zero dependencies), captures desktop/mobile screenshots
-// and checks Trace, nav, a11y and motion behaviour.
+// 24 global WebSocket, no imports), captures desktop/mobile screenshots and
+// checks Trace, nav, a11y and motion behaviour. Its accessibility pass injects
+// axe-core from node_modules, so run `npm ci` first.
 // Usage: node scripts/verify-ui.mjs <baseUrl> <outDir> [label]
 // Set BROWSER_PATH to choose the browser; otherwise the first one found is used.
 // Run against `next start` (and `next dev`); exits non-zero if any check fails
@@ -303,6 +304,16 @@ const MOBILE = { width: 375, height: 812, mobile: true };
 await load("/", DESKTOP);
 const css = responses.filter((r) => r.url.includes(".css"));
 check("stylesheet loads", css.length > 0 && css.every((r) => r.status === 200), css.map((r) => r.status).join(","));
+// A budget on the home page's first-load JavaScript, compressed as served: the phone menu and the copy
+// toast (Radix) load on first use, so a static import that drags them back in fails here. Measured
+// 2026-10-21; raise it on purpose, never to make a run pass.
+const JS_BUDGET_KB = 200;
+const firstLoadJs = await evaluate(
+  `Math.round(performance.getEntriesByType('resource').filter((e) => { const p = new URL(e.name).pathname; return p.startsWith('/_next/static/') && p.endsWith('.js'); }).reduce((n, e) => n + e.encodedBodySize, 0) / 1024)`,
+);
+// A dev build ships unminified code with its dev overlay (<nextjs-portal>), so the budget only judges production builds.
+if (await evaluate("!!document.querySelector('nextjs-portal')")) console.log(`skip  home's first-load JavaScript budget: a dev build (${firstLoadJs} KB unminified)`);
+else check(`home's first-load JavaScript stays within ${JS_BUDGET_KB} KB compressed`, firstLoadJs > 0 && firstLoadJs <= JS_BUDGET_KB, `${firstLoadJs} KB`);
 await shot(`${LABEL}-desktop-viewport`);
 await shot(`${LABEL}-desktop-full`, { fullPage: true });
 
@@ -377,6 +388,27 @@ const stillPhase = (await heroState()).phase;
 await evaluate("window.scrollTo(0, 0); true");
 const resumed = await waitFor(`document.querySelector('[data-hero]').dataset.phase !== ${JSON.stringify(stillPhase)}`, 5000);
 check("the story pauses while the hero is off screen and resumes on return", offPhase === stillPhase && resumed, `${offPhase} → ${stillPhase}, resumed ${resumed}`);
+
+// The pause button (WCAG 2.2.2): it holds the story where it stands, the choice survives a reload, and play carries on.
+const motion = () =>
+  evaluate(`(() => { const hero = document.querySelector('[data-hero]'); const packets = [...hero.querySelectorAll('.hero-packet')]; return { phase: hero.dataset.phase ?? null, paused: hero.hasAttribute('data-paused'), packetsStill: packets.length > 0 && packets.every(p => getComputedStyle(p).animationName === 'none'), label: hero.querySelector('.hero-motion').getAttribute('aria-label') }; })()`);
+await evaluate("window.scrollTo(0, 0); true");
+await mouseAt("[data-hero] .hero-motion");
+const heldAt = (await motion()).phase;
+await sleep(4200);
+const held = await motion();
+check(
+  "the pause button holds the story where it stands and stops the packets",
+  !!heldAt && held.phase === heldAt && held.paused && held.packetsStill && held.label === "Play animation",
+  JSON.stringify({ heldAt, ...held }),
+);
+await load("/", DESKTOP);
+await sleep(3600);
+const pauseKept = await motion();
+check("a pause is remembered on the next visit: the story stays at rest", pauseKept.phase === null && pauseKept.label === "Play animation", JSON.stringify(pauseKept));
+await mouseAt("[data-hero] .hero-motion");
+const playedOn = await waitFor(`document.querySelector('[data-hero]').dataset.phase === 'ship'`, 5000);
+check("play starts the story again and forgets the pause", playedOn && (await motion()).label === "Pause animation" && (await evaluate("localStorage.getItem('hero-motion')")) === null, String(playedOn));
 await evaluate("window.scrollTo({ top: document.querySelector('h1').getBoundingClientRect().bottom + scrollY + 40, behavior: 'instant' }); true");
 await sleep(900);
 const scrolledName = await navName();
@@ -533,14 +565,15 @@ const stack = await evaluate(
 check("stack: nine groups, both markers and a key naming them", stack.groups === 9 && stack.work > 0 && stack.project > 0 && stack.key, JSON.stringify(stack));
 const verifyLinks = await evaluate(`[...document.querySelectorAll('#credentials a[href^="http"]')].map(a => a.target + ' ' + a.rel)`);
 check(
-  "credentials: four verify links open safely in a new tab",
-  verifyLinks.length === 4 && verifyLinks.every((v) => v === "_blank noopener noreferrer"),
+  "credentials: five verify links, one per certification, open safely in a new tab",
+  verifyLinks.length === 5 && verifyLinks.every((v) => v === "_blank noopener noreferrer"),
   verifyLinks.join(" | "),
 );
+// Both own repos came off the site on 2026-10-21 and the fork stays hidden, so the GitHub section has nothing to show.
 const repos = await evaluate(
-  `({ names: [...document.querySelectorAll('#github h3 a')].map(a => a.firstChild.textContent.trim()), live: document.getElementById('github')?.innerText.includes('Last pushed') ?? false })`,
+  `({ section: !!document.getElementById('github'), unlisted: [...document.querySelectorAll('a[href]')].map(a => a.href).filter(h => /Rag-Assistant-Chatbot|Automatic-Deployment|Natural-Language-to-Robot/.test(h)) })`,
 );
-check("GitHub: the two own repos, never the uncredited fork", repos.names.length === 2 && !repos.names.some((n) => n.includes("Robot")), JSON.stringify(repos));
+check("GitHub: no section and no link to an unlisted repo", !repos.section && repos.unlisted.length === 0, JSON.stringify(repos));
 
 // The Contact section is too short to reach the observer band; at the foot of the page it is still the one marked.
 await evaluate("window.scrollTo(0, 0); true");
@@ -630,7 +663,8 @@ check("on a 375x812 phone the hero's proof lines are on the first screen", phone
 const svgShown = await evaluate("getComputedStyle(document.querySelector('figure')?.parentElement ?? document.body).display");
 check("drawing replaced by the stack below md", svgShown === "none", svgShown);
 await mouseAt("button[aria-label='Open menu']");
-const menuOpen = await evaluate("!!document.querySelector('[role=dialog]')");
+// The menu loads on first use, so wait for it rather than reading the page straight after the tap.
+const menuOpen = await waitFor("!!document.querySelector('[role=dialog]')", 3000);
 check("mobile menu opens", menuOpen);
 await shot(`${LABEL}-mobile-menu`);
 // Copying from inside the modal menu: its toast must be readable and dismissable while the menu is open.
@@ -682,10 +716,13 @@ const stackHeight = await evaluate("Math.round(document.getElementById('stack').
 check("Stack at 375 is shorter than the 2,180px it started at", stackHeight < 1900, `${stackHeight}px`);
 
 // ---------- Reflow at 320 (WCAG 1.4.10), keyboard reach and focus, unknown share-card slug ----------
-for (const path of ["/", cardHrefs[0]]) {
-  await load(path, { width: 320, height: 640, mobile: true });
-  const o = await evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth");
-  check(`${path} at 320: no horizontal scroll`, o === 0, `overflow ${o}px`);
+// 360 too: the commonest Android width, and the narrowest where the nav shows its name beside the Resume link.
+for (const width of [320, 360]) {
+  for (const path of ["/", cardHrefs[0]]) {
+    await load(path, { width, height: 640, mobile: true });
+    const o = await evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth");
+    check(`${path} at ${width}: no horizontal scroll`, o === 0, `overflow ${o}px`);
+  }
 }
 await load("/", DESKTOP);
 await evaluate("document.activeElement?.blur(); window.scrollTo(0, 0); true");
@@ -704,6 +741,9 @@ check("Tab reaches every visible control on the home page", seen.size >= focusab
 check("every focused control shows a visible focus indicator", unringed.length === 0, unringed.slice(0, 6).join(" | "));
 const ogMissing = await evaluate(`fetch('/work/not-a-case-study/opengraph-image').then(r => r.status)`);
 check("an unknown case study has no share card", ogMissing === 404, String(ogMissing));
+// /work has no page of its own: a trimmed case-study URL lands on the work section, not the 404.
+const workIndex = await fetch(`${BASE}/work`, { redirect: "manual" });
+check("/work redirects to the work section on home", workIndex.status === 307 && /\/#work$/.test(workIndex.headers.get("location") ?? ""), `${workIndex.status} ${workIndex.headers.get("location")}`);
 
 // ---------- Stack chips keep their height; the hero's separator never dangles ----------
 await load("/", DESKTOP);
@@ -965,11 +1005,11 @@ check("reduced motion runs no animations", running === 0, `${running} running`);
 const restingReduced = await evaluate("getComputedStyle(document.querySelector('#work .reveal')).opacity");
 check("reduced motion: off-screen sections are fully visible", restingReduced === "1", restingReduced);
 const heroReduced = await evaluate(
-  `({ phase: document.querySelector('[data-hero]').dataset.phase ?? null, sentence: getComputedStyle(document.querySelector('.hero-static')).clipPath, rolling: getComputedStyle(document.querySelector('.hero-rolling')).display })`,
+  `({ phase: document.querySelector('[data-hero]').dataset.phase ?? null, sentence: getComputedStyle(document.querySelector('.hero-static')).clipPath, rolling: getComputedStyle(document.querySelector('.hero-rolling')).display, pause: getComputedStyle(document.querySelector('.hero-motion')).display })`,
 );
 check(
-  "reduced motion: the hero rests, its line read as one sentence",
-  heroReduced.phase === null && heroReduced.sentence === "none" && heroReduced.rolling === "none",
+  "reduced motion: the hero rests, its line read as one sentence, with no pause button (nothing moves)",
+  heroReduced.phase === null && heroReduced.sentence === "none" && heroReduced.rolling === "none" && heroReduced.pause === "none",
   JSON.stringify(heroReduced),
 );
 await send("Emulation.setEmulatedMedia", { features: LIGHT });
@@ -978,12 +1018,16 @@ await send("Emulation.setEmulatedMedia", { features: LIGHT });
 await send("Emulation.setScriptExecutionDisabled", { value: true });
 await load("/", DESKTOP, { scripts: false });
 await send("Emulation.setScriptExecutionDisabled", { value: false });
-const noJs = await evaluate(`({ figures: document.querySelectorAll('#outcomes ul .type-figure').length, provenance: document.querySelectorAll('[id^=proof-][id$=-how]').length, name: document.querySelector('h1')?.textContent, sections: ['work', 'experience', 'stack', 'credentials', 'github', 'contact'].filter(id => document.getElementById(id)).length, revealOpacity: getComputedStyle(document.querySelector('#work .reveal')).opacity })`);
-check("content complete with JavaScript off", noJs.figures === 6 && noJs.provenance === 6 && !!noJs.name && noJs.sections === 6 && noJs.revealOpacity === "1", JSON.stringify(noJs));
+const noJs = await evaluate(`({ figures: document.querySelectorAll('#outcomes ul .type-figure').length, provenance: document.querySelectorAll('[id^=proof-][id$=-how]').length, name: document.querySelector('h1')?.textContent, sections: ['work', 'experience', 'stack', 'credentials', 'contact'].filter(id => document.getElementById(id)).length, revealOpacity: getComputedStyle(document.querySelector('#work .reveal')).opacity })`);
+check("content complete with JavaScript off", noJs.figures === 6 && noJs.provenance === 6 && !!noJs.name && noJs.sections === 5 && noJs.revealOpacity === "1", JSON.stringify(noJs));
 const noJsLine = await evaluate(
-  `({ sentence: getComputedStyle(document.querySelector('.hero-static')).clipPath, rolling: getComputedStyle(document.querySelector('.hero-rolling')).display })`,
+  `({ sentence: getComputedStyle(document.querySelector('.hero-static')).clipPath, rolling: getComputedStyle(document.querySelector('.hero-rolling')).display, pause: getComputedStyle(document.querySelector('.hero-motion')).display })`,
 );
-check("with JavaScript off the hero's line reads as one sentence", noJsLine.sentence === "none" && noJsLine.rolling === "none", JSON.stringify(noJsLine));
+check(
+  "with JavaScript off the hero's line reads as one sentence, and the pause button (which would do nothing) hides",
+  noJsLine.sentence === "none" && noJsLine.rolling === "none" && noJsLine.pause === "none",
+  JSON.stringify(noJsLine),
+);
 await shot(`${LABEL}-desktop-nojs`);
 
 await send("Emulation.setScriptExecutionDisabled", { value: true });
@@ -993,6 +1037,40 @@ const noJsWork = await evaluate(
   `({ h1: !!document.querySelector('h1'), sections: document.querySelectorAll('article h2').length, edges: document.querySelectorAll('[data-diagram] [data-edge]').length })`,
 );
 check("a case study is complete with JavaScript off", noJsWork.h1 && noJsWork.sections >= 5 && noJsWork.edges > 0, JSON.stringify(noJsWork));
+
+// ---------- Accessibility engine (axe-core) ----------
+// Every route, in both themes, at desktop and phone widths: WCAG 2.0–2.2 A and AA rules and axe's best
+// practices, plus label-in-name (WCAG 2.5.3), which axe ships switched off. CDP's evaluate isn't bound by
+// the page's CSP, so the engine goes in straight from node_modules (npm ci installs it; see package.json).
+const axePath = join(process.cwd(), "node_modules", "axe-core", "axe.min.js");
+const axeSource = existsSync(axePath) ? readFileSync(axePath, "utf8") : null;
+check("axe-core is installed for the accessibility pass", !!axeSource, axePath);
+if (axeSource) {
+  await send("Emulation.setEmulatedMedia", { features: LIGHT });
+  await load("/", DESKTOP);
+  await evaluate("localStorage.clear(); true"); // no stored theme or pause: the system setting decides
+  const findings = [];
+  let runs = 0;
+  for (const scheme of ["light", "dark"]) {
+    await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: scheme }] });
+    for (const view of [DESKTOP, MOBILE]) {
+      for (const path of ["/", ...cardHrefs, "/no-such-page"]) {
+        await load(path, view);
+        // Scroll through once so the one section reveal has played, then rest at the top.
+        await evaluate("(async () => { for (let y = 0; y < document.body.scrollHeight; y += innerHeight / 2) { scrollTo(0, y); await new Promise((r) => setTimeout(r, 60)); } scrollTo(0, 0); return true; })()");
+        await sleep(900);
+        await evaluate(`${axeSource}; true`);
+        const violations = await evaluate(
+          "axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'] }, rules: { 'label-content-name-mismatch': { enabled: true } }, resultTypes: ['violations'] }).then((r) => r.violations.map((v) => v.id + ' x' + v.nodes.length + ' at ' + v.nodes[0].target.join(' ')))",
+        );
+        runs++;
+        for (const v of violations) findings.push(`${path} ${view.width}px ${scheme}: ${v}`);
+      }
+    }
+  }
+  await send("Emulation.setEmulatedMedia", { features: LIGHT });
+  check(`axe: no violation on any route, theme or width (${runs} runs)`, findings.length === 0, findings.slice(0, 6).join(" | "));
+}
 
 check("no console errors", consoleErrors.length === 0, consoleErrors.slice(0, 3).join(" | "));
 

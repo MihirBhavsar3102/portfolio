@@ -1,0 +1,59 @@
+# Builds the Docker image and asks it for the site, so the Dockerfile (kept for
+# a later move to a container host) can't rot unnoticed. Runs when a pull
+# request changes what the image is built from, every week (the base image
+# moves under it), and by hand. Not a required check on master: a check that
+# runs only on some pull requests would block every other one.
+#
+# Same hardening as ci.yml: read-only token, no checkout credentials left on
+# disk, every action pinned to a full commit SHA, a timeout on the job.
+name: Container
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - package.json
+      - package-lock.json
+      - next.config.ts
+      - .github/workflows/container.yml
+  schedule:
+    - cron: "41 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  image:
+    name: Build and run the image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build
+        run: docker build --build-arg NEXT_PUBLIC_SITE_URL=http://127.0.0.1:3001 -t portfolio:ci .
+      # The image's own port (3001); the site must answer with its home page and the resume.
+      - name: Run it and ask for the site
+        run: |
+          docker run -d --name site -p 127.0.0.1:3001:3001 portfolio:ci
+          for _ in $(seq 1 30); do
+            if curl -fsS -o /dev/null http://127.0.0.1:3001/robots.txt; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:3001/ | grep -q "Mihir Bhavsar"
+          curl -fsS -o /dev/null -w "%{content_type}\n" http://127.0.0.1:3001/MihirBhavsar_Resume.pdf | grep -q "application/pdf"
+      - name: Container log
+        if: ${{ failure() }}
+        run: docker logs site

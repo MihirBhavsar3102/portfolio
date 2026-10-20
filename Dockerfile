@@ -6,16 +6,18 @@
 # Kubernetes, Fly.io, a bare VM, etc.). No Vercel-specific features are used.
 # ==============================================================================
 
-# Pinned base so every stage shares the same runtime. node:24-alpine is the
-# current Active LTS; Alpine keeps the layers tiny.
-ARG NODE_IMAGE=node:24-alpine
+# Every stage runs the same base, pinned by digest so a rebuild gets the exact
+# image that was tested: node:24-alpine (Node 24 is the Active LTS; Alpine keeps
+# the layers small). Dependabot moves the digest weekly (.github/dependabot.yml);
+# the Node major moves by hand, with package.json engines. Written out in each
+# FROM rather than through an ARG, which Dependabot can't follow.
 
 # ------------------------------------------------------------------------------
 # Stage 1 — deps: install dependencies only.
 # Isolated so it is cached and only re-runs when the lockfile changes.
 # `npm ci` installs exactly what package-lock.json pins (reproducible builds).
 # ------------------------------------------------------------------------------
-FROM ${NODE_IMAGE} AS deps
+FROM node:24-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f AS deps
 # libc6-compat lets glibc-linked native addons run on Alpine's musl libc.
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
@@ -30,7 +32,7 @@ RUN npm ci
 # (with output: "standalone") emits .next/standalone, .next/static and the
 # static assets.
 # ------------------------------------------------------------------------------
-FROM ${NODE_IMAGE} AS builder
+FROM node:24-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
@@ -53,7 +55,7 @@ RUN npm run build
 # Starts from a clean base and copies ONLY the standalone server, the static
 # chunks and the public assets — no source, no full node_modules, no build tools.
 # ------------------------------------------------------------------------------
-FROM ${NODE_IMAGE} AS runner
+FROM node:24-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
