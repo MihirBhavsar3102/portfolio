@@ -451,11 +451,6 @@
   scrollbar-width: none;
 }
 
-/* The window runs to the screen's edges below lg, so its focus ring is drawn inside it. */
-[data-reel-window]:focus-visible {
-  outline-offset: -2px;
-}
-
 /* Sideways, a sentinel lies under its card and is as wide, taking no room of its own,
    so a link to it (JavaScript off) brings the whole card into view, not just its edge. */
 [data-reel-snap] {
@@ -488,6 +483,16 @@
     padding-inline: 2.5rem;
     scroll-padding-inline: 2.5rem;
   }
+
+  /* With the cards capped, a wide enough window would put the last two cards' snap
+     points past the end of the range, where they fold into one and the one before
+     the last can never be in view on its own. Room after the last card lets every
+     card, the last too, scroll to the start. */
+  [data-reel-window]::after {
+    content: "";
+    flex: none;
+    width: calc(100% - var(--reel-card-width));
+  }
 }
 
 @media (width >= 64rem) {
@@ -508,6 +513,10 @@
   [data-reel-snap] {
     width: auto;
     margin-inline-end: 0;
+  }
+
+  [data-reel-window]::after {
+    display: none;
   }
 
   [data-reel-window] > article {

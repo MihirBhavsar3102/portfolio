@@ -12,6 +12,13 @@ describe("nearestIndex", () => {
     expect(nearestIndex(at, 1500, 1500)).toBe(4);
     expect(nearestIndex(at, 1499.4, 1500)).toBe(4);
   });
+  it("lets each study be current at its own position once the range reaches the last (room after the last card)", () => {
+    const wide = [0, 428, 856, 1284, 1712];
+    wide.forEach((p, i) => expect(nearestIndex(wide, p, 1712)).toBe(i));
+  });
+  it("folds the studies whose positions lie past the end into the last, which is why the window leaves room after it", () => {
+    expect(nearestIndex([0, 428, 856, 1284, 1712], 1263, 1263)).toBe(4);
+  });
   it("is the first for an empty list", () => expect(nearestIndex([], 10, 0)).toBe(0));
   it("is the first when nothing scrolls", () => expect(nearestIndex(at, 0, 0)).toBe(0));
 });
