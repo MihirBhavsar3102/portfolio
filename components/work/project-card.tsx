@@ -36,9 +36,9 @@ export function ProjectCard({ project, index }: { project: Project; index?: numb
   return (
     <article
       style={{ "--tint": tintOf(project), ...(index === undefined ? {} : { "--i": index }) } as CSSProperties}
-      className="group relative flex h-full flex-col rounded-2xl border border-[color-mix(in_oklab,var(--tint)_22%,var(--color-line))] bg-[color-mix(in_oklab,var(--tint)_6%,var(--color-surface-1))] p-7 transition-[border-color,translate] duration-300 ease-out-expo hover:-translate-y-0.5 hover:border-[color-mix(in_oklab,var(--tint)_45%,var(--color-line))] sm:p-8"
+      className="group relative flex flex-col rounded-2xl border border-[color-mix(in_oklab,var(--tint)_22%,var(--color-line))] bg-[color-mix(in_oklab,var(--tint)_6%,var(--color-surface-1))] p-7 transition-[border-color] duration-300 ease-out-expo hover:border-[color-mix(in_oklab,var(--tint)_45%,var(--color-line))] sm:p-8"
     >
-      <h3 className="text-[1.625rem] leading-tight font-semibold tracking-[-0.02em] text-ink">
+      <h3 className="text-[1.625rem] leading-tight font-semibold tracking-[-0.02em] text-ink lg:text-[1.5rem]">
         <Link
           href={`/work/${project.slug}`}
           className="after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-accent"
@@ -67,7 +67,7 @@ export function ProjectCard({ project, index }: { project: Project; index?: numb
         </div>
       )}
 
-      <div className="mt-auto flex flex-wrap items-center justify-between gap-4 pt-8 text-sm">
+      <div className="mt-auto flex flex-wrap items-center justify-end gap-4 pt-8 text-sm lg:justify-between">
         <ul aria-label="Built with" className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-ink-2 max-lg:hidden">
           {shown.map((id) => (
             <li key={id}>
