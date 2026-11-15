@@ -626,6 +626,67 @@ check(
     jumped.hash === beforeJump.hash,
   JSON.stringify({ jumped, glided, page: [beforeJump.pageY, beforeJump.hash] }),
 );
+
+// A row or segment picked from the keyboard takes focus to its card's title, as the plain in-page link does without the
+// script, so the next Tab goes on inside that card; a pointer leaves focus where it is.
+const focusInReel = () =>
+  evaluate(`(() => { const a = document.activeElement; const card = a?.closest('[data-reel-window] > article'); return { card: card ? [...${REEL}.querySelectorAll(':scope > article')].indexOf(card) : -1, title: !!a?.closest('h3') }; })()`);
+const reelToStart = async () => {
+  await evaluate(`${REEL}.scrollTo({ top: 0, left: 0, behavior: 'instant' }); true`);
+  await reelRest();
+};
+const keyPick = async (selector, nav) => {
+  await reelToStart();
+  await evaluate(`document.querySelector('${selector}').focus({ preventScroll: true }); true`);
+  const before = await reel(nav);
+  await key("Enter", "Enter", 13);
+  await reelRest();
+  return { before, after: await reel(nav), focus: await focusInReel() };
+};
+const pickedByKey = (p) =>
+  p.focus.card === 3 && p.focus.title && Math.abs(p.after.scroll - p.after.at[3]) <= 2 && p.after.current.join() === "3=true" && p.after.pageY === p.before.pageY && p.after.hash === p.before.hash;
+const rowByKey = await keyPick(fourthRow, "[data-reel-guide]");
+check(
+  "at 1280 Enter on a guide row takes focus to its card's title and scrolls only the window there; the page and URL stay put",
+  pickedByKey(rowByKey),
+  JSON.stringify({ focus: rowByKey.focus, after: rowByKey.after, page: [rowByKey.before.pageY, rowByKey.before.hash] }),
+);
+
+// A card's focus ring is drawn inside its edge: the window clips at its own edges, and the first card meets them.
+const ringInWindow = () =>
+  evaluate(`(() => {
+    const a = document.activeElement;
+    const card = a?.closest('[data-reel-window] > article');
+    if (!card) return null;
+    const win = ${REEL};
+    // The ring is a shadow on the title link's ::after, which covers the card inside its border; an outset one reaches past it.
+    const rings = getComputedStyle(a, '::after').boxShadow.split(/,(?![^(]*\\))/).map((s) => s.trim()).filter((s) => !s.startsWith('rgba(0, 0, 0, 0)'));
+    const spread = (s) => parseFloat((s.match(/-?[\\d.]+px/g) ?? [])[3] ?? '0');
+    const reach = Math.max(0, ...rings.map((s) => (/inset/.test(s) ? 0 : spread(s))));
+    const r = card.getBoundingClientRect(), v = win.getBoundingClientRect();
+    const left = r.left + card.clientLeft, top = r.top + card.clientTop;
+    const ring = { left: left - reach, top: top - reach, right: left + card.clientWidth + reach, bottom: top + card.clientHeight + reach };
+    const view = { left: v.left + win.clientLeft, top: v.top + win.clientTop, right: v.left + win.clientLeft + win.clientWidth, bottom: v.top + win.clientTop + win.clientHeight };
+    const round = (b) => Object.fromEntries(Object.entries(b).map(([k, n]) => [k, Math.round(n * 10) / 10]));
+    return {
+      shadow: rings.join(' | '),
+      width: Math.max(0, ...rings.map(spread)),
+      whole: ring.left >= view.left - 0.5 && ring.top >= view.top - 0.5 && ring.right <= view.right + 0.5 && ring.bottom <= view.bottom + 0.5,
+      ring: round(ring),
+      view: round(view),
+    };
+  })()`);
+const ringCheck = async (width) => {
+  await reelToStart();
+  await evaluate(`${REEL}.scrollIntoView({ block: 'center' }); ${REEL}.focus({ preventScroll: true }); true`);
+  await key("Tab", "Tab", 9);
+  await reelRest();
+  const ring = await ringInWindow();
+  check(`at ${width} the first card's 2px focus ring shows in full inside the window`, !!ring && ring.width >= 2 && ring.whole, JSON.stringify(ring));
+  await shot(`${LABEL}-reel-ring-${width}`);
+};
+await ringCheck(1280);
+await evaluate("document.activeElement?.blur(); true");
 await reelToEnd();
 const deskEnd = await reel("[data-reel-guide]");
 check("at 1280 scrolling the window to its end marks the last row", deskEnd.scroll >= deskEnd.max - 1 && deskEnd.current.join() === `${LAST_STUDY}=true`, JSON.stringify(deskEnd));
@@ -671,21 +732,52 @@ check(
 );
 await evaluate("document.activeElement?.blur(); true");
 
+// Every card fits the window less the deepest card's 28px sticky offset and 5px more, so no pinned card's links sit
+// below its fold and, at the end of the range, no stuck card is pushed up out of the pile. Each card is at least the
+// window less 36px; the tallest card's own content (its minimum height lifted) stays 12px or more under that, so text
+// that runs a little longer still fits.
+const reelFit = () =>
+  evaluate(`(() => {
+    const w = ${REEL};
+    const cards = [...w.querySelectorAll(':scope > article')];
+    const own = cards.map((a) => { const m = a.style.minHeight; a.style.minHeight = '0px'; const h = a.offsetHeight; a.style.minHeight = m; return h; });
+    return { window: w.clientHeight, cards: cards.map((a) => a.offsetHeight), own, sideways: document.documentElement.scrollWidth - innerWidth, work: document.getElementById('work').offsetHeight };
+  })()`);
+const fitsWithPile = (fit) => fit.cards.length === cardHrefs.length && fit.cards.every((h) => h <= fit.window - 33);
 for (const view of [REEL_DESKTOP, { width: 1024, height: 768, mobile: false }]) {
   if (view !== REEL_DESKTOP) {
     await load("/", view);
     await reelReady();
   }
-  const fit = await evaluate(
-    `(() => { const w = ${REEL}; return { window: w.clientHeight, cards: [...w.querySelectorAll(':scope > article')].map((a) => a.offsetHeight), sideways: document.documentElement.scrollWidth - innerWidth, work: document.getElementById('work').offsetHeight }; })()`,
-  );
+  const fit = await reelFit();
+  const tallest = Math.max(...fit.own);
   check(
-    `at ${view.width} every card fits the window, so a pinned card's links never sit below its fold`,
-    fit.cards.length === cardHrefs.length && fit.cards.every((h) => h <= fit.window),
+    `at ${view.width} every card fits the window with room for the pile, so a pinned card's links never sit below its fold`,
+    fitsWithPile(fit),
     `window ${fit.window}px; cards ${fit.cards.join(", ")}`,
   );
+  check(
+    `at ${view.width} the tallest card's content leaves 12px or more of its minimum height spare`,
+    tallest <= fit.window - 36 - 12,
+    `tallest ${tallest}px; minimum ${fit.window - 36}px; own heights ${fit.own.join(", ")}`,
+  );
+  console.log(`note  at ${view.width} the tallest card's content is ${tallest}px in a ${fit.window}px window (cards at least ${fit.window - 36}px)`);
   check(`at ${view.width} the reel never pushes the page sideways`, fit.sideways <= 0, `${fit.sideways}px`);
   if (view === REEL_DESKTOP) console.log(`note  #work is ${fit.work}px tall at 1280`);
+}
+// A reader who sets a larger default font size in the browser (20px here) gets a taller window with the text, so the
+// cards' foot, the Code link with it, never drops out of view. At 20px, 1280 is the up-and-down window's lg and 1600 its xl.
+for (const width of [1280, 1600]) {
+  await send("Page.setFontSizes", { fontSizes: { standard: 20 } });
+  await load("/", { width, height: 900, mobile: false });
+  await reelReady();
+  const fit = await reelFit();
+  await send("Page.setFontSizes", { fontSizes: { standard: 16 } });
+  check(
+    `at ${width} with a 20px default font size every card fits the window with room for the pile`,
+    fitsWithPile(fit),
+    `window ${fit.window}px; cards ${fit.cards.join(", ")}`,
+  );
 }
 
 // Below lg: phones, and 960, where the window leaves room after the last card so each card, the fourth too, can
@@ -713,6 +805,16 @@ for (const view of [{ width: 390, height: 844, mobile: true }, { width: 360, hei
   await reelToEnd();
   const end = await reel("[data-reel-story]");
   check(`at ${w} scrolling the window to its end marks the last segment`, end.scroll >= end.max - 1 && end.current.join() === `${LAST_STUDY}=true`, JSON.stringify(end));
+  if (w === 390) {
+    const segmentByKey = await keyPick(fourthSegment, "[data-reel-story]");
+    check(
+      "at 390 Enter on a story segment takes focus to its card's title and scrolls only the window there; the page and URL stay put",
+      pickedByKey(segmentByKey),
+      JSON.stringify({ focus: segmentByKey.focus, after: segmentByKey.after, page: [segmentByKey.before.pageY, segmentByKey.before.hash] }),
+    );
+    await ringCheck(390);
+    await evaluate("document.activeElement?.blur(); true");
+  }
   if (w === 360) {
     const labels = await evaluate(`(() => {
       const bar = document.querySelector('[data-reel-story]');
@@ -741,6 +843,37 @@ check(
   thirdAt1280.current.join() === "2=true" && thirdAt390.current.join() === "2=true" && Math.abs(thirdAt390.scroll - thirdAt390.at[2]) <= 2,
   JSON.stringify({ thirdAt1280, thirdAt390 }),
 );
+
+// Printed, the reel is a plain list: every card whole, one under another, with no guide or story bar. 720 is a portrait
+// page (A4 or Letter less its margins), which would otherwise print the sideways strip; 1280 is wide enough for the
+// up-and-down window, as a landscape page nearly is.
+for (const width of [720, 1280]) {
+  await load("/", { width, height: 1000, mobile: false });
+  await reelReady();
+  await send("Emulation.setEmulatedMedia", { media: "print", features: LIGHT });
+  const printedReel = await evaluate(`(() => {
+    const win = ${REEL};
+    const box = win.getBoundingClientRect();
+    const cards = [...win.querySelectorAll(':scope > article')].map((a) => a.getBoundingClientRect());
+    const shown = (sel) => getComputedStyle(document.querySelector(sel)).display !== 'none';
+    return {
+      cards: cards.length,
+      stacked: cards.every((r, i) => i === 0 || r.top >= cards[i - 1].bottom),
+      whole: cards.every((r) => r.top >= box.top - 1 && r.bottom <= box.bottom + 1 && r.left >= box.left - 1 && r.right <= box.right + 1 && r.right <= innerWidth),
+      scrolls: win.scrollHeight - win.clientHeight > 1 || win.scrollWidth - win.clientWidth > 1,
+      guide: shown('[data-reel-guide]'),
+      story: shown('[data-reel-story]'),
+      heights: cards.map((r) => Math.round(r.height)),
+    };
+  })()`);
+  if (width === 720) await shot(`${LABEL}-reel-print-720`, { fullPage: true });
+  await send("Emulation.setEmulatedMedia", { media: "", features: LIGHT });
+  check(
+    `printed at ${width} the reel lists all five cards whole, one under another, without the guide or the story bar`,
+    printedReel.cards === cardHrefs.length && printedReel.stacked && printedReel.whole && !printedReel.scrolls && !printedReel.guide && !printedReel.story,
+    JSON.stringify(printedReel),
+  );
+}
 
 // ---------- Stack, credentials, GitHub and contact ----------
 await load("/", DESKTOP);
