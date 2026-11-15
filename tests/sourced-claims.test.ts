@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { diagrams } from "@/content/work/diagrams";
+import { resume } from "@/lib/resume-data";
 import { readSource } from "./source-files";
 
 /**
@@ -37,6 +38,14 @@ const UNSOURCED = [
   },
   { file: "lib/resume-data.ts", text: "The whole platform", why: "the resume says its AWS infrastructure is Terraform, not all of it" },
   { file: "lib/resume-data.ts", text: "Linux servers underneath", why: "invents a relationship between the servers and the estate" },
+  // The wallet study's sources are its public repository (README and docs/), not the resume.
+  ...["content/work/digital-wallet-devops.mdx", "lib/resume-data.ts"].flatMap((file) => [
+    { file, text: "deployed to production", why: "production was configured and plan-checked, never applied" },
+    { file, text: "my application", why: "the wallet app is tedrosdev's, not mine" },
+    { file, text: "my app", why: "the wallet app is tedrosdev's, not mine" },
+    { file, text: "HTTPS everywhere", why: "the load balancer is HTTP only" },
+    { file, text: "zero downtime", why: "nothing measured downtime" },
+  ]),
 ];
 
 describe("unsourced claims", () => {
@@ -57,5 +66,20 @@ describe("diagram claims", () => {
   it("stops the Ansible edge at the region, since the source doesn't say what Ansible configures", () => {
     const d = diagrams["aws-web-platform"];
     expect(d.edges.filter((e) => e.from === "ansible").map((e) => e.to)).toEqual(["region"]);
+  });
+});
+
+describe("wallet study order and honesty", () => {
+  it("sits fourth, between the HR assistant and the DevSecOps pipeline", () => {
+    expect(resume.projects.map((p) => p.slug)).toEqual([
+      "avd-automation", "aws-web-platform", "hr-policy-assistant", "digital-wallet-devops", "devsecops-pipeline",
+    ]);
+  });
+  it("says what was not done", () => {
+    const mdx = readSource("content/work/digital-wallet-devops.mdx");
+    for (const said of ["it was never applied", "plain HTTP", "written by someone else"]) expect(mdx, said).toContain(said);
+  });
+  it("draws production as configured, not applied", () => {
+    expect(diagrams["digital-wallet-devops"].nodes.find((n) => n.id === "prod")?.meta).toBe("configured, not applied");
   });
 });
