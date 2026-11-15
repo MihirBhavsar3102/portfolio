@@ -21,7 +21,7 @@ I'm a Cloud Operations Engineer at Parkar Global Technologies, where I've automa
 
 - **What I do, on the first screen**, beside a live diagram of my workloads.
 - **Measured outcomes** with how each was achieved, tied to a service map that lights up whatever produced it.
-- **Four case studies** with architecture diagrams: [Azure Virtual Desktop automation](content/work/avd-automation.mdx), a [multi-AZ AWS web platform](content/work/aws-web-platform.mdx), an [HR policy assistant](content/work/hr-policy-assistant.mdx) and a [DevSecOps CI/CD pipeline](content/work/devsecops-pipeline.mdx).
+- **Five case studies** with architecture diagrams: [Azure Virtual Desktop automation](content/work/avd-automation.mdx), a [multi-AZ AWS web platform](content/work/aws-web-platform.mdx), an [HR policy assistant](content/work/hr-policy-assistant.mdx), a [wallet app run on AWS from code](content/work/digital-wallet-devops.mdx) and a [DevSecOps CI/CD pipeline](content/work/devsecops-pipeline.mdx).
 
 Then experience, stack, credentials and contact. The visual system, in light and dark themes, is in [DESIGN.md](DESIGN.md).
 
