@@ -505,8 +505,8 @@ const legalCount = await evaluate(`document.body.innerText.split("Parkar Global 
 check("legal employer name appears exactly once", legalCount === 1, String(legalCount));
 const cardHrefs = await evaluate(`[...document.querySelectorAll('#work article h3 a')].map(a => a.getAttribute('href'))`);
 check(
-  "four case-study cards link to /work/*",
-  cardHrefs.length === 4 && cardHrefs.every((h) => /^\/work\/[a-z-]+$/.test(h)),
+  "five case-study cards link to /work/*",
+  cardHrefs.length === 5 && cardHrefs.every((h) => /^\/work\/[a-z-]+$/.test(h)),
   cardHrefs.join(", "),
 );
 
@@ -521,9 +521,40 @@ for (let i = 0; i < 60 && !cardRing; i++) {
 }
 check("keyboard reaches a card and shows its focus ring", !!cardRing && cardRing !== "none", String(cardRing));
 
+// The reel's scroll window. Positions along its axis are read as ReelSync reads them: up and down from the
+// zero-height anchor before each card (a stuck card's own offset moves with the scroll), sideways from the cards.
+const REEL = "document.querySelector('[data-reel-window]')";
+const reel = (nav) =>
+  evaluate(`(() => {
+    const win = ${REEL};
+    const down = getComputedStyle(win).scrollSnapType.startsWith('y');
+    const snaps = [...win.querySelectorAll('[data-reel-snap]')];
+    const cards = [...win.querySelectorAll(':scope > article')];
+    return {
+      scroll: Math.round(down ? win.scrollTop : win.scrollLeft),
+      max: down ? win.scrollHeight - win.clientHeight : win.scrollWidth - win.clientWidth,
+      at: down ? snaps.map((s) => s.offsetTop - snaps[0].offsetTop) : cards.map((c) => c.offsetLeft - cards[0].offsetLeft),
+      current: [...document.querySelectorAll(${JSON.stringify(nav)} + ' [data-reel-go][aria-current]')].map((a) => a.dataset.reelGo + '=' + a.getAttribute('aria-current')),
+      pageY: Math.round(scrollY),
+      hash: location.hash,
+    };
+  })()`);
+// A smooth scroll's length varies: poll until the window has held still for half a second rather than sleeping a fixed time.
+const reelRest = async (ms = 8000) => {
+  let last = null;
+  for (let t = 0, still = 0; t < ms; t += 100) {
+    const now = await evaluate(`${REEL}.scrollTop + ',' + ${REEL}.scrollLeft`);
+    still = now === last ? still + 1 : 0;
+    if (still >= 5) return true;
+    last = now;
+    await sleep(100);
+  }
+  return false;
+};
+
 // Client-side round trip: card → case study → All work → the nav still tracks sections.
 await evaluate("document.activeElement?.blur(); true");
-await mouseAt("#work article:nth-child(1) h3 a");
+await mouseAt("#work article:nth-of-type(1) h3 a");
 const opened = await waitFor(`location.pathname === ${JSON.stringify(cardHrefs[0])} && !!document.querySelector('[data-diagram]')`);
 check("a card opens its case study", opened, await evaluate("location.pathname"));
 const homeLinks = await evaluate(
@@ -547,13 +578,169 @@ const atHero = await marked();
 check("scrolling back to the hero clears the marked section", atHero === null, String(atHero));
 await evaluate("document.getElementById('work').scrollIntoView({ block: 'start' }); true");
 await sleep(800);
-await mouseAt("#work article:nth-child(2) h3 a");
+// The second card waits under the first until the window brings it up, which the guide's second row does.
+await mouseAt('[data-reel-guide] [data-reel-go="1"]');
+await reelRest();
+await mouseAt("#work article:nth-of-type(2) h3 a");
 await waitFor(`location.pathname === ${JSON.stringify(cardHrefs[1])} && !!document.querySelector('[data-diagram]')`);
 await mouseAt("header a[href='/']");
 const home = await waitFor(`location.pathname === '/' && !!document.getElementById('work')`);
 await sleep(800);
 const afterName = await marked();
 check("returning home through the name link marks no section", home && afterName === null, `${home} ${afterName}`);
+
+// ---------- The work reel ----------
+// A guide (from lg) or a story bar (below it) beside one window of cards. A row or segment scrolls only the window to
+// its study; the window's own scroll marks the study in view, the last at the end of its range; a focused link is never
+// left under a covering card; every card fits the window; and the page never scrolls sideways.
+const REEL_DESKTOP = { width: 1280, height: 900, mobile: false };
+const LAST_STUDY = String(cardHrefs.length - 1);
+const reelReady = () => waitFor("!!document.querySelector('[data-reel][data-reel-ready]')");
+// The section's reveal moves its contents 8px as it plays; let it finish before reading where things are.
+const revealDone = () => waitFor("document.querySelector('#work .reveal').getAnimations().length === 0", 3000);
+const reelToEnd = async () => {
+  await evaluate(`(() => { const w = ${REEL}; w.scrollTop = w.scrollHeight; w.scrollLeft = w.scrollWidth; return true; })()`);
+  await reelRest();
+};
+
+await load("/", REEL_DESKTOP);
+await reelReady();
+const fourthRow = '[data-reel-guide] [data-reel-go="3"]';
+// Where mouseAt would put the row anyway, so the page's scroll before the click is the one to compare with.
+await evaluate(`document.querySelector('${fourthRow}').scrollIntoView({ block: "center" }); true`);
+await revealDone();
+const beforeJump = await reel("[data-reel-guide]");
+await mouseAt(fourthRow);
+await reelRest();
+// The marker glides for 450ms after the last change of row.
+const markerOnRow = `(() => { const m = document.querySelector('[data-reel-marker]'), row = document.querySelector('${fourthRow}'); return { top: m.offsetTop, row: row.offsetTop }; })()`;
+await waitFor(`(({ top, row }) => Math.abs(top - row) <= 2)(${markerOnRow})`, 3000);
+const jumped = await reel("[data-reel-guide]");
+const glided = await evaluate(markerOnRow);
+check(
+  "at 1280 a guide row scrolls only the window to its study, marks that row alone and glides the marker to it; the page and URL stay put",
+  Math.abs(jumped.scroll - jumped.at[3]) <= 2 &&
+    jumped.current.join() === "3=true" &&
+    Math.abs(glided.top - glided.row) <= 2 &&
+    jumped.pageY === beforeJump.pageY &&
+    jumped.hash === beforeJump.hash,
+  JSON.stringify({ jumped, glided, page: [beforeJump.pageY, beforeJump.hash] }),
+);
+await reelToEnd();
+const deskEnd = await reel("[data-reel-guide]");
+check("at 1280 scrolling the window to its end marks the last row", deskEnd.scroll >= deskEnd.max - 1 && deskEnd.current.join() === `${LAST_STUDY}=true`, JSON.stringify(deskEnd));
+
+// The Deck: at the end of the range the first card lies under the rest, scaled back; reduced motion keeps the pile
+// pinned and scales nothing.
+const pile = () => evaluate(`[...${REEL}.querySelectorAll(':scope > article')].map((a) => { const s = getComputedStyle(a); return { transform: s.transform, position: s.position }; })`);
+const deck = await pile();
+check(
+  "at 1280 a card covered by the ones after it is scaled back",
+  deck[0].transform !== "none" && deck[0].transform !== "matrix(1, 0, 0, 1, 0, 0)",
+  deck.map((c) => c.transform).join(" | "),
+);
+await send("Emulation.setEmulatedMedia", { features: [...LIGHT, { name: "prefers-reduced-motion", value: "reduce" }] });
+const deckReduced = await pile();
+await send("Emulation.setEmulatedMedia", { features: LIGHT });
+check(
+  "under reduced motion no card is scaled, and the cards still pin",
+  deckReduced.every((c) => c.transform === "none" && c.position === "sticky"),
+  JSON.stringify(deckReduced),
+);
+
+// Focus landing on a link in a covered card brings that card forward (WCAG 2.4.11). At the end of the range the first
+// card's title lies under the cards after it; Tab onto it from the window itself.
+await reelToEnd();
+const firstTitleOnTop = () =>
+  evaluate(`(() => {
+    const a = ${REEL}.querySelector('article h3 a');
+    const r = a.getBoundingClientRect();
+    const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+    const card = hit?.closest('[data-reel-window] > article');
+    return { onTop: !!hit && a.contains(hit), focused: document.activeElement === a, hit: hit ? hit.tagName + (card ? ' in card ' + [...card.parentElement.children].filter((c) => c.tagName === 'ARTICLE').indexOf(card) : '') : null };
+  })()`);
+const underPile = await firstTitleOnTop();
+await evaluate(`${REEL}.focus({ preventScroll: true }); true`);
+await key("Tab", "Tab", 9);
+await reelRest();
+const broughtForward = await firstTitleOnTop();
+check(
+  "at 1280 Tab onto the title of a covered card brings that card forward, so the focused link is on top",
+  !underPile.onTop && broughtForward.focused && broughtForward.onTop,
+  JSON.stringify({ underPile, broughtForward }),
+);
+await evaluate("document.activeElement?.blur(); true");
+
+for (const view of [REEL_DESKTOP, { width: 1024, height: 768, mobile: false }]) {
+  if (view !== REEL_DESKTOP) {
+    await load("/", view);
+    await reelReady();
+  }
+  const fit = await evaluate(
+    `(() => { const w = ${REEL}; return { window: w.clientHeight, cards: [...w.querySelectorAll(':scope > article')].map((a) => a.offsetHeight), sideways: document.documentElement.scrollWidth - innerWidth, work: document.getElementById('work').offsetHeight }; })()`,
+  );
+  check(
+    `at ${view.width} every card fits the window, so a pinned card's links never sit below its fold`,
+    fit.cards.length === cardHrefs.length && fit.cards.every((h) => h <= fit.window),
+    `window ${fit.window}px; cards ${fit.cards.join(", ")}`,
+  );
+  check(`at ${view.width} the reel never pushes the page sideways`, fit.sideways <= 0, `${fit.sideways}px`);
+  if (view === REEL_DESKTOP) console.log(`note  #work is ${fit.work}px tall at 1280`);
+}
+
+// Below lg: phones, and 960, where the window leaves room after the last card so each card, the fourth too, can
+// come to the start and be the one marked instead of folding into the last.
+for (const view of [{ width: 390, height: 844, mobile: true }, { width: 360, height: 740, mobile: true }, { width: 960, height: 900, mobile: false }]) {
+  const w = view.width;
+  await load("/", view);
+  await reelReady();
+  const bars = await evaluate(
+    "({ guide: getComputedStyle(document.querySelector('[data-reel-guide]')).display, story: getComputedStyle(document.querySelector('[data-reel-story]')).display })",
+  );
+  check(`at ${w} the story bar shows in place of the guide`, bars.guide === "none" && bars.story !== "none", JSON.stringify(bars));
+  const fourthSegment = '[data-reel-story] [data-reel-go="3"]';
+  await evaluate(`document.querySelector('${fourthSegment}').scrollIntoView({ block: "center" }); true`);
+  await revealDone();
+  const before = await reel("[data-reel-story]");
+  await mouseAt(fourthSegment);
+  await reelRest();
+  const swiped = await reel("[data-reel-story]");
+  check(
+    `at ${w} the fourth segment brings its card to the window's start and marks that segment alone; the page and URL stay put`,
+    Math.abs(swiped.scroll - swiped.at[3]) <= 2 && swiped.current.join() === "3=true" && swiped.pageY === before.pageY && swiped.hash === before.hash,
+    JSON.stringify({ swiped, page: [before.pageY, before.hash] }),
+  );
+  await reelToEnd();
+  const end = await reel("[data-reel-story]");
+  check(`at ${w} scrolling the window to its end marks the last segment`, end.scroll >= end.max - 1 && end.current.join() === `${LAST_STUDY}=true`, JSON.stringify(end));
+  if (w === 360) {
+    const labels = await evaluate(`(() => {
+      const bar = document.querySelector('[data-reel-story]');
+      const label = (a) => [...a.childNodes].filter((n) => n.nodeType === 3).map((n) => n.data).join('').trim();
+      return { bar: bar.scrollWidth - bar.clientWidth, cut: [...bar.querySelectorAll('a')].filter((a) => a.scrollWidth > a.clientWidth).map((a) => label(a) + ' ' + a.scrollWidth + '>' + a.clientWidth), widths: [...bar.querySelectorAll('a')].map((a) => label(a) + ' ' + a.clientWidth) };
+    })()`);
+    check("at 360 every story label fits its segment", labels.cut.length === 0 && labels.bar <= 0, JSON.stringify(labels));
+  }
+  const sideways = await evaluate("document.documentElement.scrollWidth - innerWidth");
+  check(`at ${w} the reel never pushes the page sideways`, sideways <= 0, `${sideways}px`);
+  if (w === 390) console.log(`note  #work is ${await evaluate("document.getElementById('work').offsetHeight")}px tall at 390`);
+}
+
+// Crossing lg turns the window's axis; the study in view stays the one marked and shown.
+await load("/", REEL_DESKTOP);
+await reelReady();
+await mouseAt('[data-reel-guide] [data-reel-go="2"]');
+await reelRest();
+const thirdAt1280 = await reel("[data-reel-guide]");
+await send("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: false });
+await waitFor(`!!document.querySelector('[data-reel-story] [data-reel-go="2"][aria-current=true]')`, 3000);
+await reelRest();
+const thirdAt390 = await reel("[data-reel-story]");
+check(
+  "a study marked at 1280 is still the one marked and shown after narrowing to 390",
+  thirdAt1280.current.join() === "2=true" && thirdAt390.current.join() === "2=true" && Math.abs(thirdAt390.scroll - thirdAt390.at[2]) <= 2,
+  JSON.stringify({ thirdAt1280, thirdAt390 }),
+);
 
 // ---------- Stack, credentials, GitHub and contact ----------
 await load("/", DESKTOP);
@@ -956,7 +1143,12 @@ if (process.env.EXPECT_ORIGIN) {
 const nfHead = await head("/no-such-page");
 check("the 404 says noindex exactly once", nfHead.robots.length === 1 && nfHead.robots[0].includes("noindex"), JSON.stringify(nfHead.robots));
 const siteMap = await evaluate(`fetch('/sitemap.xml').then(r => r.text())`);
-check("the sitemap lists home and the four case studies", cardHrefs.every((h) => siteMap.includes(`${h}</loc>`)), `${(siteMap.match(/<loc>/g) ?? []).length} urls`);
+const sitemapPaths = [...siteMap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);
+check(
+  "the sitemap lists home and every case study",
+  sitemapPaths.includes("/") && cardHrefs.every((h) => sitemapPaths.includes(h)),
+  `${sitemapPaths.length} urls: ${sitemapPaths.join(", ")}`,
+);
 
 // ---------- Themes ----------
 const theme = () => evaluate("document.documentElement.dataset.theme ?? null");
@@ -1037,6 +1229,39 @@ const noJsWork = await evaluate(
   `({ h1: !!document.querySelector('h1'), sections: document.querySelectorAll('article h2').length, edges: document.querySelectorAll('[data-diagram] [data-edge]').length })`,
 );
 check("a case study is complete with JavaScript off", noJsWork.h1 && noJsWork.sections >= 5 && noJsWork.edges > 0, JSON.stringify(noJsWork));
+
+// The reel without its script: every card, in a window that scrolls natively on its axis; no row or segment marked
+// current, since nothing could keep that true; no card scaled. Rows and segments are plain links to a card's anchor,
+// and landing on one brings it into view, even the last card, whose snap point the window can't always reach.
+for (const view of [DESKTOP, MOBILE]) {
+  await send("Emulation.setScriptExecutionDisabled", { value: true });
+  await load(`/?nojs-${view.width}#work-devsecops-pipeline`, view, { scripts: false }); // its own query: a hash-only change fires no load
+  await send("Emulation.setScriptExecutionDisabled", { value: false });
+  const plain = await evaluate(`(() => {
+    const win = document.querySelector('[data-reel-window]');
+    const style = getComputedStyle(win);
+    const down = style.scrollSnapType.startsWith('y');
+    const a = document.getElementById('work-devsecops-pipeline').getBoundingClientRect();
+    const box = win.getBoundingClientRect();
+    return {
+      ready: !!document.querySelector('[data-reel-ready]'),
+      cards: document.querySelectorAll('#work article').length,
+      current: document.querySelectorAll('#work [aria-current]').length,
+      scaled: [...win.querySelectorAll(':scope > article')].filter((c) => getComputedStyle(c).transform !== 'none').length,
+      axis: down ? 'y' : 'x',
+      overflow: down ? style.overflowY : style.overflowX,
+      anchor: { top: Math.round(a.top), bottom: Math.round(a.bottom), left: Math.round(a.left), right: Math.round(a.right) },
+      inViewport: a.top >= 0 && a.bottom <= innerHeight && a.left >= 0 && a.right <= innerWidth,
+      inWindow: a.top >= box.top - 1 && a.bottom <= box.bottom + 1 && a.left >= box.left - 1 && a.right <= box.right + 1,
+    };
+  })()`);
+  check(
+    `with JavaScript off at ${view.width} the reel is five plain cards in a window that scrolls natively, none marked current or scaled`,
+    !plain.ready && plain.cards === 5 && plain.current === 0 && plain.scaled === 0 && plain.overflow === "auto" && plain.axis === (view === DESKTOP ? "y" : "x"),
+    JSON.stringify(plain),
+  );
+  check(`with JavaScript off at ${view.width} a link to the last card's anchor lands with it in view`, plain.inViewport && plain.inWindow, JSON.stringify(plain.anchor));
+}
 
 // ---------- Accessibility engine (axe-core) ----------
 // Every route, in both themes, at desktop and phone widths: WCAG 2.0–2.2 A and AA rules and axe's best
