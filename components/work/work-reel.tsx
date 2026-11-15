@@ -74,7 +74,7 @@ export function WorkReel() {
               aria-hidden="true"
               className="h-[3px] rounded-[2px] bg-line-strong transition-colors duration-300 ease-out-expo group-aria-[current=true]:bg-(--tint)"
             />
-            {placeLabel(project)}
+            {placeLabel(project)}{" "}
             <span className="sr-only">{project.title}</span>
           </a>
         ))}

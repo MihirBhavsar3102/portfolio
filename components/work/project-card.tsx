@@ -9,7 +9,7 @@ import { StageLine } from "@/components/work/stages";
 /** How many stack marks a card shows before "+N more". */
 const STACK_SHOWN = 4;
 
-/** Colour belongs to where the work ran; a personal project stays neutral. */
+/** Colour belongs to where the work ran, a personal project's too; a study that ran on no cloud stays neutral (tintOf). */
 const tints: Record<EstateZone["id"], string> = {
   azure: "var(--color-cloud-azure)",
   aws: "var(--color-cloud-aws)",
@@ -27,6 +27,9 @@ export const tintOf = (project: Project): string => (project.zone ? tints[projec
  * `index` is the study's place in the data, which the reel reads as `--i`.
  * From lg the heading is the long headline (the reel's guide already shows the
  * short title); below lg it is the short title and the stack is left out.
+ * From lg the footer asks for only 16px above it: the reel holds each card at
+ * least the window's height less 36px and the spare room gathers above the
+ * footer, so the gap looks the same, and the tallest card has room to run long.
  */
 export function ProjectCard({ project, index }: { project: Project; index?: number }) {
   const lead = project.figures[0];
@@ -41,9 +44,9 @@ export function ProjectCard({ project, index }: { project: Project; index?: numb
       <h3 className="text-[1.625rem] leading-tight font-semibold tracking-[-0.02em] text-ink lg:text-[1.5rem]">
         <Link
           href={`/work/${project.slug}`}
-          className="after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-accent"
+          className="after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-accent focus-visible:after:ring-inset"
         >
-          <span className="lg:hidden">{project.title}</span>
+          <span className="lg:hidden">{project.title}</span>{" "}
           <span className="max-lg:hidden">{project.headline}</span>
         </Link>
       </h3>
@@ -67,7 +70,7 @@ export function ProjectCard({ project, index }: { project: Project; index?: numb
         </div>
       )}
 
-      <div className="mt-auto flex flex-wrap items-center justify-end gap-4 pt-8 text-sm lg:justify-between">
+      <div className="mt-auto flex flex-wrap items-center justify-end gap-4 pt-8 text-sm lg:justify-between lg:pt-4">
         <ul aria-label="Built with" className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-ink-2 max-lg:hidden">
           {shown.map((id) => (
             <li key={id}>

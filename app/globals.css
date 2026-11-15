@@ -421,11 +421,14 @@
  * The work reel (components/work/work-reel.tsx). One window holds every card.
  * Below lg it scrolls sideways under the story bar, one card and a peek of the
  * next at a time, edge to edge. From lg it scrolls up and down beside the
- * guide; each card is the window's height less 36px, so the next one peeks.
- * The tallest card must fit in that (541px at 1024 wide, 506px from xl), or
- * its links would sit below the fold and, at the end of the range, a stuck
- * card would be pushed up out of the pile; so the window is 580px between lg
- * and xl, where the narrower cards run longer, and 544px from xl. A sentinel
+ * guide; each card is at least the window's height less 36px, so the next one
+ * peeks. The tallest card must fit in that with room to spare (its content is
+ * 511px at 1024 wide and 490px from xl, against 544px and 508px), or its links
+ * would sit below the fold and, at the end of the range, a stuck card would be
+ * pushed up out of the pile; so the window is 36.25rem between lg and xl,
+ * where the narrower cards run longer, and 34rem from xl (580px and 544px at
+ * the default 16px). In rem it grows with a reader's larger font size, as the
+ * cards' text does. A sentinel
  * before each card, taking no room of its own, carries its anchor and its
  * snap point, so no position depends on a card that is stuck. Scroll chaining
  * stays on: at either end of the window the page takes over.
@@ -497,7 +500,7 @@
 
 @media (width >= 64rem) {
   [data-reel-window] {
-    --reel-height: 580px;
+    --reel-height: 36.25rem;
     flex-direction: column;
     height: var(--reel-height);
     overflow-x: hidden;
@@ -539,13 +542,44 @@
 
 @media (width >= 80rem) {
   [data-reel-window] {
-    --reel-height: 544px;
+    --reel-height: 34rem;
   }
 }
 
 @media (width >= 64rem) and (prefers-reduced-motion: no-preference) {
   [data-reel][data-reel-ready] [data-reel-window] > article {
     transform: scale(calc(1 - 0.035 * var(--depth, 0)));
+  }
+}
+
+/* Printed, a page is a strip of paper, not a window: every card prints whole, one under
+   another, and the guide and story bar, which only steer the window, are left out. A card
+   stays relative, not sticky, so its title link's cover (a PDF's link area) is its own. */
+@media print {
+  [data-reel-guide],
+  [data-reel-story],
+  [data-reel-snap],
+  [data-reel-window]::after {
+    display: none;
+  }
+
+  [data-reel-window] {
+    display: block;
+    height: auto;
+    overflow: visible;
+    margin-inline: 0;
+    padding: 0;
+  }
+
+  [data-reel][data-reel-ready] [data-reel-window] > article,
+  [data-reel-window] > article {
+    position: relative;
+    top: auto;
+    width: auto;
+    min-height: 0;
+    margin: 0 0 12px;
+    transform: none;
+    break-inside: avoid;
   }
 }
 
