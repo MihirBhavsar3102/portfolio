@@ -10,6 +10,7 @@ import { RepoList } from "@/components/sections/github-repos";
 import { Contact } from "@/components/sections/contact";
 import type { RepoCard } from "@/lib/github";
 import { evidenceLabel, skillEvidence } from "@/lib/stack";
+import { placeLabel, rowStat } from "@/lib/work";
 import { tech } from "@/lib/tech";
 import { htmlOf, textOf } from "./render";
 
@@ -35,6 +36,36 @@ describe("SelectedWork", () => {
   it("opens repo links in a new tab, safely", () => {
     for (const p of resume.projects.filter((x) => x.repo))
       expect(html).toContain(`href="https://github.com/${p.repo!.owner}/${p.repo!.name}" target="_blank" rel="noopener noreferrer"`);
+  });
+
+  it("guides to every study in data order, under its group, by an in-page link", () => {
+    const guide = html.slice(html.indexOf("data-reel-guide"), html.indexOf("data-reel-story"));
+    const order = [...guide.matchAll(/href="#work-([a-z-]+)"/g)].map((m) => m[1]);
+    expect(order).toEqual(resume.projects.map((p) => p.slug));
+    expect(text).toContain("At Parkar Global Technologies");
+    expect(text).toContain("Personal projects");
+    for (const p of resume.projects) expect(guide, p.slug).toContain(rowStat(p)!);
+  });
+
+  it("has a story-bar segment per study, labelled by where it ran", () => {
+    const story = html.slice(html.indexOf("data-reel-story"), html.indexOf("data-reel-window"));
+    expect(story.split("data-reel-go=").length - 1).toBe(resume.projects.length);
+    for (const p of resume.projects) expect(story, p.slug).toContain(placeLabel(p));
+  });
+
+  it("holds the cards in a labelled, focusable scroll region, each after its anchor", () => {
+    expect(html).toMatch(/data-reel-window[^>]*role="region"[^>]*tabindex="0"|role="region"[^>]*data-reel-window/);
+    for (const p of resume.projects) expect(html).toContain(`id="work-${p.slug}"`);
+    expect(html.split("<article").length - 1).toBe(resume.projects.length);
+  });
+
+  it("marks nothing as current on the server, since only the script can keep that true", () => {
+    expect(html).not.toContain("aria-current");
+  });
+
+  it("drops the count from the intro", () => {
+    expect(text).toContain("Case studies, coloured by where they ran.");
+    expect(text).not.toMatch(/\b(Four|Five)\b/);
   });
 });
 
