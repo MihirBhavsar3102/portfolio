@@ -259,7 +259,7 @@ export const resume: Resume = {
       title: "Wallet app on AWS",
       headline: "A wallet app on AWS, built, shipped and monitored from code",
       summary:
-        "A ready-made wallet app run on AWS from code: Terraform modules shared by staging and production, a GitHub Actions pipeline with an approval gate before production, and CloudWatch alarms tried under real load.",
+        "A ready-made wallet app run on AWS from code: Terraform modules for staging and a plan-checked production, a GitHub Actions pipeline with an approval gate, and CloudWatch alarms tried under generated load.",
       kind: "personal",
       zone: "aws",
       role: "Built everything around the app: the Terraform, the CI/CD pipeline, the monitoring and the documentation. The application is an open-source sample, not mine.",

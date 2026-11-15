@@ -86,7 +86,7 @@ export const digitalWalletDevops: Diagram = {
     {
       from: "asg",
       to: "secrets",
-      path: [[368, 238], [368, 100], [474, 100]],
+      path: [[384, 238], [384, 100], [474, 100]],
       source: "repo: README.md — §5 Secrets handling, the instances read the database password and the JWT key from Secrets Manager at deploy time",
     },
     {
@@ -157,7 +157,7 @@ export const digitalWalletDevops: Diagram = {
       "cd->approval": { path: [[151, 772], [151, 796]] },
       "approval->prod": { path: [[151, 828], [151, 938]] },
       "asg->secrets": { path: [[292, 403], [328, 403], [328, 24], [310, 24]] },
-      "asg->cloudwatch": { path: [[280, 380], [280, 110]] },
+      "asg->cloudwatch": { path: [[264, 380], [264, 110]] },
       "cloudwatch->sns": { path: [[196, 87], [164, 87]] },
     },
   },

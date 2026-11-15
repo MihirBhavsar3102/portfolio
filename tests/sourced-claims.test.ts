@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { diagrams } from "@/content/work/diagrams";
+import { phoneView } from "@/components/diagram/geometry";
 import { resume } from "@/lib/resume-data";
 import { readSource } from "./source-files";
 
@@ -81,5 +82,14 @@ describe("wallet study order and honesty", () => {
   });
   it("draws production as configured, not applied", () => {
     expect(diagrams["digital-wallet-devops"].nodes.find((n) => n.id === "prod")?.meta).toBe("configured, not applied");
+  });
+  it("never lines the deploy up with a line leaving the Auto Scaling group, which would read as Merge feeding what that line reaches", () => {
+    const d = diagrams["digital-wallet-devops"];
+    for (const [layout, view] of [["desktop", d], ["phone", phoneView(d)]] as const) {
+      const deploy = view.edges.find((e) => e.from === "cd" && e.to === "asg")!.path[0][0];
+      // Every line that leaves the group straight up or down, as the deploy arrives.
+      const leaving = view.edges.filter((e) => e.from === "asg" && e.path[0][0] === e.path[1][0]);
+      for (const e of leaving) expect(Math.abs(e.path[0][0] - deploy), `${layout}: asg->${e.to}`).toBeGreaterThanOrEqual(12);
+    }
   });
 });
