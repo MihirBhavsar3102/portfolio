@@ -23,6 +23,21 @@ export function nearestIndex(positions: number[], scroll: number, maxScroll: num
   return best;
 }
 
+/** An element's edges on screen, in viewport pixels, as getBoundingClientRect gives them. */
+export type Edges = { top: number; right: number; bottom: number; left: number };
+
+/**
+ * Whether a focused link is out of the reader's sight: the window cuts it off on
+ * any side, or a later card, which lies on top of its own, starts above the
+ * link's bottom edge. `covers` are the tops of the cards after the link's card
+ * (none when the window runs sideways, where cards never overlap). A sub-pixel
+ * overlap does not count.
+ */
+export function obscured(link: Edges, view: Edges, covers: number[]): boolean {
+  const cut = link.top < view.top - 1 || link.bottom > view.bottom + 1 || link.left < view.left - 1 || link.right > view.right + 1;
+  return cut || covers.some((top) => top < link.bottom - 1);
+}
+
 /**
  * How many cards cover card `i`, up to MAX_DEPTH: each card after it counts
  * from 0 as it starts to slide over to 1 once it has arrived, so the pile
