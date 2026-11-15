@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { resume } from "@/lib/resume-data";
 import { positioningLine } from "@/lib/format";
 import { tech } from "@/lib/tech";
+import { rowStat } from "@/lib/work";
 import { diagrams } from "@/content/work/diagrams";
 import { listSourceFiles, readSource } from "./source-files";
 
@@ -75,11 +76,15 @@ describe("projects", () => {
     for (const p of resume.projects) expect(p.figures.length + (p.stages?.length ?? 0), p.slug).toBeGreaterThan(0);
   });
 
-  it("name the zone each work project ran in, and none for a personal project", () => {
+  it("name the zone each work project ran in; a personal project may name the cloud it ran on", () => {
     for (const p of resume.projects) {
       if (p.kind === "work") expect(zoneIds.has(p.zone as never), p.slug).toBe(true);
-      else expect(p.zone, p.slug).toBeUndefined();
+      else if (p.zone) expect(zoneIds.has(p.zone as never), p.slug).toBe(true);
     }
+  });
+
+  it("give every card a short stat for the work list", () => {
+    for (const p of resume.projects) expect(rowStat(p), p.slug).toBeTruthy();
   });
 
   it("link workstreams only to existing case studies", () => {

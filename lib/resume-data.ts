@@ -259,6 +259,8 @@ export const resume: Resume = {
       summary:
         "A Jenkins pipeline with security gates at build and deploy, shipping a three-tier Java app to self-managed Kubernetes on every push.",
       kind: "personal",
+      ranOn: "Kubernetes",
+      highlight: { value: "3 gates", label: "security scans between push and deploy" },
       role: "Designed and built it.",
       stack: ["jenkins", "sonarqube", "owasp-dependency-check", "trivy", "docker", "kubernetes", "maven", "github"],
       figures: [],
