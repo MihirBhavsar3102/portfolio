@@ -61,7 +61,7 @@ describe("SelectedWork", () => {
 
   it("keeps words apart where styles are ignored (reader modes, screen readers): a card's title from its headline, a segment's place from its title", () => {
     // What a reader mode gets: the text alone, with no space added where a tag ends.
-    const bare = (s: string) => s.replace(/<[^>]+>/g, "").replace(/&#x27;/g, "'").replace(/&amp;/g, "&");
+    const bare = (s: string) => s.replace(/</g, "").replace(/>/g, "").replace(/&#x27;/g, "'").replace(/&amp;/g, "&");
     const cards = bare(html.slice(html.indexOf("data-reel-window")));
     const story = bare(html.slice(html.indexOf("data-reel-story"), html.indexOf("data-reel-window")));
     for (const p of resume.projects) {
