@@ -28,6 +28,22 @@ function textPairs(t: Tokens): [string, string, string][] {
       [`ink-3 on the ${z} card`, t["ink-3"], card(z)],
     ]),
     ["ink-3 on the personal card", t["ink-3"], card("ink-3")],
+    // The reel (work-reel.tsx, globals.css). A story-bar label, and a guide row's place label, is in its
+    // study's tint on canvas (Ink Three for a personal project with no cloud, already covered above).
+    ...["cloud-azure", "cloud-aws", "cloud-ai"].map((z): [string, string, string] => [`${z} place label on canvas`, t[z], t.canvas]),
+    // A guide row takes its tint at 5% over canvas under the pointer, and sits on the marker, its tint at
+    // 10% over canvas, while its study is in view. On either ground: the place label in the tint, the title
+    // in Ink, the stat in Ink Three (at rest) or Ink (marked or hovered).
+    ...["cloud-azure", "cloud-aws", "cloud-ai", "ink-3"].flatMap((z): [string, string, string][] =>
+      [
+        ["hovered", mixOklab(t[z], 5, t.canvas)],
+        ["marked", mixOklab(t[z], 10, t.canvas)],
+      ].flatMap(([state, ground]): [string, string, string][] => [
+        [`${z} place label on its ${state} guide row`, t[z], ground],
+        [`ink on a ${state} ${z} guide row`, t.ink, ground],
+        [`ink-3 on a ${state} ${z} guide row`, t["ink-3"], ground],
+      ]),
+    ),
   ];
 }
 

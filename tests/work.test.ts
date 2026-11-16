@@ -1,6 +1,17 @@
 import { describe, expect, it } from "vitest";
 import type { Project, Role } from "@/types/resume";
-import { getProject, pagerFor, repoUrl, unlinkedWorkProjects, whereLabel, zoneLabel } from "@/lib/work";
+import {
+  cardAnchor,
+  getProject,
+  groupProjects,
+  pagerFor,
+  placeLabel,
+  repoUrl,
+  rowStat,
+  unlinkedWorkProjects,
+  whereLabel,
+  zoneLabel,
+} from "@/lib/work";
 
 const make = (slug: string, kind: Project["kind"] = "work"): Project => ({
   slug,
@@ -43,6 +54,44 @@ describe("zoneLabel", () => {
     expect(zoneLabel({ ...make("c"), zone: "ai" })).toBe("Applied AI");
     expect(zoneLabel(make("d", "personal"))).toBe("Personal project");
   });
+
+  it("names the cloud a personal project ran on after saying it is personal", () => {
+    expect(zoneLabel({ ...make("p", "personal"), zone: "aws" })).toBe("Personal project · AWS");
+    expect(zoneLabel(make("d", "personal"))).toBe("Personal project");
+    expect(zoneLabel({ ...make("a"), zone: "ai" })).toBe("Applied AI");
+  });
+});
+
+describe("placeLabel", () => {
+  it("is the zone's short name, else where it ran, else Personal", () => {
+    expect(placeLabel({ ...make("a"), zone: "ai" })).toBe("AI");
+    expect(placeLabel({ ...make("b", "personal"), zone: "aws" })).toBe("AWS");
+    expect(placeLabel({ ...make("c", "personal"), ranOn: "Kubernetes" })).toBe("Kubernetes");
+    expect(placeLabel(make("d", "personal"))).toBe("Personal");
+  });
+});
+
+describe("rowStat", () => {
+  const f = { value: "99.9%", label: "l", provenance: "p" };
+  it("is the lead figure's value, else the highlight's, else nothing", () => {
+    expect(rowStat({ ...make("a"), figures: [f], highlight: { value: "x", label: "y" } })).toBe("99.9%");
+    expect(rowStat({ ...make("b"), highlight: { value: "3 gates", label: "y" } })).toBe("3 gates");
+    expect(rowStat(make("c"))).toBeUndefined();
+  });
+});
+
+describe("groupProjects", () => {
+  it("groups work under the employer and personal projects after, in data order, dropping an empty group", () => {
+    expect(groupProjects(projects, "Acme")).toEqual([
+      { label: "At Acme", projects: [projects[0], projects[1]] },
+      { label: "Personal projects", projects: [projects[2]] },
+    ]);
+    expect(groupProjects([projects[2]], "Acme").map((g) => g.label)).toEqual(["Personal projects"]);
+  });
+});
+
+describe("cardAnchor", () => {
+  it("is the id a card's anchor carries", () => expect(cardAnchor("x-y")).toBe("work-x-y"));
 });
 
 describe("unlinkedWorkProjects", () => {

@@ -2,7 +2,8 @@ import type { Certification, Figure, Resume } from "@/types/resume";
 
 /**
  * Single source of truth for site content. Facts come from Mihir's October 2026
- * resume and his questionnaire answers only; wording is paraphrased for the web.
+ * resume and his questionnaire answers only, except the wallet study, whose
+ * source is its public repository; wording is paraphrased for the web.
  */
 
 // Figures are defined once and shared by the proof strip and the project cards.
@@ -252,6 +253,44 @@ export const resume: Resume = {
       stack: ["python", "fastapi", "langchain", "faiss", "llama"],
       figures: [fig.answers],
     },
+    // Sourced from the repository's README and docs/. All three figures were measured on staging.
+    {
+      slug: "digital-wallet-devops",
+      title: "Wallet app on AWS",
+      headline: "A wallet app on AWS, built, shipped and monitored from code",
+      summary:
+        "A ready-made wallet app run on AWS from code: Terraform modules for staging and a plan-checked production, a GitHub Actions pipeline with an approval gate, and CloudWatch alarms tried under generated load.",
+      kind: "personal",
+      zone: "aws",
+      role: "Built everything around the app: the Terraform, the CI/CD pipeline, the monitoring and the documentation. The application is an open-source sample, not mine.",
+      repo: { owner: "MihirBhavsar3102", name: "digital-wallet-devops" },
+      stack: [
+        "terraform", "github-actions", "docker", "cloudwatch", "ec2", "auto-scaling", "alb",
+        "rds", "postgresql", "ecr", "secrets-manager", "systems-manager", "trivy", "k6",
+      ],
+      figures: [
+        {
+          value: "10–12 min",
+          label: "to rebuild staging from Terraform",
+          provenance: "Staging was destroyed and rebuilt daily from the same Terraform modules; most of the wait is the database.",
+          measuredHow: "Timed on each rebuild during the build, 9–12 Nov 2026.",
+        },
+        {
+          value: "90 s",
+          label: "for the error alarm to fire in a failure drill",
+          provenance:
+            "With one request in ten failing on purpose, the application-errors alarm fired 90 seconds in and the load balancer's 5xx alarm after 7 minutes 14 seconds; both cleared themselves.",
+          measuredHow: "A k6 error burst against staging, 12 Nov 2026.",
+        },
+        {
+          value: "13–15 min",
+          label: "to restore the database in a drill",
+          provenance:
+            "A point-in-time restore and a snapshot restore of the staging database, run while traffic kept writing to it and checked by row counts.",
+          measuredHow: "Restore drill on staging, 12 Nov 2026; switching the app over was not measured.",
+        },
+      ],
+    },
     {
       slug: "devsecops-pipeline",
       title: "DevSecOps CI/CD pipeline",
@@ -259,6 +298,8 @@ export const resume: Resume = {
       summary:
         "A Jenkins pipeline with security gates at build and deploy, shipping a three-tier Java app to self-managed Kubernetes on every push.",
       kind: "personal",
+      ranOn: "Kubernetes",
+      highlight: { value: "3 gates", label: "security scans between push and deploy" },
       role: "Designed and built it.",
       stack: ["jenkins", "sonarqube", "owasp-dependency-check", "trivy", "docker", "kubernetes", "maven", "github"],
       figures: [],
@@ -337,7 +378,7 @@ export const resume: Resume = {
         { name: "PowerShell", tech: "powershell" },
         { name: "Java" },
         { name: "SQL" },
-        { name: "PostgreSQL" },
+        { name: "PostgreSQL", tech: "postgresql" },
         { name: "MongoDB" },
         { name: "DynamoDB" },
       ],

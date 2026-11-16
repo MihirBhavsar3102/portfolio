@@ -417,6 +417,198 @@
   }
 }
 
+/*
+ * The work reel (components/work/work-reel.tsx). One window holds every card.
+ * Below lg it scrolls sideways under the story bar, one card and a peek of the
+ * next at a time, edge to edge. From lg it scrolls up and down beside the
+ * guide; each card is at least the window's height less 36px, so the next one
+ * peeks. The tallest card must fit in that with room to spare (its content is
+ * 511px at 1024 wide and 490px from xl, against 544px and 508px), or its links
+ * would sit below the fold and, at the end of the range, a stuck card would be
+ * pushed up out of the pile; so the window is 36.25rem between lg and xl,
+ * where the narrower cards run longer, and 34rem from xl (580px and 544px at
+ * the default 16px). In rem it grows with a reader's larger font size, as the
+ * cards' text does. A sentinel
+ * before each card, taking no room of its own, carries its anchor and its
+ * snap point, so no position depends on a card that is stuck. Scroll chaining
+ * stays on: at either end of the window the page takes over.
+ *
+ * ReelSync (reel-sync.tsx) sets data-reel-ready once it runs, and only then
+ * does the Deck apply: each card sticks 7px lower than the one before, so the
+ * cards passed pile up at the top with an edge showing for each, and a card
+ * steps back 3.5% for each card on top of it (--depth, at most three). It
+ * moves only with the reader's own scroll; reduced motion keeps the pinning
+ * and drops the scaling. Without JavaScript the cards scroll as a plain
+ * snapping list, and no card can cover a focused link.
+ */
+[data-reel-window] {
+  --reel-card-width: 86%;
+  position: relative;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  margin-inline: -1.25rem;
+  padding-inline: 1.25rem;
+  scroll-padding-inline: 1.25rem;
+  scrollbar-width: none;
+}
+
+/* Sideways, a sentinel lies under its card and is as wide, taking no room of its own,
+   so a link to it (JavaScript off) brings the whole card into view, not just its edge. */
+[data-reel-snap] {
+  flex: none;
+  width: var(--reel-card-width);
+  margin-inline-end: calc(-1 * var(--reel-card-width));
+  scroll-snap-align: start;
+}
+
+[data-reel-window] > article {
+  flex: none;
+  width: var(--reel-card-width);
+  margin-inline-end: 12px;
+}
+
+[data-reel-window] > article:last-child {
+  margin-inline-end: 0;
+}
+
+@media (width < 64rem) {
+  [data-reel-window]::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (width >= 40rem) {
+  [data-reel-window] {
+    --reel-card-width: min(86%, 26rem);
+    margin-inline: -2.5rem;
+    padding-inline: 2.5rem;
+    scroll-padding-inline: 2.5rem;
+  }
+
+  /* With the cards capped, a wide enough window would put the last two cards' snap
+     points past the end of the range, where they fold into one and the one before
+     the last can never be in view on its own. Room after the last card lets every
+     card, the last too, scroll to the start. */
+  [data-reel-window]::after {
+    content: "";
+    flex: none;
+    width: calc(100% - var(--reel-card-width));
+  }
+}
+
+@media (width >= 64rem) {
+  [data-reel-window] {
+    --reel-height: 36.25rem;
+    flex-direction: column;
+    height: var(--reel-height);
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+    margin-inline: 0;
+    padding-inline: 0 10px;
+    scroll-padding: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+
+  [data-reel-snap] {
+    width: auto;
+    margin-inline-end: 0;
+  }
+
+  [data-reel-window]::after {
+    display: none;
+  }
+
+  [data-reel-window] > article {
+    width: auto;
+    min-height: calc(var(--reel-height) - 36px);
+    margin-inline-end: 0;
+    margin-block-end: 12px;
+    transform-origin: 50% 0;
+  }
+
+  [data-reel-window] > article:last-child {
+    margin-block-end: 0;
+  }
+
+  [data-reel][data-reel-ready] [data-reel-window] > article {
+    position: sticky;
+    top: calc(var(--i) * 7px);
+  }
+}
+
+@media (width >= 80rem) {
+  [data-reel-window] {
+    --reel-height: 34rem;
+  }
+}
+
+@media (width >= 64rem) and (prefers-reduced-motion: no-preference) {
+  [data-reel][data-reel-ready] [data-reel-window] > article {
+    transform: scale(calc(1 - 0.035 * var(--depth, 0)));
+  }
+}
+
+/* Printed, a page is a strip of paper, not a window: every card prints whole, one under
+   another, and the guide and story bar, which only steer the window, are left out. A card
+   stays relative, not sticky, so its title link's cover (a PDF's link area) is its own. */
+@media print {
+  [data-reel-guide],
+  [data-reel-story],
+  [data-reel-snap],
+  [data-reel-window]::after {
+    display: none;
+  }
+
+  [data-reel-window] {
+    display: block;
+    height: auto;
+    overflow: visible;
+    margin-inline: 0;
+    padding: 0;
+  }
+
+  [data-reel][data-reel-ready] [data-reel-window] > article,
+  [data-reel-window] > article {
+    position: relative;
+    top: auto;
+    width: auto;
+    min-height: 0;
+    margin: 0 0 12px;
+    transform: none;
+    break-inside: avoid;
+  }
+}
+
+/*
+ * Glide: the guide's marker is one element under the rows that slides to the
+ * row in view and takes its study's tint at 10% over canvas, as the nav's
+ * underline glides between links. Hidden until ReelSync has placed it, so it
+ * never glides in at load; held still by a theme switch and by reduced motion.
+ */
+[data-reel-marker] {
+  position: absolute;
+  inset-inline: 0;
+  top: var(--marker-top, 0);
+  z-index: -1;
+  display: none;
+  height: var(--marker-height, 0);
+  border-radius: var(--radius-xl);
+  background-color: color-mix(in oklab, var(--tint) 10%, var(--color-canvas));
+  pointer-events: none;
+  transition:
+    top 450ms var(--ease-out-expo),
+    height 450ms var(--ease-out-expo),
+    background-color 450ms var(--ease-out-expo);
+}
+
+[data-reel][data-reel-ready] [data-reel-marker] {
+  display: block;
+}
+
 /* Toast (copy-email confirmation) — portalled out of flow. */
 @keyframes toast-in {
   from {

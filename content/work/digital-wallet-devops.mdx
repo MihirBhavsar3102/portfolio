@@ -1,0 +1,65 @@
+export const meta = { slug: "digital-wallet-devops" };
+
+## Context
+
+A personal project, built to a DevOps assignment brief: take a ready-made wallet application and run it on AWS with Terraform, a CI/CD pipeline and monitoring. The application is an open-source sample, a NestJS backend, a React frontend and a PostgreSQL database, written by someone else. Everything around it is mine: the infrastructure, the pipeline, the monitoring and the documentation.
+
+I built it in small steps, one pull request per step, and ran each step against a real AWS account before starting the next.
+
+## Constraints
+
+Two limits decide what I can claim. Staging was applied and checked end to end. Production is defined by the same Terraform modules and its plan was checked, but it was never applied, because it would cost about $200 a month. There is also no domain, so the load balancer serves plain HTTP: a certificate needs a domain. The repository says both as well.
+
+## Architecture
+
+<Diagram />
+
+Only the load balancer is public. It sends requests to EC2 instances in an Auto Scaling group, which run the frontend and the backend as Docker containers in private subnets, with no public address and no SSH. The database is RDS PostgreSQL in its own private subnets with no route to the internet, and it accepts only encrypted connections.
+
+A pull request runs nine jobs: linting, unit and integration tests, dependency, secret and image scans, the Terraform checks and tests for the deploy scripts. A merge builds and scans both images, pushes them to ECR, deploys them to staging and runs a smoke test, then waits for an approval before production. Production is set up to receive the same images that passed staging, checked by digest, and never a rebuild.
+
+GitHub signs in to AWS with short-lived OIDC tokens, so the repository holds no secrets at all. RDS creates the database password and rotates it, and it sits in Secrets Manager beside the application's signing key.
+
+CloudWatch collects the logs and metrics, shows them on two dashboards, and raises ten alarms that e-mail through SNS.
+
+## Decisions and trade-offs
+
+- **EC2 with Docker, not ECS or EKS.** Two small containers don't need an orchestrator, and EC2 is the cheapest option and keeps the whole stack in view. The cost is that I patch the hosts and run Docker myself.
+- **CloudWatch, not Grafana and Prometheus.** There is nothing extra to run, and every AWS service already reports there. The cost is plainer dashboards and no request tracing.
+- **One folder per environment, not Terraform workspaces.** Each environment has its own state, and nobody can apply to the wrong one by forgetting to switch. The cost is four duplicated files, kept identical by a diff check.
+- **SSM Run Command for deploys, not CodeDeploy or SSH.** No extra service and no open port. The cost is no automatic traffic shifting; going back to an earlier release is a manual workflow, and it can't undo a database migration.
+
+## What I built
+
+<Ownership
+  mine={[
+    "The Terraform: ten reusable modules that both environments call, with only a small variables file differing between them.",
+    "The pipeline: nine jobs on every pull request, then build, scan, deploy to staging, a smoke test and an approval gate, plus a manual workflow that redeploys an earlier release.",
+    "The monitoring: structured application logs, two dashboards, seven saved queries and ten alarms.",
+    "The container images, a health route and JSON logging, added to the application so it could be deployed and watched.",
+    "The backup plan, and a restore drill to test it.",
+  ]}
+  teamLabel="Not mine"
+  team={["The wallet application itself: tedrosdev/digital-wallet, an open-source sample. I changed only what deployment, security and logging needed."]}
+/>
+
+## What broke
+
+**The first pipeline login failed.** GitHub now issues a new, immutable form of its OIDC subject to newer repositories, with numeric ids after the names, and my trust policy expected the older form. I had never exercised that login before the first real run. The fix builds the subject from the ids in Terraform.
+
+**An outage I didn't control stopped new instances from booting.** The startup script installed the AWS CLI from the Snap store, the store became unreachable, and the Auto Scaling group replaced one failed instance after another while the old one kept serving. The CLI now comes from AWS's own installer, and a deploy waits for boot to finish, so a failed boot is reported as a failed boot.
+
+**A green check stopped meaning anything.** After I let two Terraform modules refer to each other, the policy scanner silently skipped ten checks and still passed. I found it by comparing the totals with the main branch, then split the module so references run one way.
+
+## Results
+
+Three things were measured on staging, and they are the figures at the top of this page: how long a full rebuild takes, how fast an alarm fires once requests start failing, and how long the database takes to restore.
+
+In a stress test at 40 requests a second on one small instance, all 14,389 checks passed and CPU peaked at 18.5%. In the failure drill both alarms also cleared themselves once the errors stopped. Staging costs about $115 a month if it runs all month, so it is destroyed when it isn't in use.
+
+## What I'd do next
+
+- HTTPS: a domain, a certificate and a firewall in front of the load balancer.
+- Apply production for real, and run the approval, the promotion and a return to an earlier release once.
+- Separate AWS accounts for staging and production.
+- Make the backend re-read the database password after a rotation; today it needs a restart.

@@ -97,8 +97,10 @@ export interface Project {
   headline: string;
   summary: string;
   kind: ProjectKind;
-  /** The estate zone the work ran in; colours its card. A personal project has none. */
+  /** The estate zone the work ran in; colours its card. A work project always has one; a personal project names one only when it ran on that cloud. */
   zone?: EstateZone["id"];
+  /** Where a personal project ran when that is no cloud, e.g. "Kubernetes". Shown in the work list when there is no zone. */
+  ranOn?: string;
   /** What Mihir owned, one line. */
   role: string;
   repo?: { owner: string; name: string };
@@ -107,6 +109,8 @@ export interface Project {
   figures: Figure[];
   /** Pipeline stages, shown on a card that has no figure. */
   stages?: string[];
+  /** A short stat for the work list on a card that has no figure: the value, then what it counts. */
+  highlight?: { value: string; label: string };
 }
 
 export interface Skill {

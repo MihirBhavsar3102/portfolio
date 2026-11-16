@@ -89,8 +89,8 @@ describe("stack evidence in the site data", () => {
     );
   });
 
-  it("marks the personal pipeline's tools as project work", () => {
-    expect(marked("project")).toEqual(["Docker", "Jenkins", "Kubernetes"]);
+  it("marks the personal projects' tools as project work", () => {
+    expect(marked("project")).toEqual(["Docker", "Jenkins", "Kubernetes", "PostgreSQL"]);
   });
 
   it("keeps the resume's nine groups", () => {

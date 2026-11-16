@@ -9,36 +9,45 @@ import { StageLine } from "@/components/work/stages";
 /** How many stack marks a card shows before "+N more". */
 const STACK_SHOWN = 4;
 
-/** Colour belongs to where the work ran; a personal project stays neutral. */
+/** Colour belongs to where the work ran, a personal project's too; a study that ran on no cloud stays neutral (tintOf). */
 const tints: Record<EstateZone["id"], string> = {
   azure: "var(--color-cloud-azure)",
   aws: "var(--color-cloud-aws)",
   ai: "var(--color-cloud-ai)",
 };
 
+/** The colour a project's card, guide row and story segment take: its zone's, else neutral. */
+export const tintOf = (project: Project): string => (project.zone ? tints[project.zone] : "var(--color-ink-3)");
+
 /**
  * A case-study card, tinted by the cloud the work ran on: the title, where it
  * ran, the summary, the lead figure with its provenance (or, for a pipeline with
  * no figure, its stages), the main stack. The title link covers the whole
  * card; the code link sits above that overlay so it stays its own target.
+ * `index` is the study's place in the data, which the reel reads as `--i`.
+ * From lg the heading is the long headline (the reel's guide already shows the
+ * short title); below lg it is the short title and the stack is left out.
+ * From lg the footer asks for only 16px above it: the reel holds each card at
+ * least the window's height less 36px and the spare room gathers above the
+ * footer, so the gap looks the same, and the tallest card has room to run long.
  */
-export function ProjectCard({ project }: { project: Project }) {
+export function ProjectCard({ project, index }: { project: Project; index?: number }) {
   const lead = project.figures[0];
-  const tint = project.zone ? tints[project.zone] : "var(--color-ink-3)";
   const shown = project.stack.slice(0, STACK_SHOWN);
   const more = project.stack.length - shown.length;
 
   return (
     <article
-      style={{ "--tint": tint } as CSSProperties}
-      className="group relative flex h-full flex-col rounded-2xl border border-[color-mix(in_oklab,var(--tint)_22%,var(--color-line))] bg-[color-mix(in_oklab,var(--tint)_6%,var(--color-surface-1))] p-7 transition-[border-color,translate] duration-300 ease-out-expo hover:-translate-y-0.5 hover:border-[color-mix(in_oklab,var(--tint)_45%,var(--color-line))] sm:p-8"
+      style={{ "--tint": tintOf(project), ...(index === undefined ? {} : { "--i": index }) } as CSSProperties}
+      className="group relative flex flex-col rounded-2xl border border-[color-mix(in_oklab,var(--tint)_22%,var(--color-line))] bg-[color-mix(in_oklab,var(--tint)_6%,var(--color-surface-1))] p-7 transition-[border-color] duration-300 ease-out-expo hover:border-[color-mix(in_oklab,var(--tint)_45%,var(--color-line))] sm:p-8"
     >
-      <h3 className="text-[1.625rem] leading-tight font-semibold tracking-[-0.02em] text-ink">
+      <h3 className="text-[1.625rem] leading-tight font-semibold tracking-[-0.02em] text-ink lg:text-[1.5rem]">
         <Link
           href={`/work/${project.slug}`}
-          className="after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-accent"
+          className="after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-accent focus-visible:after:ring-inset"
         >
-          {project.title}
+          <span className="lg:hidden">{project.title}</span>{" "}
+          <span className="max-lg:hidden">{project.headline}</span>
         </Link>
       </h3>
       <p className="mt-2 inline-flex items-center gap-2 text-[13px] font-medium text-(--tint)">
@@ -61,8 +70,8 @@ export function ProjectCard({ project }: { project: Project }) {
         </div>
       )}
 
-      <div className="mt-auto flex flex-wrap items-center justify-between gap-4 pt-8 text-sm">
-        <ul aria-label="Built with" className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-ink-2">
+      <div className="mt-auto flex flex-wrap items-center justify-end gap-4 pt-8 text-sm lg:justify-between lg:pt-4">
+        <ul aria-label="Built with" className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-ink-2 max-lg:hidden">
           {shown.map((id) => (
             <li key={id}>
               <TechMark id={id} />
