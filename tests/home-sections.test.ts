@@ -60,8 +60,15 @@ describe("SelectedWork", () => {
   });
 
   it("keeps words apart where styles are ignored (reader modes, screen readers): a card's title from its headline, a segment's place from its title", () => {
-    // What a reader mode gets: the text alone, with no space added where a tag ends.
-    const bare = (s: string) => s.replace(/</g, "").replace(/>/g, "").replace(/&#x27;/g, "'").replace(/&amp;/g, "&");
+    // What a reader mode gets: the text alone, with no space added where a tag ends. Each tag is cut from its "<"
+    // through the next ">" (React escapes both in text and attributes, so that is exact for this markup).
+    const bare = (s: string) =>
+      s
+        .split("<")
+        .map((part, i) => (i === 0 ? part : part.slice(part.indexOf(">") + 1)))
+        .join("")
+        .replace(/&#x27;/g, "'")
+        .replace(/&amp;/g, "&");
     const cards = bare(html.slice(html.indexOf("data-reel-window")));
     const story = bare(html.slice(html.indexOf("data-reel-story"), html.indexOf("data-reel-window")));
     for (const p of resume.projects) {
